@@ -15,3 +15,11 @@ public class GreetingController {
         return greetingService.greet("Quang Tâm nè");
     }
 }
+@RestController
+class HelloController {
+    @GetMapping("/hello")
+    public String sayHello() {
+        System.out.println("Hellooooo, Spring Boot!");
+        return "Hello, Spring Boot!";
+    }
+}
