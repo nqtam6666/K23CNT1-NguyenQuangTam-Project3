@@ -1,0 +1,28 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<!-- Sử dụng head Fragment -->
+<head th:replace="fragments/_layout::head('Devmaster::Profile')">
+    <title>Profile</title>
+</head>
+<body>
+    <!-- Sử dụng Header Fragment -->
+    <header th:replace="fragments/_layout::header"></header>
+
+    <!-- Sử dụng Menu Fragment / Chèn menu -->
+    <nav th:insert="fragments/_layout::menu"></nav>
+
+    <!-- Nội dung chính của trang profile -->
+    <section class="container" style="min-height: 268px">
+        <div class="alert alert-danger" th:each="info : ${DevmasterProfile}">
+            <h2 th:text="${info.fullName}"></h2>
+            <p>Gender: <span th:text="${info.gender}"></span></p>
+            <p>Age: <span th:text="${info.age}"></span></p>
+            <p>Salary: <span th:text="${info.salary}"></span></p>
+        </div>
+        <a th:href="@{/}" class="btn btn-success">Back</a>
+    </section>
+
+    <!-- Sử dụng Footer Fragment -->
+    <footer th:replace="fragments/_layout::footer"></footer>
+</body>
+</html>
