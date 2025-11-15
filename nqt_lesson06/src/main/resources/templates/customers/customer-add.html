@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no,
+initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Thêm mới thông tin khách hàng</title>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+</head>
+<body style="background: #CCC">
+<header class="container bg-white">
+    <div class="logo">
+        <img src="https://devmaster.edu.vn/images/logo.png"
+             alt="Devmaster Academy"/>
+    </div>
+</header>
+<section class="container bg-white py-3">
+    <form th:action="@{/customers}" th:object="${customer}" method="post">
+        <div class="card">
+            <div class="card-header">
+                <h2>THÊM MỚI THÔNG TIN KHÁCH HÀNG</h2>
+            </div>
+            <div class="card-body">
+                <div class="mb-3 row">
+                    <label for="username" class="col-sm-2 col-form-label">Username</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" name="username" id="username"
+                               th:field="*{username}" required/>
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                    <label for="password" class="col-sm-2 col-form-label">Password</label>
+                    <div class="col-sm-10">
+                        <input type="password" class="form-control" name="password" id="password"
+                               th:field="*{password}" required/>
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                    <label for="fullName" class="col-sm-2 col-form-label">Full Name</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" name="fullName" id="fullName"
+                               th:field="*{fullName}" required/>
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                    <label for="email" class="col-sm-2 col-form-label">Email</label>
+                    <div class="col-sm-10">
+                        <input type="email" class="form-control" name="email" id="email"
+                               th:field="*{email}" required/>
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                    <label for="phone" class="col-sm-2 col-form-label">Phone</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" name="phone" id="phone"
+                               th:field="*{phone}" required/>
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                    <label for="address" class="col-sm-2 col-form-label">Address</label>
+                    <div class="col-sm-10">
+                        <textarea class="form-control" name="address" id="address"
+                                  th:field="*{address}" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                    <label for="birthDay" class="col-sm-2 col-form-label">Birth Day</label>
+                    <div class="col-sm-10">
+                        <input type="date" class="form-control" name="birthDay" id="birthDay"
+                               th:field="*{birthDay}"/>
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                    <label for="active" class="col-sm-2 col-form-label">Active</label>
+                    <div class="col-sm-10">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="active" id="active"
+                                   th:field="*{active}" checked/>
+                            <label class="form-check-label" for="active">
+                                Kích hoạt
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <button type="submit" class="btn btn-primary">Thêm mới</button>
+                <a href="/customers" class="btn btn-secondary">Quay lại</a>
+            </div>
+        </div>
+    </form>
+</section>
+</body>
+</html>
+

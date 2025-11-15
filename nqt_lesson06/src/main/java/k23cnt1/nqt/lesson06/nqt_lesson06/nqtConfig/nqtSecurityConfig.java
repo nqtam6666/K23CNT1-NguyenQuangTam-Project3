@@ -20,7 +20,7 @@ public class nqtSecurityConfig {
 
                 // Cho phép tất cả truy cập
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/home", "/login", "/error", "/students/**").permitAll()
+                        .requestMatchers("/", "/home", "/login", "/error", "/students/**", "/customers/**").permitAll()
                         .anyRequest().authenticated()
                 )
 
