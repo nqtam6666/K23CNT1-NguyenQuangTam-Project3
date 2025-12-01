@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{admin/layout :: layout(nqtTitle='Form Đánh giá')}">
+
+<body>
+    <div th:fragment="content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 th:text="${nqtId != null ? 'Cập nhật Đánh giá' : 'Thêm mới Đánh giá'}"></h2>
+            <a th:href="@{/admin/danh-gia}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Quay lại
+            </a>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <form th:action="${nqtId != null ? '/admin/danh-gia/edit/' + nqtId : '/admin/danh-gia/create'}"
+                    th:object="${nqtRequest}" method="post">
+
+                    <div class="mb-3">
+                        <label for="nqtDatPhongId" class="form-label">Đặt phòng</label>
+                        <select class="form-select" id="nqtDatPhongId" th:field="*{nqtDatPhongId}" required>
+                            <option value="">-- Chọn đặt phòng --</option>
+                            <option th:each="dp : ${nqtDatPhongList}" th:value="${dp.nqtId}"
+                                th:text="'Mã: ' + ${dp.nqtId} + ' - Tổng tiền: ' + ${dp.nqtTongTien}"></option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="nqtNoiDungDanhGia" class="form-label">Nội dung đánh giá</label>
+                        <textarea class="form-control" id="nqtNoiDungDanhGia" th:field="*{nqtNoiDungDanhGia}" rows="3"
+                            required></textarea>
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="nqtStatus" th:field="*{nqtStatus}">
+                        <label class="form-check-label" for="nqtStatus">Hiển thị</label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save"></i> Lưu lại
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

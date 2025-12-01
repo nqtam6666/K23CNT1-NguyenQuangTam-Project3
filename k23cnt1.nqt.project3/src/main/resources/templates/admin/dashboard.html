@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{admin/layout :: layout(nqtTitle='Dashboard')}">
+<body>
+    <div th:fragment="content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="bi bi-speedometer2"></i> Dashboard</h2>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-3">
+                <div class="card text-white bg-primary">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-people"></i> Người dùng</h5>
+                        <h3 th:text="${#lists.size(nqtNguoiDungList) ?: 0}">0</h3>
+                        <a th:href="@{/admin/nguoi-dung}" class="text-white">Xem chi tiết →</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-success">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-house-door"></i> Phòng</h5>
+                        <h3 th:text="${#lists.size(nqtPhongList) ?: 0}">0</h3>
+                        <a th:href="@{/admin/phong}" class="text-white">Xem chi tiết →</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-warning">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-calendar-check"></i> Đặt phòng</h5>
+                        <h3 th:text="${#lists.size(nqtDatPhongList) ?: 0}">0</h3>
+                        <a th:href="@{/admin/dat-phong}" class="text-white">Xem chi tiết →</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-info">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-star"></i> Dịch vụ</h5>
+                        <h3 th:text="${#lists.size(nqtDichVuList) ?: 0}">0</h3>
+                        <a th:href="@{/admin/dich-vu}" class="text-white">Xem chi tiết →</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Chào mừng đến với Admin Panel</h5>
+                        <p class="card-text">Quản lý hệ thống khách sạn một cách dễ dàng và hiệu quả.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

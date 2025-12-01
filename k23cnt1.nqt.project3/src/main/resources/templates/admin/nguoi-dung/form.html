@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{admin/layout :: layout(nqtTitle=${nqtId != null ? 'Sửa Người dùng' : 'Thêm Người dùng'})}">
+<body>
+    <div th:fragment="content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-person-plus" th:if="${nqtId == null}"></i>
+                <i class="bi bi-person-check" th:if="${nqtId != null}"></i>
+                <span th:text="${nqtId != null ? 'Sửa Người dùng' : 'Thêm Người dùng'}"></span>
+            </h2>
+            <a th:href="@{/admin/nguoi-dung}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Quay lại
+            </a>
+        </div>
+        
+        <div class="card">
+            <div class="card-body">
+                <form th:action="${nqtId != null ? '/admin/nguoi-dung/edit/' + nqtId : '/admin/nguoi-dung/create'}" 
+                      th:object="${nqtRequest}" method="post">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Họ và tên</label>
+                            <input type="text" class="form-control" th:field="*{nqtHoVaTen}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Tài khoản</label>
+                            <input type="text" class="form-control" th:field="*{nqtTaiKhoan}" required>
+                        </div>
+                        <div class="col-md-6 mb-3" th:if="${nqtId == null}">
+                            <label class="form-label">Mật khẩu</label>
+                            <input type="password" class="form-control" th:field="*{nqtMatKhau}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Số điện thoại</label>
+                            <input type="text" class="form-control" th:field="*{nqtSoDienThoai}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" th:field="*{nqtEmail}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Địa chỉ</label>
+                            <input type="text" class="form-control" th:field="*{nqtDiaChi}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Vai trò</label>
+                            <select class="form-select" th:field="*{nqtVaiTro}">
+                                <option value="0">Người dùng</option>
+                                <option value="1">Nhân viên</option>
+                                <option value="99">Admin</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Trạng thái</label>
+                            <select class="form-select" th:field="*{nqtStatus}">
+                                <option th:value="true">Hoạt động</option>
+                                <option th:value="false">Không hoạt động</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save"></i> Lưu
+                        </button>
+                        <a th:href="@{/admin/nguoi-dung}" class="btn btn-secondary">Hủy</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

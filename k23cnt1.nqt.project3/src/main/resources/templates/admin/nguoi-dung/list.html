@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{admin/layout :: layout(nqtTitle='Quản lý Người dùng')}">
+<body>
+    <div th:fragment="content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="bi bi-people"></i> Quản lý Người dùng</h2>
+            <a th:href="@{/admin/nguoi-dung/create}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Thêm mới
+            </a>
+        </div>
+        
+        <div class="card">
+            <div class="card-body">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Họ và tên</th>
+                            <th>Tài khoản</th>
+                            <th>Số điện thoại</th>
+                            <th>Email</th>
+                            <th>Vai trò</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="item : ${nqtList}">
+                            <td th:text="${item.nqtId}"></td>
+                            <td th:text="${item.nqtHoVaTen}"></td>
+                            <td th:text="${item.nqtTaiKhoan}"></td>
+                            <td th:text="${item.nqtSoDienThoai}"></td>
+                            <td th:text="${item.nqtEmail}"></td>
+                            <td>
+                                <span th:if="${item.nqtVaiTro == 0}" class="badge bg-secondary">Người dùng</span>
+                                <span th:if="${item.nqtVaiTro == 1}" class="badge bg-info">Nhân viên</span>
+                                <span th:if="${item.nqtVaiTro == 99}" class="badge bg-danger">Admin</span>
+                            </td>
+                            <td>
+                                <span th:if="${item.nqtStatus}" class="badge bg-success">Hoạt động</span>
+                                <span th:unless="${item.nqtStatus}" class="badge bg-secondary">Không hoạt động</span>
+                            </td>
+                            <td>
+                                <a th:href="@{/admin/nguoi-dung/edit/{id}(id=${item.nqtId})}" class="btn btn-sm btn-warning">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a th:href="@{/admin/nguoi-dung/delete/{id}(id=${item.nqtId})}" 
+                                   class="btn btn-sm btn-danger" 
+                                   onclick="return confirm('Bạn có chắc chắn muốn xóa?')">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
