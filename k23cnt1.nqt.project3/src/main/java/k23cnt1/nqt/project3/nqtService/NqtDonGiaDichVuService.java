@@ -16,83 +16,95 @@ import java.util.stream.Collectors;
 
 @Service
 public class NqtDonGiaDichVuService {
-    
+
     @Autowired
     private NqtDonGiaDichVuRepository nqtDonGiaDichVuRepository;
-    
+
     @Autowired
     private NqtDatPhongRepository nqtDatPhongRepository;
-    
+
     @Autowired
     private NqtDichVuRepository nqtDichVuRepository;
-    
+
     public List<NqtDonGiaDichVuResponse> nqtGetAll() {
         return nqtDonGiaDichVuRepository.findAll().stream()
                 .map(this::nqtConvertToResponse)
                 .collect(Collectors.toList());
     }
-    
+
     public NqtDonGiaDichVuResponse nqtGetById(Integer nqtId) {
         NqtDonGiaDichVu nqtDonGiaDichVu = nqtDonGiaDichVuRepository.findById(nqtId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn giá dịch vụ với ID: " + nqtId));
         return nqtConvertToResponse(nqtDonGiaDichVu);
     }
-    
+
     public NqtDonGiaDichVuResponse nqtCreate(NqtDonGiaDichVuRequest nqtRequest) {
         NqtDonGiaDichVu nqtDonGiaDichVu = new NqtDonGiaDichVu();
         nqtDonGiaDichVu.setNqtSoLuong(nqtRequest.getNqtSoLuong() != null ? nqtRequest.getNqtSoLuong() : 1);
         nqtDonGiaDichVu.setNqtThanhTien(nqtRequest.getNqtThanhTien());
-        
+
         if (nqtRequest.getNqtDatPhongId() != null) {
             NqtDatPhong nqtDatPhong = nqtDatPhongRepository.findById(nqtRequest.getNqtDatPhongId())
-                    .orElseThrow(() -> new RuntimeException("Không tìm thấy đặt phòng với ID: " + nqtRequest.getNqtDatPhongId()));
+                    .orElseThrow(() -> new RuntimeException(
+                            "Không tìm thấy đặt phòng với ID: " + nqtRequest.getNqtDatPhongId()));
             nqtDonGiaDichVu.setNqtDatPhong(nqtDatPhong);
         }
-        
+
         if (nqtRequest.getNqtDichVuId() != null) {
             NqtDichVu nqtDichVu = nqtDichVuRepository.findById(nqtRequest.getNqtDichVuId())
-                    .orElseThrow(() -> new RuntimeException("Không tìm thấy dịch vụ với ID: " + nqtRequest.getNqtDichVuId()));
+                    .orElseThrow(() -> new RuntimeException(
+                            "Không tìm thấy dịch vụ với ID: " + nqtRequest.getNqtDichVuId()));
             nqtDonGiaDichVu.setNqtDichVu(nqtDichVu);
+            // Auto-calculate Total Amount
+            nqtDonGiaDichVu.setNqtThanhTien(nqtDichVu.getNqtDonGia() * nqtDonGiaDichVu.getNqtSoLuong());
         }
-        
+
         NqtDonGiaDichVu nqtSaved = nqtDonGiaDichVuRepository.save(nqtDonGiaDichVu);
         return nqtConvertToResponse(nqtSaved);
     }
-    
+
     public NqtDonGiaDichVuResponse nqtUpdate(Integer nqtId, NqtDonGiaDichVuRequest nqtRequest) {
         NqtDonGiaDichVu nqtDonGiaDichVu = nqtDonGiaDichVuRepository.findById(nqtId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn giá dịch vụ với ID: " + nqtId));
-        
+
         if (nqtRequest.getNqtSoLuong() != null) {
             nqtDonGiaDichVu.setNqtSoLuong(nqtRequest.getNqtSoLuong());
         }
         if (nqtRequest.getNqtThanhTien() != null) {
             nqtDonGiaDichVu.setNqtThanhTien(nqtRequest.getNqtThanhTien());
         }
-        
+
         if (nqtRequest.getNqtDatPhongId() != null) {
             NqtDatPhong nqtDatPhong = nqtDatPhongRepository.findById(nqtRequest.getNqtDatPhongId())
-                    .orElseThrow(() -> new RuntimeException("Không tìm thấy đặt phòng với ID: " + nqtRequest.getNqtDatPhongId()));
+                    .orElseThrow(() -> new RuntimeException(
+                            "Không tìm thấy đặt phòng với ID: " + nqtRequest.getNqtDatPhongId()));
             nqtDonGiaDichVu.setNqtDatPhong(nqtDatPhong);
         }
-        
+
         if (nqtRequest.getNqtDichVuId() != null) {
             NqtDichVu nqtDichVu = nqtDichVuRepository.findById(nqtRequest.getNqtDichVuId())
-                    .orElseThrow(() -> new RuntimeException("Không tìm thấy dịch vụ với ID: " + nqtRequest.getNqtDichVuId()));
+                    .orElseThrow(() -> new RuntimeException(
+                            "Không tìm thấy dịch vụ với ID: " + nqtRequest.getNqtDichVuId()));
             nqtDonGiaDichVu.setNqtDichVu(nqtDichVu);
         }
-        
+
+        // Recalculate Total Amount if Quantity or Service changed
+        if (nqtDonGiaDichVu.getNqtDichVu() != null && nqtDonGiaDichVu.getNqtSoLuong() != null) {
+            nqtDonGiaDichVu
+                    .setNqtThanhTien(nqtDonGiaDichVu.getNqtDichVu().getNqtDonGia() * nqtDonGiaDichVu.getNqtSoLuong());
+        }
+
         NqtDonGiaDichVu nqtUpdated = nqtDonGiaDichVuRepository.save(nqtDonGiaDichVu);
         return nqtConvertToResponse(nqtUpdated);
     }
-    
+
     public void nqtDelete(Integer nqtId) {
         if (!nqtDonGiaDichVuRepository.existsById(nqtId)) {
             throw new RuntimeException("Không tìm thấy đơn giá dịch vụ với ID: " + nqtId);
         }
         nqtDonGiaDichVuRepository.deleteById(nqtId);
     }
-    
+
     private NqtDonGiaDichVuResponse nqtConvertToResponse(NqtDonGiaDichVu nqtDonGiaDichVu) {
         NqtDonGiaDichVuResponse nqtResponse = new NqtDonGiaDichVuResponse();
         nqtResponse.setNqtId(nqtDonGiaDichVu.getNqtId());
@@ -111,4 +123,3 @@ public class NqtDonGiaDichVuService {
         return nqtResponse;
     }
 }
-

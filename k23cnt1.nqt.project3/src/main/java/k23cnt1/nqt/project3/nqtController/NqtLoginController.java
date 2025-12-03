@@ -39,6 +39,12 @@ public class NqtLoginController {
         if (nqtNguoiDungOptional.isPresent()) {
             NqtNguoiDung nqtNguoiDung = nqtNguoiDungOptional.get();
 
+            // Kiểm tra trạng thái hoạt động
+            if (nqtNguoiDung.getNqtStatus() != null && !nqtNguoiDung.getNqtStatus()) {
+                model.addAttribute("nqtError", "Tài khoản đã bị khóa hoặc chưa kích hoạt!");
+                return "admin/login";
+            }
+
             // Kiểm tra mật khẩu (ưu tiên BCrypt)
             boolean isMatch = passwordEncoder.matches(nqtMatKhau, nqtNguoiDung.getNqtMatKhau());
 
@@ -53,6 +59,7 @@ public class NqtLoginController {
             if (isMatch) {
                 if (nqtNguoiDung.getNqtVaiTro() != null && nqtNguoiDung.getNqtVaiTro() == 99) {
                     session.setAttribute("nqtAdminSession", nqtNguoiDung.getNqtTaiKhoan());
+                    session.setAttribute("nqtAdminUser", nqtNguoiDung);
                     return "redirect:/admin";
                 } else {
                     model.addAttribute("nqtError", "Bạn không có quyền truy cập Admin!");

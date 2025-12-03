@@ -8,6 +8,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import org.springframework.web.multipart.MultipartFile;
+import java.nio.file.*;
+import java.util.UUID;
 import java.util.List;
 
 @Controller
@@ -129,8 +132,12 @@ public class NqtAdminController {
 
     @PostMapping("/admin/loai-phong/create")
     public String nqtLoaiPhongCreate(@ModelAttribute NqtLoaiPhongRequest nqtRequest,
+            @RequestParam("nqtImage") MultipartFile nqtImage,
             RedirectAttributes redirectAttributes) {
         try {
+            if (nqtImage != null && !nqtImage.isEmpty()) {
+                nqtRequest.setNqtHinhAnh(saveFile(nqtImage));
+            }
             nqtLoaiPhongService.nqtCreate(nqtRequest);
             redirectAttributes.addFlashAttribute("nqtSuccess", "Tạo loại phòng thành công!");
         } catch (Exception e) {
@@ -158,8 +165,12 @@ public class NqtAdminController {
 
     @PostMapping("/admin/loai-phong/edit/{nqtId}")
     public String nqtLoaiPhongUpdate(@PathVariable Integer nqtId, @ModelAttribute NqtLoaiPhongRequest nqtRequest,
+            @RequestParam("nqtImage") MultipartFile nqtImage,
             RedirectAttributes redirectAttributes) {
         try {
+            if (nqtImage != null && !nqtImage.isEmpty()) {
+                nqtRequest.setNqtHinhAnh(saveFile(nqtImage));
+            }
             nqtLoaiPhongService.nqtUpdate(nqtId, nqtRequest);
             redirectAttributes.addFlashAttribute("nqtSuccess", "Cập nhật thành công!");
         } catch (Exception e) {
@@ -532,8 +543,13 @@ public class NqtAdminController {
     }
 
     @PostMapping("/admin/blog/create")
-    public String nqtBlogCreate(@ModelAttribute NqtBlogRequest nqtRequest, RedirectAttributes redirectAttributes) {
+    public String nqtBlogCreate(@ModelAttribute NqtBlogRequest nqtRequest,
+            @RequestParam("nqtImage") MultipartFile nqtImage,
+            RedirectAttributes redirectAttributes) {
         try {
+            if (nqtImage != null && !nqtImage.isEmpty()) {
+                nqtRequest.setNqtHinhAnh(saveFile(nqtImage));
+            }
             nqtBlogService.nqtCreate(nqtRequest);
             redirectAttributes.addFlashAttribute("nqtSuccess", "Tạo blog thành công!");
         } catch (Exception e) {
@@ -560,8 +576,12 @@ public class NqtAdminController {
 
     @PostMapping("/admin/blog/edit/{nqtId}")
     public String nqtBlogUpdate(@PathVariable Integer nqtId, @ModelAttribute NqtBlogRequest nqtRequest,
+            @RequestParam("nqtImage") MultipartFile nqtImage,
             RedirectAttributes redirectAttributes) {
         try {
+            if (nqtImage != null && !nqtImage.isEmpty()) {
+                nqtRequest.setNqtHinhAnh(saveFile(nqtImage));
+            }
             nqtBlogService.nqtUpdate(nqtId, nqtRequest);
             redirectAttributes.addFlashAttribute("nqtSuccess", "Cập nhật thành công!");
         } catch (Exception e) {
@@ -579,5 +599,23 @@ public class NqtAdminController {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
         return "redirect:/admin/blog";
+    }
+
+    // Helper method to save file
+    private String saveFile(MultipartFile file) {
+        if (file != null && !file.isEmpty()) {
+            try {
+                String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+                Path path = Paths.get("src/main/resources/static/uploads");
+                if (!Files.exists(path)) {
+                    Files.createDirectories(path);
+                }
+                Files.copy(file.getInputStream(), path.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
+                return "/uploads/" + fileName;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
     }
 }

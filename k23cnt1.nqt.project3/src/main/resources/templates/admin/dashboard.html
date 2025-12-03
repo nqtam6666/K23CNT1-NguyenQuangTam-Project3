@@ -1,61 +1,120 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{admin/layout :: layout(nqtTitle='Dashboard')}">
+
 <body>
     <div th:fragment="content">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2><i class="bi bi-speedometer2"></i> Dashboard</h2>
+        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+            <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
+            <!-- <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                <i class="bi bi-download fa-sm text-white-50"></i> Generate Report
+            </a> -->
         </div>
-        
-        <div class="row g-4">
-            <div class="col-md-3">
-                <div class="card text-white bg-primary">
+
+        <div class="row g-4 mb-4">
+            <!-- Users Card -->
+            <div class="col-xl-3 col-md-6">
+                <div class="card bg-gradient-primary text-white h-100 py-2">
                     <div class="card-body">
-                        <h5 class="card-title"><i class="bi bi-people"></i> Người dùng</h5>
-                        <h3 th:text="${#lists.size(nqtNguoiDungList) ?: 0}">0</h3>
-                        <a th:href="@{/admin/nguoi-dung}" class="text-white">Xem chi tiết →</a>
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-uppercase mb-1" style="opacity: 0.8;">
+                                    Người dùng</div>
+                                <div class="h5 mb-0 font-weight-bold" th:text="${#lists.size(nqtNguoiDungList) ?: 0}">0
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="bi bi-people-fill fa-2x text-gray-300"
+                                    style="font-size: 2.5rem; opacity: 0.5;"></i>
+                            </div>
+                        </div>
+                        <a th:href="@{/admin/nguoi-dung}" class="stretched-link"></a>
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="card text-white bg-success">
+
+            <!-- Rooms Card -->
+            <div class="col-xl-3 col-md-6">
+                <div class="card bg-gradient-success text-white h-100 py-2">
                     <div class="card-body">
-                        <h5 class="card-title"><i class="bi bi-house-door"></i> Phòng</h5>
-                        <h3 th:text="${#lists.size(nqtPhongList) ?: 0}">0</h3>
-                        <a th:href="@{/admin/phong}" class="text-white">Xem chi tiết →</a>
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-uppercase mb-1" style="opacity: 0.8;">
+                                    Phòng</div>
+                                <div class="h5 mb-0 font-weight-bold" th:text="${#lists.size(nqtPhongList) ?: 0}">0
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="bi bi-house-door-fill fa-2x text-gray-300"
+                                    style="font-size: 2.5rem; opacity: 0.5;"></i>
+                            </div>
+                        </div>
+                        <a th:href="@{/admin/phong}" class="stretched-link"></a>
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="card text-white bg-warning">
+
+            <!-- Bookings Card -->
+            <div class="col-xl-3 col-md-6">
+                <div class="card bg-gradient-warning text-white h-100 py-2">
                     <div class="card-body">
-                        <h5 class="card-title"><i class="bi bi-calendar-check"></i> Đặt phòng</h5>
-                        <h3 th:text="${#lists.size(nqtDatPhongList) ?: 0}">0</h3>
-                        <a th:href="@{/admin/dat-phong}" class="text-white">Xem chi tiết →</a>
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-uppercase mb-1" style="opacity: 0.8;">
+                                    Đặt phòng</div>
+                                <div class="h5 mb-0 font-weight-bold" th:text="${#lists.size(nqtDatPhongList) ?: 0}">0
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="bi bi-calendar-check-fill fa-2x text-gray-300"
+                                    style="font-size: 2.5rem; opacity: 0.5;"></i>
+                            </div>
+                        </div>
+                        <a th:href="@{/admin/dat-phong}" class="stretched-link"></a>
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="card text-white bg-info">
+
+            <!-- Services Card -->
+            <div class="col-xl-3 col-md-6">
+                <div class="card bg-gradient-info text-white h-100 py-2">
                     <div class="card-body">
-                        <h5 class="card-title"><i class="bi bi-star"></i> Dịch vụ</h5>
-                        <h3 th:text="${#lists.size(nqtDichVuList) ?: 0}">0</h3>
-                        <a th:href="@{/admin/dich-vu}" class="text-white">Xem chi tiết →</a>
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-uppercase mb-1" style="opacity: 0.8;">
+                                    Dịch vụ</div>
+                                <div class="h5 mb-0 font-weight-bold" th:text="${#lists.size(nqtDichVuList) ?: 0}">0
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="bi bi-star-fill fa-2x text-gray-300"
+                                    style="font-size: 2.5rem; opacity: 0.5;"></i>
+                            </div>
+                        </div>
+                        <a th:href="@{/admin/dich-vu}" class="stretched-link"></a>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <div class="row mt-4">
-            <div class="col-12">
-                <div class="card">
+
+        <!-- <div class="row">
+            <div class="col-lg-12 mb-4">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Chào mừng đến với Admin Panel</h6>
+                    </div>
                     <div class="card-body">
-                        <h5 class="card-title">Chào mừng đến với Admin Panel</h5>
-                        <p class="card-text">Quản lý hệ thống khách sạn một cách dễ dàng và hiệu quả.</p>
+                        <div class="text-center">
+                            <img class="img-fluid px-3 px-sm-4 mt-3 mb-4" style="width: 25rem;"
+                                th:src="@{/img/undraw_posting_photo.svg}" alt="...">
+                        </div>
+                        <p>Hệ thống quản lý khách sạn giúp bạn dễ dàng theo dõi phòng, đơn đặt phòng, dịch vụ và khách
+                            hàng.
+                            Sử dụng menu bên trái để điều hướng đến các chức năng quản lý.</p>
                     </div>
                 </div>
             </div>
-        </div>
+        </div> -->
     </div>
 </body>
-</html>
 
+</html>

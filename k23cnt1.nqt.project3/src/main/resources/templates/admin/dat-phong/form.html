@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+    th:replace="~{admin/layout :: layout(nqtTitle=${nqtId != null ? 'Sửa Đặt Phòng' : 'Thêm Đặt Phòng'})}">
+
+<body>
+    <div th:fragment="content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-calendar-check"></i>
+                <span th:text="${nqtId != null ? 'Sửa Đặt Phòng' : 'Thêm Đặt Phòng'}"></span>
+            </h2>
+            <a th:href="@{/admin/dat-phong}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Quay lại
+            </a>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <form th:action="${nqtId != null ? '/admin/dat-phong/edit/' + nqtId : '/admin/dat-phong/create'}"
+                    th:object="${nqtRequest}" method="post">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Người dùng</label>
+                            <select class="form-select" th:field="*{nqtNguoiDungId}" required>
+                                <option value="">-- Chọn người dùng --</option>
+                                <option th:each="nd : ${nqtNguoiDungList}" th:value="${nd.nqtId}"
+                                    th:text="${nd.nqtHoVaTen}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Phòng</label>
+                            <select class="form-select" th:field="*{nqtPhongId}" required>
+                                <option value="">-- Chọn phòng --</option>
+                                <option th:each="p : ${nqtPhongList}" th:value="${p.nqtId}" th:text="${p.nqtTenPhong}">
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Ngày đến</label>
+                            <input type="date" class="form-control" name="nqtNgayDen" id="nqtNgayDen"
+                                th:value="${#temporals.format(nqtRequest.nqtNgayDen, 'yyyy-MM-dd')}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Ngày đi</label>
+                            <input type="date" class="form-control" name="nqtNgayDi" id="nqtNgayDi"
+                                th:value="${#temporals.format(nqtRequest.nqtNgayDi, 'yyyy-MM-dd')}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Tổng tiền</label>
+                            <input type="number" step="0.01" class="form-control" th:field="*{nqtTongTien}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Trạng thái</label>
+                            <select class="form-select" th:field="*{nqtStatus}">
+                                <option value="0">Chờ thanh toán</option>
+                                <option value="1">Đã thanh toán</option>
+                                <option value="2">Hoàn tiền</option>
+                            </select>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label class="form-label">Ghi chú</label>
+                            <textarea class="form-control" th:field="*{nqtGhiChu}" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save"></i> Lưu
+                        </button>
+                        <a th:href="@{/admin/dat-phong}" class="btn btn-secondary">Hủy</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

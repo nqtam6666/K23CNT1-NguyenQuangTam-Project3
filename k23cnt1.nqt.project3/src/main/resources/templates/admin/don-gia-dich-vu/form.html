@@ -30,6 +30,7 @@
                         <select class="form-select" id="nqtDichVuId" th:field="*{nqtDichVuId}" required>
                             <option value="">-- Chọn dịch vụ --</option>
                             <option th:each="dv : ${nqtDichVuList}" th:value="${dv.nqtId}"
+                                th:data-price="${dv.nqtDonGia}"
                                 th:text="${dv.nqtTen} + ' - ' + ${#numbers.formatDecimal(dv.nqtDonGia, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">
                             </option>
                         </select>
@@ -44,8 +45,8 @@
                     <div class="mb-3">
                         <label for="nqtThanhTien" class="form-label">Thành tiền</label>
                         <input type="number" class="form-control" id="nqtThanhTien" th:field="*{nqtThanhTien}" required
-                            step="0.01">
-                        <div class="form-text">Thường sẽ tự động tính toán (Số lượng * Đơn giá)</div>
+                            step="0.01" readonly>
+                        <div class="form-text">Tự động tính toán (Số lượng * Đơn giá)</div>
                     </div>
 
                     <button type="submit" class="btn btn-primary">
@@ -55,6 +56,26 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const dichVuSelect = document.getElementById('nqtDichVuId');
+            const soLuongInput = document.getElementById('nqtSoLuong');
+            const thanhTienInput = document.getElementById('nqtThanhTien');
+
+            function calculateTotal() {
+                const selectedOption = dichVuSelect.options[dichVuSelect.selectedIndex];
+                const price = parseFloat(selectedOption.getAttribute('data-price')) || 0;
+                const quantity = parseFloat(soLuongInput.value) || 0;
+
+                const total = price * quantity;
+                thanhTienInput.value = total;
+            }
+
+            dichVuSelect.addEventListener('change', calculateTotal);
+            soLuongInput.addEventListener('input', calculateTotal);
+        });
+    </script>
 </body>
 
 </html>

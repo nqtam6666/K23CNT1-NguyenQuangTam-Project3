@@ -14,36 +14,38 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class NqtDatPhong {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "nqtId")
     private Integer nqtId;
-    
+
     @ManyToOne
     @JoinColumn(name = "nqtNguoiDungId", referencedColumnName = "nqtId")
     private NqtNguoiDung nqtNguoiDung;
-    
+
     @ManyToOne
     @JoinColumn(name = "nqtPhongId", referencedColumnName = "nqtId")
     private NqtPhong nqtPhong;
-    
+
     @Column(name = "nqtNgayDen")
     private LocalDate nqtNgayDen;
-    
+
     @Column(name = "nqtNgayDi")
     private LocalDate nqtNgayDi;
-    
+
     @Column(name = "nqtTongTien")
     private Float nqtTongTien;
-    
+
     @Column(name = "nqtGhiChu", columnDefinition = "VARCHAR(2000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci")
     private String nqtGhiChu;
-    
+
     @Column(name = "nqtStatus")
     private Byte nqtStatus; // 0-Chưa thanh toán, 1-Đã thanh toán, 2-Hoàn tiền
-    
+
     @OneToMany(mappedBy = "nqtDatPhong", cascade = CascadeType.ALL)
     private List<NqtDonGiaDichVu> nqtDonGiaDichVuList;
-}
 
+    @OneToMany(mappedBy = "nqtDatPhong", cascade = CascadeType.ALL)
+    private List<NqtDanhGia> nqtDanhGiaList;
+}
