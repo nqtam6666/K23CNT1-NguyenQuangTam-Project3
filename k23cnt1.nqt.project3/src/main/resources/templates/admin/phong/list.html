@@ -3,42 +3,65 @@
 
 <body>
     <div th:fragment="content">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2><i class="bi bi-house-door"></i> Quản lý Phòng</h2>
-            <a th:href="@{/admin/phong/create}" class="btn btn-primary">
-                <i class="bi bi-plus-circle"></i> Thêm mới
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-semibold text-gray-800 flex items-center">
+                <i class="bi bi-house-door mr-2"></i> Quản lý Phòng
+            </h2>
+            <a th:href="@{/admin/phong/create}"
+                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors flex items-center">
+                <i class="bi bi-plus-circle mr-2"></i> Thêm mới
             </a>
         </div>
 
-        <div class="card">
-            <div class="card-body">
-                <table class="table table-hover">
-                    <thead>
+        <div class="bg-white shadow-md rounded-lg overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
                         <tr>
-                            <th>ID</th>
-                            <th>Số phòng</th>
-                            <th>Tên phòng</th>
-                            <th>Loại phòng</th>
-                            <th>Trạng thái</th>
-                            <th>Thao tác</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                ID</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Số phòng</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Tên phòng</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Loại phòng</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Trạng thái</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Thao tác</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr th:each="item : ${nqtList}">
-                            <td th:text="${item.nqtId}"></td>
-                            <td th:text="${item.nqtSoPhong}"></td>
-                            <td th:text="${item.nqtTenPhong}"></td>
-                            <td th:text="${item.nqtTenLoaiPhong}"></td>
-                            <td>
-                                <span th:if="${item.nqtStatus}" class="badge bg-success">Trống</span>
-                                <span th:unless="${item.nqtStatus}" class="badge bg-danger">Đã đặt</span>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr th:each="item : ${nqtList}" class="hover:bg-gray-50 transition-colors">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${item.nqtId}"></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+                                th:text="${item.nqtSoPhong}"></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${item.nqtTenPhong}">
                             </td>
-                            <td>
-                                <a th:href="@{/admin/phong/edit/{id}(id=${item.nqtId})}" class="btn btn-sm btn-warning">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
+                                th:text="${item.nqtTenLoaiPhong}"></td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span th:if="${item.nqtStatus}"
+                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Trống</span>
+                                <span th:unless="${item.nqtStatus}"
+                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Đã
+                                    đặt</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <a th:href="@{/admin/phong/edit/{id}(id=${item.nqtId})}"
+                                    class="text-yellow-600 hover:text-yellow-900 mr-3" title="Sửa">
                                     <i class="bi bi-pencil"></i>
                                 </a>
                                 <a th:href="@{/admin/phong/delete/{id}(id=${item.nqtId})}"
-                                    class="btn btn-sm btn-danger btn-delete">
+                                    class="text-red-600 hover:text-red-900 btn-delete" title="Xóa"
+                                    onclick="return confirm('Bạn có chắc chắn muốn xóa?');">
                                     <i class="bi bi-trash"></i>
                                 </a>
                             </td>

@@ -57,7 +57,9 @@ public class NqtLoginController {
             }
 
             if (isMatch) {
-                if (nqtNguoiDung.getNqtVaiTro() != null && nqtNguoiDung.getNqtVaiTro() == 99) {
+                System.out.println("User Role: " + nqtNguoiDung.getNqtVaiTro());
+                if (nqtNguoiDung.getNqtVaiTro() != null
+                        && (nqtNguoiDung.getNqtVaiTro() == 99 || nqtNguoiDung.getNqtVaiTro() == 1)) {
                     session.setAttribute("nqtAdminSession", nqtNguoiDung.getNqtTaiKhoan());
                     session.setAttribute("nqtAdminUser", nqtNguoiDung);
                     return "redirect:/admin";

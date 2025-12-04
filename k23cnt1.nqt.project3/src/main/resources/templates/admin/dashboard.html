@@ -3,117 +3,79 @@
 
 <body>
     <div th:fragment="content">
-        <div class="d-sm-flex align-items-center justify-content-between mb-4">
-            <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
-            <!-- <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
-                <i class="bi bi-download fa-sm text-white-50"></i> Generate Report
-            </a> -->
+        <div class="flex items-center justify-between mb-6">
+            <h1 class="text-2xl font-semibold text-gray-800">Dashboard</h1>
         </div>
 
-        <div class="row g-4 mb-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-6">
             <!-- Users Card -->
-            <div class="col-xl-3 col-md-6">
-                <div class="card bg-gradient-primary text-white h-100 py-2">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-uppercase mb-1" style="opacity: 0.8;">
-                                    Người dùng</div>
-                                <div class="h5 mb-0 font-weight-bold" th:text="${#lists.size(nqtNguoiDungList) ?: 0}">0
-                                </div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="bi bi-people-fill fa-2x text-gray-300"
-                                    style="font-size: 2.5rem; opacity: 0.5;"></i>
+            <div class="relative bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg shadow-lg overflow-hidden">
+                <div class="p-5">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="text-xs font-bold text-white/80 uppercase mb-1">Người dùng</div>
+                            <div class="text-2xl font-bold text-white" th:text="${#lists.size(nqtNguoiDungList) ?: 0}">0
                             </div>
                         </div>
-                        <a th:href="@{/admin/nguoi-dung}" class="stretched-link"></a>
+                        <div class="text-white/30">
+                            <i class="bi bi-people-fill text-4xl"></i>
+                        </div>
                     </div>
                 </div>
+                <a th:href="@{/admin/nguoi-dung}" class="absolute inset-0 z-10"></a>
             </div>
 
             <!-- Rooms Card -->
-            <div class="col-xl-3 col-md-6">
-                <div class="card bg-gradient-success text-white h-100 py-2">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-uppercase mb-1" style="opacity: 0.8;">
-                                    Phòng</div>
-                                <div class="h5 mb-0 font-weight-bold" th:text="${#lists.size(nqtPhongList) ?: 0}">0
-                                </div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="bi bi-house-door-fill fa-2x text-gray-300"
-                                    style="font-size: 2.5rem; opacity: 0.5;"></i>
+            <div class="relative bg-gradient-to-r from-green-500 to-green-600 rounded-lg shadow-lg overflow-hidden">
+                <div class="p-5">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="text-xs font-bold text-white/80 uppercase mb-1">Phòng</div>
+                            <div class="text-2xl font-bold text-white" th:text="${#lists.size(nqtPhongList) ?: 0}">0
                             </div>
                         </div>
-                        <a th:href="@{/admin/phong}" class="stretched-link"></a>
+                        <div class="text-white/30">
+                            <i class="bi bi-house-door-fill text-4xl"></i>
+                        </div>
                     </div>
                 </div>
+                <a th:href="@{/admin/phong}" class="absolute inset-0 z-10"></a>
             </div>
 
             <!-- Bookings Card -->
-            <div class="col-xl-3 col-md-6">
-                <div class="card bg-gradient-warning text-white h-100 py-2">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-uppercase mb-1" style="opacity: 0.8;">
-                                    Đặt phòng</div>
-                                <div class="h5 mb-0 font-weight-bold" th:text="${#lists.size(nqtDatPhongList) ?: 0}">0
-                                </div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="bi bi-calendar-check-fill fa-2x text-gray-300"
-                                    style="font-size: 2.5rem; opacity: 0.5;"></i>
+            <div class="relative bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-lg shadow-lg overflow-hidden">
+                <div class="p-5">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="text-xs font-bold text-white/80 uppercase mb-1">Đặt phòng</div>
+                            <div class="text-2xl font-bold text-white" th:text="${#lists.size(nqtDatPhongList) ?: 0}">0
                             </div>
                         </div>
-                        <a th:href="@{/admin/dat-phong}" class="stretched-link"></a>
+                        <div class="text-white/30">
+                            <i class="bi bi-calendar-check-fill text-4xl"></i>
+                        </div>
                     </div>
                 </div>
+                <a th:href="@{/admin/dat-phong}" class="absolute inset-0 z-10"></a>
             </div>
 
             <!-- Services Card -->
-            <div class="col-xl-3 col-md-6">
-                <div class="card bg-gradient-info text-white h-100 py-2">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-uppercase mb-1" style="opacity: 0.8;">
-                                    Dịch vụ</div>
-                                <div class="h5 mb-0 font-weight-bold" th:text="${#lists.size(nqtDichVuList) ?: 0}">0
-                                </div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="bi bi-star-fill fa-2x text-gray-300"
-                                    style="font-size: 2.5rem; opacity: 0.5;"></i>
+            <div class="relative bg-gradient-to-r from-cyan-500 to-cyan-600 rounded-lg shadow-lg overflow-hidden">
+                <div class="p-5">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="text-xs font-bold text-white/80 uppercase mb-1">Dịch vụ</div>
+                            <div class="text-2xl font-bold text-white" th:text="${#lists.size(nqtDichVuList) ?: 0}">0
                             </div>
                         </div>
-                        <a th:href="@{/admin/dich-vu}" class="stretched-link"></a>
+                        <div class="text-white/30">
+                            <i class="bi bi-star-fill text-4xl"></i>
+                        </div>
                     </div>
                 </div>
+                <a th:href="@{/admin/dich-vu}" class="absolute inset-0 z-10"></a>
             </div>
         </div>
-
-        <!-- <div class="row">
-            <div class="col-lg-12 mb-4">
-                <div class="card shadow mb-4">
-                    <div class="card-header py-3">
-                        <h6 class="m-0 font-weight-bold text-primary">Chào mừng đến với Admin Panel</h6>
-                    </div>
-                    <div class="card-body">
-                        <div class="text-center">
-                            <img class="img-fluid px-3 px-sm-4 mt-3 mb-4" style="width: 25rem;"
-                                th:src="@{/img/undraw_posting_photo.svg}" alt="...">
-                        </div>
-                        <p>Hệ thống quản lý khách sạn giúp bạn dễ dàng theo dõi phòng, đơn đặt phòng, dịch vụ và khách
-                            hàng.
-                            Sử dụng menu bên trái để điều hướng đến các chức năng quản lý.</p>
-                    </div>
-                </div>
-            </div>
-        </div> -->
     </div>
 </body>
 

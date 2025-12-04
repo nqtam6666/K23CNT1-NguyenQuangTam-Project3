@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import org.springframework.web.multipart.MultipartFile;
+import jakarta.servlet.http.HttpSession;
+import k23cnt1.nqt.project3.nqtEntity.NqtNguoiDung;
 import java.nio.file.*;
 import java.util.UUID;
 import java.util.List;
@@ -39,6 +41,9 @@ public class NqtAdminController {
 
     @Autowired
     private NqtBlogService nqtBlogService;
+
+    @Autowired
+    private NqtSettingService nqtSettingService;
 
     // Dashboard
     @GetMapping({ "/admin", "/admin/dashboard" })
@@ -78,8 +83,16 @@ public class NqtAdminController {
     }
 
     @GetMapping("/admin/nguoi-dung/edit/{nqtId}")
-    public String nqtNguoiDungEditForm(@PathVariable Integer nqtId, Model model) {
+    public String nqtNguoiDungEditForm(@PathVariable Integer nqtId, Model model, HttpSession session,
+            RedirectAttributes redirectAttributes) {
         NqtNguoiDungResponse nqtResponse = nqtNguoiDungService.nqtGetById(nqtId);
+
+        // Check permission
+        NqtNguoiDung currentUser = (NqtNguoiDung) session.getAttribute("nqtAdminUser");
+        if (currentUser != null && currentUser.getNqtVaiTro() != 99 && nqtResponse.getNqtVaiTro() == 99) {
+            redirectAttributes.addFlashAttribute("nqtError", "Bạn không được phép chỉnh sửa tài khoản Admin!");
+            return "redirect:/admin/nguoi-dung";
+        }
         NqtNguoiDungRequest nqtRequest = new NqtNguoiDungRequest();
         nqtRequest.setNqtHoVaTen(nqtResponse.getNqtHoVaTen());
         nqtRequest.setNqtTaiKhoan(nqtResponse.getNqtTaiKhoan());
@@ -95,8 +108,15 @@ public class NqtAdminController {
 
     @PostMapping("/admin/nguoi-dung/edit/{nqtId}")
     public String nqtNguoiDungUpdate(@PathVariable Integer nqtId, @ModelAttribute NqtNguoiDungRequest nqtRequest,
-            RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes, HttpSession session) {
         try {
+            // Check permission
+            NqtNguoiDung currentUser = (NqtNguoiDung) session.getAttribute("nqtAdminUser");
+            NqtNguoiDungResponse targetUser = nqtNguoiDungService.nqtGetById(nqtId);
+            if (currentUser != null && currentUser.getNqtVaiTro() != 99 && targetUser.getNqtVaiTro() == 99) {
+                redirectAttributes.addFlashAttribute("nqtError", "Bạn không được phép chỉnh sửa tài khoản Admin!");
+                return "redirect:/admin/nguoi-dung";
+            }
             nqtNguoiDungService.nqtUpdate(nqtId, nqtRequest);
             redirectAttributes.addFlashAttribute("nqtSuccess", "Cập nhật thành công!");
         } catch (Exception e) {
@@ -106,8 +126,16 @@ public class NqtAdminController {
     }
 
     @GetMapping("/admin/nguoi-dung/delete/{nqtId}")
-    public String nqtNguoiDungDelete(@PathVariable Integer nqtId, RedirectAttributes redirectAttributes) {
+    public String nqtNguoiDungDelete(@PathVariable Integer nqtId, RedirectAttributes redirectAttributes,
+            HttpSession session) {
         try {
+            // Check permission
+            NqtNguoiDung currentUser = (NqtNguoiDung) session.getAttribute("nqtAdminUser");
+            NqtNguoiDungResponse targetUser = nqtNguoiDungService.nqtGetById(nqtId);
+            if (currentUser != null && currentUser.getNqtVaiTro() != 99 && targetUser.getNqtVaiTro() == 99) {
+                redirectAttributes.addFlashAttribute("nqtError", "Bạn không được phép xóa tài khoản Admin!");
+                return "redirect:/admin/nguoi-dung";
+            }
             nqtNguoiDungService.nqtDelete(nqtId);
             redirectAttributes.addFlashAttribute("nqtSuccess", "Xóa thành công!");
         } catch (Exception e) {
@@ -599,6 +627,31 @@ public class NqtAdminController {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
         return "redirect:/admin/blog";
+    }
+
+    // ========== CẤU HÌNH ==========
+    @GetMapping("/admin/setting")
+    public String nqtSetting(Model model) {
+        model.addAttribute("nqtWebsiteName", nqtSettingService.getNqtValue("nqtWebsiteName", "Quản lý Khách sạn"));
+        model.addAttribute("nqtWebsiteColor", nqtSettingService.getNqtValue("nqtWebsiteColor", "#4e73df"));
+        model.addAttribute("nqtTieuDe", nqtSettingService.getNqtValue("TieuDe", "Tiêu đề mặc định"));
+        return "admin/setting/form";
+    }
+
+    @PostMapping("/admin/setting")
+    public String nqtSettingUpdate(@RequestParam("nqtWebsiteName") String nqtWebsiteName,
+            @RequestParam("nqtWebsiteColor") String nqtWebsiteColor,
+            @RequestParam("nqtTieuDe") String nqtTieuDe,
+            RedirectAttributes redirectAttributes) {
+        try {
+            nqtSettingService.saveNqtValue("nqtWebsiteName", nqtWebsiteName);
+            nqtSettingService.saveNqtValue("nqtWebsiteColor", nqtWebsiteColor);
+            nqtSettingService.saveNqtValue("TieuDe", nqtTieuDe);
+            redirectAttributes.addFlashAttribute("nqtSuccess", "Cập nhật cấu hình thành công!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
+        }
+        return "redirect:/admin/setting";
     }
 
     // Helper method to save file
