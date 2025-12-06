@@ -46,6 +46,9 @@ public class NqtAdminController {
     @Autowired
     private NqtSettingService nqtSettingService;
 
+    @Autowired
+    private NqtReportService nqtReportService;
+
     // Global attributes for all admin pages
     @ModelAttribute
     public void globalSettings(Model model) {
@@ -770,6 +773,116 @@ public class NqtAdminController {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
         return "redirect:/admin/setting";
+    }
+
+    // ========== REPORT EXPORT ==========
+    @GetMapping("/admin/report/excel")
+    public org.springframework.http.ResponseEntity<byte[]> exportExcelReport() {
+        try {
+            // Gather all data (same as dashboard)
+            List<NqtDatPhongResponse> allBookings = nqtDatPhongService.nqtGetAll();
+
+            // Calculate statistics
+            Double nqtTongDoanhThu = 0.0;
+            for (NqtDatPhongResponse dp : allBookings) {
+                if (dp.getNqtStatus() == 1 && dp.getNqtTongTien() != null) {
+                    nqtTongDoanhThu += dp.getNqtTongTien();
+                }
+            }
+
+            LocalDate now = LocalDate.now();
+            int currentMonth = now.getMonthValue();
+            int currentYear = now.getYear();
+            int lastMonth = now.minusMonths(1).getMonthValue();
+            int lastMonthYear = now.minusMonths(1).getYear();
+
+            Double currentMonthRevenue = 0.0;
+            Double lastMonthRevenue = 0.0;
+            int newBookingsCount = 0;
+
+            for (NqtDatPhongResponse dp : allBookings) {
+                if (dp.getNqtNgayDen() != null) {
+                    int bookingMonth = dp.getNqtNgayDen().getMonthValue();
+                    int bookingYear = dp.getNqtNgayDen().getYear();
+
+                    if (bookingMonth == currentMonth && bookingYear == currentYear && dp.getNqtStatus() == 1
+                            && dp.getNqtTongTien() != null) {
+                        currentMonthRevenue += dp.getNqtTongTien();
+                    }
+
+                    if (bookingMonth == lastMonth && bookingYear == lastMonthYear && dp.getNqtStatus() == 1
+                            && dp.getNqtTongTien() != null) {
+                        lastMonthRevenue += dp.getNqtTongTien();
+                    }
+
+                    if (bookingMonth == currentMonth && bookingYear == currentYear) {
+                        newBookingsCount++;
+                    }
+                }
+            }
+
+            int growthPercentage = 0;
+            if (lastMonthRevenue > 0) {
+                growthPercentage = (int) (((currentMonthRevenue - lastMonthRevenue) / lastMonthRevenue) * 100);
+            } else if (currentMonthRevenue > 0) {
+                growthPercentage = 100;
+            }
+
+            // Calculate monthly revenue
+            Double[] nqtMonthlyRevenue = new Double[12];
+            for (int i = 0; i < 12; i++)
+                nqtMonthlyRevenue[i] = 0.0;
+
+            for (NqtDatPhongResponse dp : allBookings) {
+                if (dp.getNqtStatus() == 1 && dp.getNqtTongTien() != null && dp.getNqtNgayDen() != null) {
+                    if (dp.getNqtNgayDen().getYear() == currentYear) {
+                        int monthIndex = dp.getNqtNgayDen().getMonthValue() - 1;
+                        nqtMonthlyRevenue[monthIndex] += dp.getNqtTongTien();
+                    }
+                }
+            }
+
+            // Calculate room occupancy
+            List<k23cnt1.nqt.project3.nqtDto.NqtPhongResponse> rooms = nqtPhongService.nqtGetAll();
+            int nqtOccupiedRooms = 0;
+
+            for (NqtDatPhongResponse dp : allBookings) {
+                if (dp.getNqtStatus() != 2 && dp.getNqtNgayDen() != null && dp.getNqtNgayDi() != null) {
+                    if (!now.isBefore(dp.getNqtNgayDen()) && !now.isAfter(dp.getNqtNgayDi())) {
+                        nqtOccupiedRooms++;
+                    }
+                }
+            }
+            int nqtVacantRooms = rooms.size() - nqtOccupiedRooms;
+            if (nqtVacantRooms < 0)
+                nqtVacantRooms = 0;
+
+            // Generate Excel report
+            byte[] excelBytes = nqtReportService.generateExcelReport(
+                    nqtTongDoanhThu,
+                    growthPercentage,
+                    newBookingsCount,
+                    nqtOccupiedRooms,
+                    nqtVacantRooms,
+                    nqtMonthlyRevenue,
+                    allBookings);
+
+            // Set response headers
+            org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
+            headers.setContentType(org.springframework.http.MediaType.APPLICATION_OCTET_STREAM);
+            String filename = "BaoCaoHoatDong_" + now.format(java.time.format.DateTimeFormatter.ofPattern("ddMMyyyy"))
+                    + ".xlsx";
+            headers.setContentDispositionFormData("attachment", filename);
+
+            return new org.springframework.http.ResponseEntity<>(excelBytes, headers,
+                    org.springframework.http.HttpStatus.OK);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return org.springframework.http.ResponseEntity
+                    .status(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)
+                    .build();
+        }
     }
 
     // Helper method to save file
