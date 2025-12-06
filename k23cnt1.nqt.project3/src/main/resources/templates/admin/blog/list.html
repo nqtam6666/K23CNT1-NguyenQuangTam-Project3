@@ -13,9 +13,20 @@
             </a>
         </div>
 
+        <!-- Quick Filters -->
+        <div class="mb-4 flex space-x-4">
+            <select
+                class="nqt-filter-dropdown px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-700"
+                data-filter-column="4">
+                <option value="">-- Tất cả Trạng thái --</option>
+                <option value="Hiện">Hiện</option>
+                <option value="Ẩn">Ẩn</option>
+            </select>
+        </div>
+
         <div class="bg-white shadow-md rounded-lg overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
+                <table id="nqtDataTable" class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
                             <th scope="col"

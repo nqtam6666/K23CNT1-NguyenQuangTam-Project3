@@ -14,6 +14,7 @@ import k23cnt1.nqt.project3.nqtEntity.NqtNguoiDung;
 import java.nio.file.*;
 import java.util.UUID;
 import java.util.List;
+import java.time.LocalDate;
 
 @Controller
 public class NqtAdminController {
@@ -45,10 +46,117 @@ public class NqtAdminController {
     @Autowired
     private NqtSettingService nqtSettingService;
 
-    // Dashboard
-    @GetMapping({ "/admin", "/admin/dashboard" })
+    // Global attributes for all admin pages
+    @ModelAttribute
+    public void globalSettings(Model model) {
+        model.addAttribute("nqtWebsiteName", nqtSettingService.getNqtValue("nqtWebsiteName", "Quản lý Khách sạn"));
+        model.addAttribute("nqtWebsiteColor", nqtSettingService.getNqtValue("nqtWebsiteColor", "#4e73df"));
+        model.addAttribute("nqtWebsiteFont", nqtSettingService.getNqtValue("nqtWebsiteFont", "Nunito"));
+        model.addAttribute("nqtWebsiteLogo", nqtSettingService.getNqtValue("nqtWebsiteLogo", ""));
+    }
+
+    @ModelAttribute
+    public void addCurrentURI(jakarta.servlet.http.HttpServletRequest request, Model model) {
+        model.addAttribute("nqtCurrentURI", request.getRequestURI());
+    }
+
+    // ... (rest of the file until configuration section)
+
+    @GetMapping({ "/admin", "/admin/", "/admin/dashboard" })
     public String nqtDashboard(Model model) {
         System.out.println("NqtAdminController: nqtDashboard called");
+
+        List<NqtDatPhongResponse> allBookings = nqtDatPhongService.nqtGetAll();
+
+        // 1. Calculate Total Revenue (All time)
+        Double nqtTongDoanhThu = 0.0;
+        for (NqtDatPhongResponse dp : allBookings) {
+            if (dp.getNqtStatus() == 1 && dp.getNqtTongTien() != null) { // 1: Paid
+                nqtTongDoanhThu += dp.getNqtTongTien();
+            }
+        }
+        model.addAttribute("nqtTongDoanhThu", nqtTongDoanhThu);
+
+        // 2. Calculate Revenue Growth (Current Month vs Last Month)
+        LocalDate now = LocalDate.now();
+        int currentMonth = now.getMonthValue();
+        int currentYear = now.getYear();
+        int lastMonth = now.minusMonths(1).getMonthValue();
+        int lastMonthYear = now.minusMonths(1).getYear();
+
+        Double currentMonthRevenue = 0.0;
+        Double lastMonthRevenue = 0.0;
+        int newBookingsCount = 0;
+
+        for (NqtDatPhongResponse dp : allBookings) {
+            if (dp.getNqtNgayDen() != null) {
+                int bookingMonth = dp.getNqtNgayDen().getMonthValue();
+                int bookingYear = dp.getNqtNgayDen().getYear();
+
+                // Revenue for Current Month
+                if (bookingMonth == currentMonth && bookingYear == currentYear && dp.getNqtStatus() == 1
+                        && dp.getNqtTongTien() != null) {
+                    currentMonthRevenue += dp.getNqtTongTien();
+                }
+
+                // Revenue for Last Month
+                if (bookingMonth == lastMonth && bookingYear == lastMonthYear && dp.getNqtStatus() == 1
+                        && dp.getNqtTongTien() != null) {
+                    lastMonthRevenue += dp.getNqtTongTien();
+                }
+
+                // Count New Bookings (Current Month)
+                if (bookingMonth == currentMonth && bookingYear == currentYear) {
+                    newBookingsCount++;
+                }
+            }
+        }
+
+        double growthPercentage = 0.0;
+        if (lastMonthRevenue > 0) {
+            growthPercentage = ((currentMonthRevenue - lastMonthRevenue) / lastMonthRevenue) * 100;
+        } else if (currentMonthRevenue > 0) {
+            growthPercentage = 100.0; // 100% growth if last month was 0 and this month > 0
+        }
+
+        model.addAttribute("nqtRevenueGrowth", (int) growthPercentage);
+        model.addAttribute("nqtNewBookingsCount", newBookingsCount);
+
+        // 3. Calculate Monthly Revenue (Current Year)
+        Double[] nqtMonthlyRevenue = new Double[12];
+        for (int i = 0; i < 12; i++)
+            nqtMonthlyRevenue[i] = 0.0;
+
+        for (NqtDatPhongResponse dp : allBookings) {
+            if (dp.getNqtStatus() == 1 && dp.getNqtTongTien() != null && dp.getNqtNgayDen() != null) {
+                if (dp.getNqtNgayDen().getYear() == currentYear) {
+                    int monthIndex = dp.getNqtNgayDen().getMonthValue() - 1; // 0-11
+                    nqtMonthlyRevenue[monthIndex] += dp.getNqtTongTien();
+                }
+            }
+        }
+        model.addAttribute("nqtMonthlyRevenue", nqtMonthlyRevenue);
+
+        // 4. Calculate Room Occupancy (Real-time)
+        List<k23cnt1.nqt.project3.nqtDto.NqtPhongResponse> rooms = nqtPhongService.nqtGetAll();
+        int nqtTotalRooms = rooms.size();
+        int nqtOccupiedRooms = 0;
+
+        for (NqtDatPhongResponse dp : allBookings) {
+            if (dp.getNqtStatus() != 2 && dp.getNqtNgayDen() != null && dp.getNqtNgayDi() != null) { // Not Cancelled
+                // Check if Today is within [NgayDen, NgayDi]
+                if (!now.isBefore(dp.getNqtNgayDen()) && !now.isAfter(dp.getNqtNgayDi())) {
+                    nqtOccupiedRooms++;
+                }
+            }
+        }
+        int nqtVacantRooms = nqtTotalRooms - nqtOccupiedRooms;
+        if (nqtVacantRooms < 0)
+            nqtVacantRooms = 0; // Safety check
+
+        model.addAttribute("nqtOccupiedRooms", nqtOccupiedRooms);
+        model.addAttribute("nqtVacantRooms", nqtVacantRooms);
+
         model.addAttribute("nqtNguoiDungList", nqtNguoiDungService.nqtGetAll());
         model.addAttribute("nqtPhongList", nqtPhongService.nqtGetAll());
         model.addAttribute("nqtDatPhongList", nqtDatPhongService.nqtGetAll());
@@ -635,17 +743,27 @@ public class NqtAdminController {
         model.addAttribute("nqtWebsiteName", nqtSettingService.getNqtValue("nqtWebsiteName", "Quản lý Khách sạn"));
         model.addAttribute("nqtWebsiteColor", nqtSettingService.getNqtValue("nqtWebsiteColor", "#4e73df"));
         model.addAttribute("nqtTieuDe", nqtSettingService.getNqtValue("TieuDe", "Tiêu đề mặc định"));
+        model.addAttribute("nqtWebsiteLogo", nqtSettingService.getNqtValue("nqtWebsiteLogo", ""));
         return "admin/setting/form";
     }
 
     @PostMapping("/admin/setting")
     public String nqtSettingUpdate(@RequestParam("nqtWebsiteName") String nqtWebsiteName,
             @RequestParam("nqtWebsiteColor") String nqtWebsiteColor,
+            @RequestParam("nqtWebsiteFont") String nqtWebsiteFont,
             @RequestParam("nqtTieuDe") String nqtTieuDe,
+            @RequestParam(value = "nqtWebsiteLogoFile", required = false) MultipartFile nqtWebsiteLogoFile,
             RedirectAttributes redirectAttributes) {
         try {
+            if (nqtWebsiteLogoFile != null && !nqtWebsiteLogoFile.isEmpty()) {
+                String logoPath = saveFile(nqtWebsiteLogoFile);
+                if (logoPath != null) {
+                    nqtSettingService.saveNqtValue("nqtWebsiteLogo", logoPath);
+                }
+            }
             nqtSettingService.saveNqtValue("nqtWebsiteName", nqtWebsiteName);
             nqtSettingService.saveNqtValue("nqtWebsiteColor", nqtWebsiteColor);
+            nqtSettingService.saveNqtValue("nqtWebsiteFont", nqtWebsiteFont);
             nqtSettingService.saveNqtValue("TieuDe", nqtTieuDe);
             redirectAttributes.addFlashAttribute("nqtSuccess", "Cập nhật cấu hình thành công!");
         } catch (Exception e) {
