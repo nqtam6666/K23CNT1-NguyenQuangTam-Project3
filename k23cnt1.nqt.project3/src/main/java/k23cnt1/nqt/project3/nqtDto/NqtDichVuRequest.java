@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 public class NqtDichVuRequest {
     private String nqtTen;
     private Float nqtDonGia;
+    private String nqtHinhAnh;
     private Boolean nqtStatus;
     private String nqtMetaTitle;
     private String nqtMetaKeyword;

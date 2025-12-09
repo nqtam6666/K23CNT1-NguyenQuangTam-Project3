@@ -23,6 +23,9 @@ public class NqtDichVu {
     @Column(name = "nqtDonGia")
     private Float nqtDonGia;
     
+    @Column(name = "nqtHinhAnh")
+    private String nqtHinhAnh;
+    
     @Column(name = "nqtStatus")
     private Boolean nqtStatus; // 1-Hoạt động, 0-Không hoạt động
     

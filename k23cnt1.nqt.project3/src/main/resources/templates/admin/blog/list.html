@@ -85,8 +85,10 @@
                             <td class="px-6 py-4 text-sm font-medium text-gray-900 max-w-xs truncate"
                                 th:text="${item.nqtTieuDe}"></td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <img th:if="${item.nqtHinhAnh}" th:src="${item.nqtHinhAnh}"
-                                    class="h-10 w-10 rounded object-cover border border-gray-200">
+                                <img th:if="${item.nqtHinhAnh != null and item.nqtHinhAnh != ''}" th:src="${item.nqtHinhAnh}"
+                                    class="h-10 w-10 rounded object-cover border border-gray-200" alt="Hình ảnh blog">
+                                <span th:unless="${item.nqtHinhAnh != null and item.nqtHinhAnh != ''}" 
+                                    class="text-xs text-gray-400">Chưa có ảnh</span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
                                 th:text="${#temporals.format(item.nqtNgayTao, 'dd/MM/yyyy HH:mm')}"></td>

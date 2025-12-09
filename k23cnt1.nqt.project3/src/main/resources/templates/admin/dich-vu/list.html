@@ -38,7 +38,7 @@
         <div class="mb-4 flex space-x-4">
             <select
                 class="nqt-filter-dropdown px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-700"
-                data-filter-column="3">
+                data-filter-column="4">
                 <option value="">-- Tất cả Trạng thái --</option>
                 <option value="Hoạt động">Hoạt động</option>
                 <option value="Không hoạt động">Không hoạt động</option>
@@ -63,6 +63,9 @@
                                 Tên dịch vụ</th>
                             <th scope="col"
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Hình ảnh</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Đơn giá</th>
                             <th scope="col"
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -81,6 +84,12 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${item.nqtId}"></td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
                                 th:text="${item.nqtTen}"></td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <img th:if="${item.nqtHinhAnh != null and item.nqtHinhAnh != ''}" th:src="${item.nqtHinhAnh}"
+                                    class="h-10 w-10 rounded object-cover border border-gray-200" alt="Hình ảnh dịch vụ">
+                                <span th:unless="${item.nqtHinhAnh != null and item.nqtHinhAnh != ''}" 
+                                    class="text-xs text-gray-400">Chưa có ảnh</span>
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
                                 th:text="${#numbers.formatDecimal(item.nqtDonGia, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">
                             </td>

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org"
-    th:replace="~{nqtCustomer/layout :: layout(title='Danh sách phòng - ' + (nqtWebsiteName ?: 'Hotel NQT'), description='Khám phá các phòng nghỉ của chúng tôi - ' + (nqtWebsiteName ?: 'Hotel NQT'))}">
+    th:replace="~{nqtCustomer/layout :: layout(title=${'Danh sách phòng - ' + (nqtWebsiteName != null ? nqtWebsiteName : 'Hotel NQT')}, description=${'Khám phá các phòng nghỉ của chúng tôi - ' + (nqtWebsiteName != null ? nqtWebsiteName : 'Hotel NQT')})}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -26,7 +26,7 @@
 </head>
 <body>
     <div th:fragment="content" class="pb-16 pt-0" style="padding-top: 0 !important; margin-top: 0 !important;">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" style="margin-top: 100px;">
             <div class="text-center mb-12">
                 <h1 class="font-serif text-4xl md:text-5xl font-bold text-gray-900 mb-4">Phòng nghỉ <span class="gold-accent">sang trọng</span></h1>
                 <p class="text-xl text-gray-600 max-w-2xl mx-auto">Mỗi phòng là một tác phẩm nghệ thuật, kết hợp hoàn hảo giữa thiết kế tinh tế và tiện nghi hiện đại</p>

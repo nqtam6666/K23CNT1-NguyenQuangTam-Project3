@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${title ?: (nqtWebsiteName ?: 'Hotel NQT')} + ' - ' + ${nqtWebsiteName ?: 'Trải nghiệm sang trọng đẳng cấp'}">
+    <title th:text="${title != null ? title : (nqtWebsiteName != null ? (nqtWebsiteName + ' - Trải nghiệm sang trọng đẳng cấp') : 'Hotel NQT - Trải nghiệm sang trọng đẳng cấp')}">
         Hotel NQT - Trải nghiệm sang trọng đẳng cấp
     </title>
     <meta name="description" th:content="${description ?: 'Khách sạn cao cấp với dịch vụ tinh tế, phòng nghỉ sang trọng và trải nghiệm độc quyền'}">
@@ -189,6 +189,23 @@
             margin-top: 0 !important;
         }
 
+        /* User Avatar - Ensure it's always visible */
+        .user-avatar-bg,
+        button .w-9.h-9.rounded-full {
+            display: flex !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            width: 36px !important;
+            height: 36px !important;
+            min-width: 36px !important;
+            min-height: 36px !important;
+            max-width: 36px !important;
+            max-height: 36px !important;
+            position: relative !important;
+            z-index: 50 !important;
+            flex-shrink: 0 !important;
+        }
+
         /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 10px;
@@ -254,10 +271,13 @@
                         </a>
                         <!-- User Menu -->
                         <div class="relative group">
-                            <button class="flex items-center space-x-2 text-gray-700 hover:text-amber-700 transition-colors">
-                                <div class="w-9 h-9 rounded-full flex items-center justify-center user-avatar-bg"
-                                    th:style="'background: linear-gradient(to right bottom, ' + ${nqtWebsiteColor ?: '#d97706'} + ', ' + ${#strings.replace(nqtWebsiteColor ?: '#d97706', '#', '')} + 'cc);'">
-                                    <span class="text-white font-semibold text-sm" th:text="${#strings.substring(session.nqtCustomerUser.nqtHoVaTen, 0, 1)}">U</span>
+                            <button class="flex items-center space-x-2 text-gray-700 hover:text-amber-700 transition-colors" type="button">
+                                <div class="rounded-full flex items-center justify-center flex-shrink-0 shadow-md overflow-hidden"
+                                    style="width: 36px !important; height: 36px !important; min-width: 36px !important; min-height: 36px !important; max-width: 36px !important; max-height: 36px !important; display: flex !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 50 !important; background: linear-gradient(135deg, #d97706, rgba(217, 119, 6, 0.8)) !important;"
+                                    th:style="'width: 36px !important; height: 36px !important; min-width: 36px !important; min-height: 36px !important; max-width: 36px !important; max-height: 36px !important; display: flex !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 50 !important; background: linear-gradient(135deg, ' + ${nqtWebsiteColor ?: '#d97706'} + ', rgba(217, 119, 6, 0.8)) !important;'">
+                                    <span class="text-white font-semibold text-sm leading-none" 
+                                        style="color: white !important; font-size: 14px !important; line-height: 1 !important; display: block !important;"
+                                        th:text="${session.nqtCustomerUser != null and session.nqtCustomerUser.nqtHoVaTen != null ? #strings.substring(session.nqtCustomerUser.nqtHoVaTen, 0, 1) : 'U'}">U</span>
                                 </div>
                                 <span class="font-medium hidden md:block" th:text="${session.nqtCustomerUser.nqtHoVaTen}">User</span>
                             </button>

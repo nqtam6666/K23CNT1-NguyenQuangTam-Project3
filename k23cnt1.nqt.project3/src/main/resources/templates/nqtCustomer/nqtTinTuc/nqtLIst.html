@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org"
-    th:replace="~{nqtCustomer/layout :: layout(title='Tin tức - ' + (nqtWebsiteName ?: 'Hotel NQT'), description='Cập nhật mới nhất từ ' + (nqtWebsiteName ?: 'Hotel NQT'))}">
+    th:replace="~{nqtCustomer/layout :: layout(title=${'Tin tức - ' + (nqtWebsiteName != null ? nqtWebsiteName : 'Hotel NQT')}, description=${'Cập nhật mới nhất từ ' + (nqtWebsiteName != null ? nqtWebsiteName : 'Hotel NQT')})}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,7 +20,7 @@
     </style>
 </head>
 <body>
-    <div th:fragment="content" class="pb-16">
+    <div th:fragment="content" class="pb-16" style="margin-top: 100px;">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12">
                 <h1 class="font-serif text-4xl md:text-5xl font-bold text-gray-900 mb-4">Tin tức & <span class="gold-accent">Sự kiện</span></h1>
@@ -42,11 +42,18 @@
 
             <div th:if="${blogs != null and !blogs.isEmpty()}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <div th:each="blog : ${blogs}" class="glass-card rounded-2xl overflow-hidden group cursor-pointer">
-                    <div class="h-48 flex items-center justify-center relative blog-card-bg"
-                        th:style="'background: linear-gradient(to bottom right, ' + ${nqtWebsiteColor ?: '#d97706'} + ', ' + ${#strings.replace(nqtWebsiteColor ?: '#d97706', '#', '')} + 'cc);'"
-                        style="background: linear-gradient(to bottom right, #d97706, #d97706cc);">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                        <span class="text-white text-4xl font-serif font-bold z-10" th:text="${#strings.substring(blog.nqtTieuDe, 0, 1)}">N</span>
+                    <div class="h-48 relative overflow-hidden">
+                        <img th:if="${blog.nqtHinhAnh != null and blog.nqtHinhAnh != ''}" 
+                            th:src="${blog.nqtHinhAnh}" 
+                            th:alt="${blog.nqtTieuDe}"
+                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                        <div th:unless="${blog.nqtHinhAnh != null and blog.nqtHinhAnh != ''}"
+                            class="h-full flex items-center justify-center relative blog-card-bg"
+                            th:style="'background: linear-gradient(to bottom right, ' + ${nqtWebsiteColor ?: '#d97706'} + ', ' + ${#strings.replace(nqtWebsiteColor ?: '#d97706', '#', '')} + 'cc);'"
+                            style="background: linear-gradient(to bottom right, #d97706, #d97706cc);">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            <span class="text-white text-4xl font-serif font-bold z-10" th:text="${#strings.substring(blog.nqtTieuDe, 0, 1)}">N</span>
+                        </div>
                     </div>
                     <div class="p-6">
                         <h3 class="font-serif text-xl font-bold text-gray-900 mb-2 line-clamp-2" th:text="${blog.nqtTieuDe}">Tiêu đề</h3>

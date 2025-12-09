@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org"
-    th:replace="~{nqtCustomer/layout :: layout(title='Giới thiệu - ' + (nqtWebsiteName ?: 'Hotel NQT'), description='Về chúng tôi - ' + (nqtWebsiteName ?: 'Hotel NQT'))}">
+    th:replace="~{nqtCustomer/layout :: layout(title=${'Giới thiệu - ' + (nqtWebsiteName != null ? nqtWebsiteName : 'Hotel NQT')}, description=${'Về chúng tôi - ' + (nqtWebsiteName != null ? nqtWebsiteName : 'Hotel NQT')})}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,7 +18,7 @@
     </style>
 </head>
 <body>
-    <div th:fragment="content" class="pb-16">
+    <div th:fragment="content" class="pb-16" style="margin-top: 100px;">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12">
                 <h1 class="font-serif text-4xl md:text-5xl font-bold text-gray-900 mb-4">Về <span class="gold-accent">chúng tôi</span></h1>

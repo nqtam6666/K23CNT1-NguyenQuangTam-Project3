@@ -32,6 +32,7 @@ public class NqtDichVuService {
         NqtDichVu nqtDichVu = new NqtDichVu();
         nqtDichVu.setNqtTen(nqtRequest.getNqtTen());
         nqtDichVu.setNqtDonGia(nqtRequest.getNqtDonGia());
+        nqtDichVu.setNqtHinhAnh(nqtRequest.getNqtHinhAnh());
         nqtDichVu.setNqtStatus(nqtRequest.getNqtStatus() != null ? nqtRequest.getNqtStatus() : true);
         nqtDichVu.setNqtMetaTitle(nqtRequest.getNqtMetaTitle());
         nqtDichVu.setNqtMetaKeyword(nqtRequest.getNqtMetaKeyword());
@@ -47,6 +48,9 @@ public class NqtDichVuService {
         
         nqtDichVu.setNqtTen(nqtRequest.getNqtTen());
         nqtDichVu.setNqtDonGia(nqtRequest.getNqtDonGia());
+        if (nqtRequest.getNqtHinhAnh() != null) {
+            nqtDichVu.setNqtHinhAnh(nqtRequest.getNqtHinhAnh());
+        }
         if (nqtRequest.getNqtStatus() != null) {
             nqtDichVu.setNqtStatus(nqtRequest.getNqtStatus());
         }
@@ -76,6 +80,7 @@ public class NqtDichVuService {
         nqtResponse.setNqtId(nqtDichVu.getNqtId());
         nqtResponse.setNqtTen(nqtDichVu.getNqtTen());
         nqtResponse.setNqtDonGia(nqtDichVu.getNqtDonGia());
+        nqtResponse.setNqtHinhAnh(nqtDichVu.getNqtHinhAnh());
         nqtResponse.setNqtStatus(nqtDichVu.getNqtStatus());
         nqtResponse.setNqtMetaTitle(nqtDichVu.getNqtMetaTitle());
         nqtResponse.setNqtMetaKeyword(nqtDichVu.getNqtMetaKeyword());

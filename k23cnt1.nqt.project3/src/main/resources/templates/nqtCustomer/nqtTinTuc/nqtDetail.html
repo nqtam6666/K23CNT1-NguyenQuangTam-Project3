@@ -15,11 +15,19 @@
     </style>
 </head>
 <body>
-    <div th:fragment="content" class="pb-16">
+    <div th:fragment="content" class="pb-16" style="margin-top: 100px;">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div th:if="${blog}" class="glass-card rounded-2xl p-8 md:p-12">
                 <h1 class="font-serif text-4xl font-bold text-gray-900 mb-4" th:text="${blog.nqtTieuDe}">Tiêu đề</h1>
-                <p class="text-gray-500 mb-8" th:text="${#temporals.format(blog.nqtNgayTao, 'dd/MM/yyyy HH:mm')}">01/01/2024</p>
+                <p class="text-gray-500 mb-6" th:text="${#temporals.format(blog.nqtNgayTao, 'dd/MM/yyyy HH:mm')}">01/01/2024</p>
+                
+                <div th:if="${blog.nqtHinhAnh != null and blog.nqtHinhAnh != ''}" 
+                    class="mb-8 rounded-xl overflow-hidden">
+                    <img th:src="${blog.nqtHinhAnh}" 
+                        th:alt="${blog.nqtTieuDe}"
+                        class="w-full h-auto object-cover">
+                </div>
+                
                 <div class="prose max-w-none" th:utext="${blog.nqtNoiDung}">
                     Nội dung bài viết...
                 </div>
@@ -29,9 +37,21 @@
                 <h2 class="font-serif text-3xl font-bold text-gray-900 mb-6">Tin tức liên quan</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <a th:each="related : ${relatedBlogs}" th:href="@{/nqtTinTuc/{id}(id=${related.nqtId})}"
-                        class="glass-card rounded-xl p-6 hover:shadow-lg transition-all">
-                        <h3 class="font-semibold text-gray-900 mb-2 line-clamp-2" th:text="${related.nqtTieuDe}">Tiêu đề</h3>
-                        <p class="text-sm text-gray-500" th:text="${#temporals.format(related.nqtNgayTao, 'dd/MM/yyyy')}">01/01/2024</p>
+                        class="glass-card rounded-xl overflow-hidden hover:shadow-lg transition-all">
+                        <div class="h-40 relative overflow-hidden">
+                            <img th:if="${related.nqtHinhAnh != null and related.nqtHinhAnh != ''}" 
+                                th:src="${related.nqtHinhAnh}" 
+                                th:alt="${related.nqtTieuDe}"
+                                class="w-full h-full object-cover hover:scale-110 transition-transform duration-500">
+                            <div th:unless="${related.nqtHinhAnh != null and related.nqtHinhAnh != ''}"
+                                class="h-full flex items-center justify-center bg-gradient-to-br from-amber-600 to-amber-800">
+                                <span class="text-white text-2xl font-serif font-bold" th:text="${#strings.substring(related.nqtTieuDe, 0, 1)}">N</span>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="font-semibold text-gray-900 mb-2 line-clamp-2" th:text="${related.nqtTieuDe}">Tiêu đề</h3>
+                            <p class="text-sm text-gray-500" th:text="${#temporals.format(related.nqtNgayTao, 'dd/MM/yyyy')}">01/01/2024</p>
+                        </div>
                     </a>
                 </div>
             </div>

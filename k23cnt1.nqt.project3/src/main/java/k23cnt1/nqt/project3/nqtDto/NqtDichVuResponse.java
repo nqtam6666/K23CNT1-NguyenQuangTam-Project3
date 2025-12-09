@@ -11,6 +11,7 @@ public class NqtDichVuResponse {
     private Integer nqtId;
     private String nqtTen;
     private Float nqtDonGia;
+    private String nqtHinhAnh;
     private Boolean nqtStatus;
     private String nqtMetaTitle;
     private String nqtMetaKeyword;

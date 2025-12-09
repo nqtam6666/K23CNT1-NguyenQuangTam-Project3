@@ -763,8 +763,13 @@ public class NqtAdminController {
     }
 
     @PostMapping("/admin/dich-vu/create")
-    public String nqtDichVuCreate(@ModelAttribute NqtDichVuRequest nqtRequest, RedirectAttributes redirectAttributes) {
+    public String nqtDichVuCreate(@ModelAttribute NqtDichVuRequest nqtRequest,
+            @RequestParam("nqtImage") MultipartFile nqtImage,
+            RedirectAttributes redirectAttributes) {
         try {
+            if (nqtImage != null && !nqtImage.isEmpty()) {
+                nqtRequest.setNqtHinhAnh(saveFile(nqtImage));
+            }
             nqtDichVuService.nqtCreate(nqtRequest);
             redirectAttributes.addFlashAttribute("nqtSuccess", "Tạo dịch vụ thành công!");
         } catch (Exception e) {
@@ -779,6 +784,7 @@ public class NqtAdminController {
         NqtDichVuRequest nqtRequest = new NqtDichVuRequest();
         nqtRequest.setNqtTen(nqtResponse.getNqtTen());
         nqtRequest.setNqtDonGia(nqtResponse.getNqtDonGia());
+        nqtRequest.setNqtHinhAnh(nqtResponse.getNqtHinhAnh());
         nqtRequest.setNqtStatus(nqtResponse.getNqtStatus());
         nqtRequest.setNqtMetaTitle(nqtResponse.getNqtMetaTitle());
         nqtRequest.setNqtMetaKeyword(nqtResponse.getNqtMetaKeyword());
@@ -790,8 +796,12 @@ public class NqtAdminController {
 
     @PostMapping("/admin/dich-vu/edit/{nqtId}")
     public String nqtDichVuUpdate(@PathVariable Integer nqtId, @ModelAttribute NqtDichVuRequest nqtRequest,
+            @RequestParam(value = "nqtImage", required = false) MultipartFile nqtImage,
             RedirectAttributes redirectAttributes) {
         try {
+            if (nqtImage != null && !nqtImage.isEmpty()) {
+                nqtRequest.setNqtHinhAnh(saveFile(nqtImage));
+            }
             nqtDichVuService.nqtUpdate(nqtId, nqtRequest);
             redirectAttributes.addFlashAttribute("nqtSuccess", "Cập nhật thành công!");
         } catch (Exception e) {
@@ -822,6 +832,7 @@ public class NqtAdminController {
                     NqtDichVuRequest request = new NqtDichVuRequest();
                     request.setNqtTen(service.getNqtTen());
                     request.setNqtDonGia(service.getNqtDonGia());
+                    request.setNqtHinhAnh(service.getNqtHinhAnh());
                     request.setNqtStatus(true);
                     request.setNqtMetaTitle(service.getNqtMetaTitle());
                     request.setNqtMetaKeyword(service.getNqtMetaKeyword());
@@ -849,6 +860,7 @@ public class NqtAdminController {
                     NqtDichVuRequest request = new NqtDichVuRequest();
                     request.setNqtTen(service.getNqtTen());
                     request.setNqtDonGia(service.getNqtDonGia());
+                    request.setNqtHinhAnh(service.getNqtHinhAnh());
                     request.setNqtStatus(false);
                     request.setNqtMetaTitle(service.getNqtMetaTitle());
                     request.setNqtMetaKeyword(service.getNqtMetaKeyword());
