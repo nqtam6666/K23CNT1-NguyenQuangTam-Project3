@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+    th:replace="~{admin/layout :: layout(nqtTitle=${nqtId != null ? 'Sửa Người dùng' : 'Thêm Người dùng'})}">
+
+<body>
+    <div th:fragment="content">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-semibold text-gray-800 flex items-center">
+                <i class="bi bi-person-plus mr-2" th:if="${nqtId == null}"></i>
+                <i class="bi bi-person-check mr-2" th:if="${nqtId != null}"></i>
+                <span th:text="${nqtId != null ? 'Sửa Người dùng' : 'Thêm Người dùng'}"></span>
+            </h2>
+            <a th:href="@{/admin/nguoi-dung}"
+                class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white font-medium rounded-lg shadow-sm transition-colors flex items-center">
+                <i class="bi bi-arrow-left mr-2"></i> Quay lại
+            </a>
+        </div>
+
+        <div class="bg-white shadow-md rounded-lg overflow-hidden">
+            <div class="p-6">
+                <form th:action="${nqtId != null ? '/admin/nguoi-dung/edit/' + nqtId : '/admin/nguoi-dung/create'}"
+                    th:object="${nqtRequest}" method="post">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Họ và tên</label>
+                            <input type="text"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                th:field="*{nqtHoVaTen}" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tài khoản</label>
+                            <input type="text"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                th:field="*{nqtTaiKhoan}" required>
+                        </div>
+                        <div class="mb-4" th:if="${nqtId == null}">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Mật khẩu</label>
+                            <input type="password"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                th:field="*{nqtMatKhau}" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Số điện thoại</label>
+                            <input type="text"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                th:field="*{nqtSoDienThoai}">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                            <input type="email"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                th:field="*{nqtEmail}">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Địa chỉ</label>
+                            <input type="text"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                th:field="*{nqtDiaChi}">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Vai trò</label>
+                            <select
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                th:field="*{nqtVaiTro}">
+                                <option value="0">Người dùng</option>
+                                <option value="1">Nhân viên</option>
+                                <option value="99">Admin</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Trạng thái</label>
+                            <select
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                th:field="*{nqtStatus}">
+                                <option th:value="true">Hoạt động</option>
+                                <option th:value="false">Không hoạt động</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Cấp bậc</label>
+                            <select
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                th:field="*{nqtCapBac}">
+                                <option value="">-- Chọn cấp bậc --</option>
+                                <option value="KhachThuong">Khách thường</option>
+                                <option value="KhachVip">Khách VIP</option>
+                            </select>
+                            <!-- <p class="mt-1 text-xs text-gray-500">Có thể áp dụng cho tất cả vai trò</p> -->
+                        </div>
+                    </div>
+                    <div class="mt-6 flex items-center space-x-3">
+                        <button type="submit"
+                            class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors flex items-center">
+                            <i class="bi bi-save mr-2"></i> Lưu
+                        </button>
+                        <a th:href="@{/admin/nguoi-dung}"
+                            class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white font-medium rounded-lg shadow-sm transition-colors">Hủy</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

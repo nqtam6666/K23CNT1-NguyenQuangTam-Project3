@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="layout(nqtTitle)" x-data="{ sidebarOpen: false }">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${nqtTitle} ?: (${nqtTieuDe} ?: (${nqtWebsiteName} ?: 'Admin - Quản lý Khách sạn'))">Admin</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link
+        th:href="@{'https://fonts.googleapis.com/css?family=' + ${#strings.replace(nqtWebsiteFont ?: 'Nunito', ' ', '+')} + ':200,300,400,600,700,800,900&display=swap'}"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" type="text/css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "[[${nqtWebsiteColor} ?: '#4e73df']]",
+                        secondary: '#858796',
+                        success: '#1cc88a',
+                        info: '#36b9cc',
+                        warning: '#f6c23e',
+                        danger: '#e74a3b',
+                        light: '#f8f9fc',
+                        dark: '#5a5c69',
+                        sidebar: "[[${nqtWebsiteColor} ?: '#4e73df']]",
+                        sidebarActive: 'rgba(255, 255, 255, 0.1)',
+                    },
+                    fontFamily: {
+                        sans: ["[[${nqtWebsiteFont} ?: 'Nunito']]", 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: "[[${nqtWebsiteFont} ?: 'Nunito']]",
+            sans-serif;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Wrapper adjustments */
+        .datatable-wrapper {
+            padding: 1rem;
+        }
+
+        .datatable-top {
+            padding-bottom: 1rem;
+        }
+
+        .datatable-bottom {
+            padding-top: 1rem;
+        }
+
+        /* Search Input */
+        .datatable-input {
+            padding: 0.5rem 1rem !important;
+            border-radius: 0.5rem !important;
+            border: 1px solid #e5e7eb !important;
+            outline: none !important;
+            font-size: 0.875rem;
+            color: #374151;
+            transition: all 0.2s;
+            width: 250px !important;
+        }
+
+        .datatable-input:focus {
+            border-color: #4e73df !important;
+            box-shadow: 0 0 0 3px rgba(78, 115, 223, 0.1) !important;
+        }
+
+        /* Pagination Buttons */
+        .datatable-pagination li a {
+            padding: 0.5rem 0.85rem !important;
+            border-radius: 0.5rem !important;
+            margin: 0 0.25rem !important;
+            color: #6b7280 !important;
+            text-decoration: none !important;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .datatable-pagination li:not(.active) a:hover {
+            background-color: #f3f4f6 !important;
+            color: #111827 !important;
+        }
+
+        .datatable-pagination li.active a {
+            background-color: #4e73df !important;
+            color: #ffffff !important;
+            font-weight: 600 !important;
+            box-shadow: 0 2px 4px rgba(78, 115, 223, 0.2);
+        }
+
+        .datatable-pagination li.disabled a {
+            color: #d1d5db !important;
+            cursor: not-allowed;
+        }
+
+        /* Table Info Text */
+        .datatable-info {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+
+        /* GTranslate Customizing */
+        .gtranslate_wrapper select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem !important;
+            padding-left: 1rem !important;
+            padding-top: 0.5rem !important;
+            padding-bottom: 0.5rem !important;
+            border: 1px solid #e5e7eb !important;
+            border-radius: 0.5rem !important;
+            font-size: 0.875rem !important;
+            line-height: 1.25rem !important;
+            color: #374151 !important;
+            outline: none !important;
+            transition: all 0.2s;
+            cursor: pointer;
+            background-color: white;
+            height: auto !important;
+        }
+
+        .gtranslate_wrapper select:hover {
+            border-color: #d1d5db !important;
+        }
+
+        .gtranslate_wrapper select:focus {
+            border-color: #4e73df !important;
+            box-shadow: 0 0 0 3px rgba(78, 115, 223, 0.1) !important;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 font-sans antialiased text-gray-700 hover:text-gray-900 transition-colors duration-200" x-data="{ 
+        sidebarOpen: false,
+        sidebarCollapsed: localStorage.getItem('sidebarCollapsed') === 'true',
+        toggleCollapse() {
+            this.sidebarCollapsed = !this.sidebarCollapsed;
+            localStorage.setItem('sidebarCollapsed', this.sidebarCollapsed);
+        }
+    }">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <aside
+            class="flex flex-col bg-sidebar text-white transition-all duration-300 ease-in-out transform lg:translate-x-0 fixed lg:static inset-y-0 left-0 z-30"
+            :class="[
+                sidebarOpen ? 'translate-x-0' : '-translate-x-full',
+                sidebarCollapsed ? 'w-16' : 'w-64'
+            ]">
+
+            <!-- Sidebar Header -->
+            <div class="flex items-center justify-center h-16 bg-black/20 shadow-md relative" style="padding: 10px; margin: 10px">
+                <a href="/admin" class="text-xl font-bold uppercase tracking-wider flex items-center p-4"
+                    :class="sidebarCollapsed ? 'justify-center' : ''">
+                    <img th:src="${nqtWebsiteLogo}" alt="Logo" class="w-8 h-8 rounded-full object-cover"
+                        :class="sidebarCollapsed ? '' : 'mr-2'"
+                        th:if="${nqtWebsiteLogo != null and nqtWebsiteLogo != ''}">
+                    <i class="bi bi-building text-primary" :class="sidebarCollapsed ? '' : 'mr-2'"
+                        th:unless="${nqtWebsiteLogo != null and nqtWebsiteLogo != ''}"></i>
+                    <span x-show="!sidebarCollapsed" x-transition th:text="${nqtWebsiteName} ?: 'Admin Panel'"></span>
+                </a>
+
+                <!-- Toggle Button -->
+                <button @click="toggleCollapse()"
+                    class="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-white text-sidebar rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center hidden lg:flex">
+                    <i class="bi text-xs transition-transform duration-200"
+                        :class="sidebarCollapsed ? 'bi-chevron-right' : 'bi-chevron-left'"></i>
+                </button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto custom-scrollbar py-4">
+                <nav class="space-y-1 px-2">
+                    <div th:data-active="${nqtCurrentURI != null and (#strings.startsWith(nqtCurrentURI, '/admin/loai-phong') or #strings.startsWith(nqtCurrentURI, '/admin/phong'))}"
+                        x-data="{ open: $el.dataset.active === 'true' }">
+                        <button @click="open = !open"
+                            class="flex items-center justify-between w-full px-4 py-3 text-gray-300 hover:bg-sidebarActive hover:text-white rounded-lg transition-colors group"
+                            :class="[open ? 'bg-sidebarActive text-white' : '', sidebarCollapsed ? 'justify-center' : '']">
+                            <div class="flex items-center" :class="sidebarCollapsed ? 'mx-auto' : ''">
+                                <i class="bi bi-houses text-lg" :class="sidebarCollapsed ? '' : 'mr-3'"></i>
+                                <span class="font-medium" x-show="!sidebarCollapsed" x-transition>Phòng & Loại</span>
+                            </div>
+                            <i class="bi bi-chevron-down text-xs transition-transform duration-200"
+                                x-show="!sidebarCollapsed" x-transition :class="open ? 'transform rotate-180' : ''"></i>
+                        </button>
+                        <div x-show="open && !sidebarCollapsed" x-collapse class="pl-4 mt-1 space-y-1">
+                            <a href="/admin/loai-phong"
+                                th:classappend="${#strings.startsWith(nqtCurrentURI, '/admin/loai-phong')} ? 'text-white bg-gray-800' : ''"
+                                class="flex items-center px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-gray-800 rounded-md transition-colors">
+                                <i class="bi bi-door-open mr-2"></i> Loại phòng
+                            </a>
+                            <a href="/admin/phong"
+                                th:classappend="${#strings.startsWith(nqtCurrentURI, '/admin/phong')} ? 'text-white bg-gray-800' : ''"
+                                class="flex items-center px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-gray-800 rounded-md transition-colors">
+                                <i class="bi bi-house-door mr-2"></i> Phòng
+                            </a>
+                        </div>
+                    </div>
+
+                    <a href="/admin/dat-phong"
+                        th:classappend="${#strings.startsWith(nqtCurrentURI, '/admin/dat-phong')} ? 'bg-sidebarActive text-white' : ''"
+                        class="flex items-center px-4 py-3 text-gray-300 hover:bg-sidebarActive hover:text-white rounded-lg transition-colors group"
+                        :class="sidebarCollapsed ? 'justify-center' : ''">
+                        <i class="bi bi-calendar-check text-lg" :class="sidebarCollapsed ? '' : 'mr-3'"></i>
+                        <span class="font-medium" x-show="!sidebarCollapsed" x-transition>Đặt phòng</span>
+                    </a>
+
+                    <div class="pt-4 pb-2 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider"
+                        x-show="!sidebarCollapsed" x-transition>Dịch vụ
+                    </div>
+
+                    <div th:data-active="${nqtCurrentURI != null and (#strings.startsWith(nqtCurrentURI, '/admin/dich-vu') or #strings.startsWith(nqtCurrentURI, '/admin/don-gia-dich-vu'))}"
+                        x-data="{ open: $el.dataset.active === 'true' }">
+                        <button @click="open = !open"
+                            class="flex items-center justify-between w-full px-4 py-3 text-gray-300 hover:bg-sidebarActive hover:text-white rounded-lg transition-colors group"
+                            :class="[open ? 'bg-sidebarActive text-white' : '', sidebarCollapsed ? 'justify-center' : '']">
+                            <div class="flex items-center" :class="sidebarCollapsed ? 'mx-auto' : ''">
+                                <i class="bi bi-stars text-lg" :class="sidebarCollapsed ? '' : 'mr-3'"></i>
+                                <span class="font-medium" x-show="!sidebarCollapsed" x-transition>Dịch vụ</span>
+                            </div>
+                            <i class="bi bi-chevron-down text-xs transition-transform duration-200"
+                                x-show="!sidebarCollapsed" x-transition :class="open ? 'transform rotate-180' : ''"></i>
+                        </button>
+                        <div x-show="open && !sidebarCollapsed" x-collapse class="pl-4 mt-1 space-y-1">
+                            <a href="/admin/dich-vu"
+                                th:classappend="${#strings.startsWith(nqtCurrentURI, '/admin/dich-vu')} ? 'text-white bg-gray-800' : ''"
+                                class="flex items-center px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-gray-800 rounded-md transition-colors">
+                                <i class="bi bi-list-task mr-2"></i> DS Dịch vụ
+                            </a>
+                            <a href="/admin/don-gia-dich-vu"
+                                th:classappend="${#strings.startsWith(nqtCurrentURI, '/admin/don-gia-dich-vu')} ? 'text-white bg-gray-800' : ''"
+                                class="flex items-center px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-gray-800 rounded-md transition-colors">
+                                <i class="bi bi-cash-coin mr-2"></i> Đơn giá DV
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="pt-4 pb-2 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider"
+                        x-show="!sidebarCollapsed" x-transition>Quản lý Chung</div>
+
+                    <a href="/admin/nguoi-dung"
+                        th:classappend="${#strings.startsWith(nqtCurrentURI, '/admin/nguoi-dung')} ? 'bg-sidebarActive text-white' : ''"
+                        class="flex items-center px-4 py-3 text-gray-300 hover:bg-sidebarActive hover:text-white rounded-lg transition-colors group"
+                        :class="sidebarCollapsed ? 'justify-center' : ''">
+                        <i class="bi bi-people text-lg" :class="sidebarCollapsed ? '' : 'mr-3'"></i>
+                        <span class="font-medium" x-show="!sidebarCollapsed" x-transition>Người dùng</span>
+                    </a>
+
+                    <a href="/admin/giam-gia"
+                        th:classappend="${#strings.startsWith(nqtCurrentURI, '/admin/giam-gia')} ? 'bg-sidebarActive text-white' : ''"
+                        class="flex items-center px-4 py-3 text-gray-300 hover:bg-sidebarActive hover:text-white rounded-lg transition-colors group"
+                        :class="sidebarCollapsed ? 'justify-center' : ''">
+                        <i class="bi bi-ticket-perforated text-lg" :class="sidebarCollapsed ? '' : 'mr-3'"></i>
+                        <span class="font-medium" x-show="!sidebarCollapsed" x-transition>Mã giảm giá</span>
+                    </a>
+
+                    <a href="/admin/cron-log"
+                        th:classappend="${#strings.startsWith(nqtCurrentURI, '/admin/cron-log')} ? 'bg-sidebarActive text-white' : ''"
+                        class="flex items-center px-4 py-3 text-gray-300 hover:bg-sidebarActive hover:text-white rounded-lg transition-colors group"
+                        :class="sidebarCollapsed ? 'justify-center' : ''">
+                        <i class="bi bi-clock-history text-lg" :class="sidebarCollapsed ? '' : 'mr-3'"></i>
+                        <span class="font-medium" x-show="!sidebarCollapsed" x-transition>Cron Log</span>
+                    </a>
+
+                    <a href="/admin/ngan-hang"
+                        th:classappend="${#strings.startsWith(nqtCurrentURI, '/admin/ngan-hang')} ? 'bg-sidebarActive text-white' : ''"
+                        class="flex items-center px-4 py-3 text-gray-300 hover:bg-sidebarActive hover:text-white rounded-lg transition-colors group"
+                        :class="sidebarCollapsed ? 'justify-center' : ''">
+                        <i class="bi bi-bank text-lg" :class="sidebarCollapsed ? '' : 'mr-3'"></i>
+                        <span class="font-medium" x-show="!sidebarCollapsed" x-transition>Ngân Hàng</span>
+                    </a>
+
+                    <a href="/admin/danh-gia"
+                        th:classappend="${#strings.startsWith(nqtCurrentURI, '/admin/danh-gia')} ? 'bg-sidebarActive text-white' : ''"
+                        class="flex items-center px-4 py-3 text-gray-300 hover:bg-sidebarActive hover:text-white rounded-lg transition-colors group"
+                        :class="sidebarCollapsed ? 'justify-center' : ''">
+                        <i class="bi bi-chat-left-quote text-lg" :class="sidebarCollapsed ? '' : 'mr-3'"></i>
+                        <span class="font-medium" x-show="!sidebarCollapsed" x-transition>Đánh giá</span>
+                    </a>
+
+                    <a href="/admin/blog"
+                        th:classappend="${#strings.startsWith(nqtCurrentURI, '/admin/blog')} ? 'bg-sidebarActive text-white' : ''"
+                        class="flex items-center px-4 py-3 text-gray-300 hover:bg-sidebarActive hover:text-white rounded-lg transition-colors group"
+                        :class="sidebarCollapsed ? 'justify-center' : ''">
+                        <i class="bi bi-newspaper text-lg" :class="sidebarCollapsed ? '' : 'mr-3'"></i>
+                        <span class="font-medium" x-show="!sidebarCollapsed" x-transition>Blog</span>
+                    </a>
+
+                    <div class="pt-4 pb-2 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider"
+                        x-show="!sidebarCollapsed" x-transition>Hệ thống
+                    </div>
+
+                    <a href="/admin/setting"
+                        th:classappend="${#strings.startsWith(nqtCurrentURI, '/admin/setting')} ? 'bg-sidebarActive text-white' : ''"
+                        class="flex items-center px-4 py-3 text-gray-300 hover:bg-sidebarActive hover:text-white rounded-lg transition-colors group"
+                        :class="sidebarCollapsed ? 'justify-center' : ''">
+                        <i class="bi bi-gear text-lg" :class="sidebarCollapsed ? '' : 'mr-3'"></i>
+                        <span class="font-medium" x-show="!sidebarCollapsed" x-transition>Cấu hình</span>
+                    </a>
+                    <a th:if="${session.nqtAdminUser != null and session.nqtAdminUser.nqtVaiTro != null and session.nqtAdminUser.nqtVaiTro == 99}"
+                        href="/nqtTrangChu"
+                        class="flex items-center px-4 py-3 text-gray-300 hover:bg-sidebarActive hover:text-white rounded-lg transition-colors group"
+                        :class="sidebarCollapsed ? 'justify-center' : ''">
+                        <i class="bi bi-globe text-lg" :class="sidebarCollapsed ? '' : 'mr-3'"></i>
+                        <span class="font-medium" x-show="!sidebarCollapsed" x-transition>Về trang khách</span>
+                    </a>
+                </nav>
+            </div>
+        </aside>
+        <div class="flex-1 flex flex-col overflow-hidden bg-gray-100">
+            <!-- Topbar -->
+            <header
+                class="flex items-center justify-between h-16 bg-white shadow-sm px-4 lg:px-6 z-10 shrink-0 transition-colors duration-200">
+                <button @click="sidebarOpen = !sidebarOpen" class="text-gray-500 focus:outline-none lg:hidden">
+                    <i class="bi bi-list text-2xl"></i>
+                </button>
+
+                <!-- Search (Optional) -->
+                <div class="hidden md:flex items-center bg-gray-100 rounded-full px-4 py-2 w-64">
+                    <i class="bi bi-search text-gray-400 mr-2"></i>
+                    <input type="text" placeholder="Tìm kiếm..."
+                        class="bg-transparent border-none focus:outline-none text-sm text-gray-600 w-full">
+                </div>
+
+                <!-- User Menu -->
+                <div class="flex items-center space-x-4">
+                    <div class="gtranslate_wrapper"></div>
+                    <div class="relative" x-data="{ open: false }">
+                        <button @click="open = !open" class="flex items-center space-x-2 focus:outline-none">
+                            <div
+                                class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-bold">
+                                <span
+                                    th:text="${session.nqtAdminUser != null ? #strings.substring(session.nqtAdminUser.nqtHoVaTen, 0, 1) : 'A'}">A</span>
+                            </div>
+                            <span class="hidden md:block text-sm font-medium text-gray-700"
+                                th:text="${session.nqtAdminUser != null ? session.nqtAdminUser.nqtHoVaTen : 'Admin'}">Admin</span>
+                            <i class="bi bi-chevron-down text-xs text-gray-500"></i>
+                        </button>
+
+                        <!-- Dropdown -->
+                        <div x-show="open" @click.away="open = false"
+                            class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5 z-50 transition-colors duration-200"
+                            style="display: none;">
+                            <a th:if="${session.nqtAdminUser != null}"
+                                th:href="@{/admin/nguoi-dung/edit/{id}(id=${session.nqtAdminUser.nqtId})}"
+                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="bi bi-person mr-2"></i> Hồ sơ
+                            </a>
+                            <a th:href="@{/admin/setup-2fa}"
+                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="bi bi-shield-lock mr-2"></i> Bảo mật 2FA
+                            </a>
+                            <a th:href="@{/admin/setting}"
+                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="bi bi-gear mr-2"></i> Cài đặt
+                            </a>
+                            <a th:if="${session.nqtAdminUser != null and session.nqtAdminUser.nqtVaiTro != null and session.nqtAdminUser.nqtVaiTro == 99}"
+                                href="/nqtTrangChu"
+                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="bi bi-globe mr-2"></i> Về trang khách
+                            </a>
+                            <div class="border-t border-gray-100"></div>
+                            <a href="/admin/logout" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
+                                <i class="bi bi-box-arrow-right mr-2"></i> Đăng xuất
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <main class="flex-1 overflow-x-hidden overflow-y-auto p-4 lg:p-6">
+                <!-- Alerts -->
+                <div th:if="${nqtSuccess}"
+                    class="mb-4 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded shadow-sm flex items-center justify-between"
+                    role="alert">
+                    <div class="flex items-center">
+                        <i class="bi bi-check-circle-fill mr-2 text-xl"></i>
+                        <span th:text="${nqtSuccess}"></span>
+                    </div>
+                    <button onclick="this.parentElement.remove()" class="text-green-700 hover:text-green-900"><i
+                            class="bi bi-x-lg"></i></button>
+                </div>
+                <div th:if="${nqtError}"
+                    class="mb-4 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded shadow-sm flex items-center justify-between"
+                    role="alert">
+                    <div class="flex items-center">
+                        <i class="bi bi-exclamation-triangle-fill mr-2 text-xl"></i>
+                        <span th:text="${nqtError}"></span>
+                    </div>
+                    <button onclick="this.parentElement.remove()" class="text-red-700 hover:text-red-900"><i
+                            class="bi bi-x-lg"></i></button>
+                </div>
+
+                <div th:replace="~{::content}"></div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://unpkg.com/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" type="text/javascript"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tableElement = document.getElementById("nqtDataTable");
+            if (tableElement) {
+                const dataTable = new simpleDatatables.DataTable(tableElement, {
+                    labels: {
+                        placeholder: "Tìm kiếm...",
+                        perPage: "bản ghi mỗi trang",
+                        noRows: "Không tìm thấy dữ liệu",
+                        info: "Hiển thị {start} đến {end} của {rows} bản ghi",
+                    },
+                    perPage: 10,
+                });
+
+                const filterInputs = document.querySelectorAll('.nqt-filter-dropdown');
+
+                if (filterInputs.length > 0) {
+                    const activeFilters = {};
+
+                    // Function to populate filters
+                    function populateFilters() {
+                        console.log('🔍 Starting populateFilters...');
+                        console.log('Filter inputs found:', filterInputs.length);
+
+                        filterInputs.forEach(select => {
+                            const colIndex = parseInt(select.dataset.filterColumn);
+                            console.log(`Processing filter for column ${colIndex}`);
+
+                            const uniqueValues = new Set();
+                            const wrapper = tableElement.closest('.datatable-wrapper');
+                            const tbody = wrapper ? wrapper.querySelector('.datatable-table tbody') : tableElement.querySelector('tbody');
+
+                            console.log('Wrapper found:', !!wrapper);
+                            console.log('Tbody found:', !!tbody);
+
+                            const rows = tbody ? tbody.querySelectorAll('tr') : [];
+                            console.log(`Rows found: ${rows.length}`);
+
+                            rows.forEach(row => {
+                                const cells = row.querySelectorAll('td');
+                                if (cells[colIndex]) {
+                                    const cellText = cells[colIndex].textContent.trim();
+                                    if (cellText) {
+                                        uniqueValues.add(cellText);
+                                        // Store original value for translation compatibility
+                                        if (!cells[colIndex].dataset.nqtOriginal) {
+                                            cells[colIndex].dataset.nqtOriginal = cellText;
+                                        }
+                                    }
+                                }
+                            });
+
+                            console.log(`Unique values for column ${colIndex}:`, Array.from(uniqueValues));
+
+                            // Save current selection
+                            const currentValue = select.value;
+
+                            // Clear and repopulate
+                            while (select.options.length > 1) {
+                                select.remove(1);
+                            }
+
+                            Array.from(uniqueValues).sort().forEach(value => {
+                                const option = document.createElement('option');
+                                option.value = value;
+                                option.textContent = value;
+                                select.appendChild(option);
+                            });
+
+                            console.log(`Added ${uniqueValues.size} options to filter`);
+
+                            // Restore selection if still exists
+                            if (currentValue && Array.from(select.options).some(opt => opt.value === currentValue)) {
+                                select.value = currentValue;
+                            }
+                        });
+                    }
+
+                    // Initial population - wait for datatable to finish rendering
+                    setTimeout(() => {
+                        populateFilters();
+                    }, 200);
+
+                    // Filter function
+                    function applyFilters() {
+                        const wrapper = tableElement.closest('.datatable-wrapper');
+                        const datatableBody = wrapper ? wrapper.querySelector('.datatable-table tbody') : tableElement.querySelector('tbody');
+                        const allRows = datatableBody.querySelectorAll('tr');
+
+                        allRows.forEach((row) => {
+                            const cells = row.querySelectorAll('td');
+                            let shouldShow = true;
+
+                            for (const [colIdx, filterVal] of Object.entries(activeFilters)) {
+                                const cell = cells[colIdx];
+                                if (!cell) {
+                                    shouldShow = false;
+                                    break;
+                                }
+
+                                const currentText = cell.textContent.trim();
+                                const originalText = cell.dataset.nqtOriginal || currentText;
+
+                                // Match against both current (translated) and original text
+                                if (currentText !== filterVal && originalText !== filterVal) {
+                                    shouldShow = false;
+                                    break;
+                                }
+                            }
+
+                            row.style.display = shouldShow ? '' : 'none';
+                        });
+                    }
+
+                    // Attach change listeners
+                    filterInputs.forEach(select => {
+                        select.addEventListener('change', (e) => {
+                            const colIndex = parseInt(e.target.dataset.filterColumn);
+                            const value = e.target.value;
+
+                            if (value) {
+                                activeFilters[colIndex] = value;
+                            } else {
+                                delete activeFilters[colIndex];
+                            }
+
+                            applyFilters();
+                        });
+                    });
+                }
+            }
+        });
+    </script>
+    <script>
+        window.gtranslateSettings = {
+            "default_language": "vi",
+            "detect_browser_language": true,
+            "languages": ["vi", "en", "zh-CN", "it", "es", "de", "ar", "tr", "ru", "uk", "km", "th", "fr"],
+            "wrapper_selector": ".gtranslate_wrapper"
+        };
+    </script>
+    <script src="https://cdn.gtranslate.net/widgets/latest/dropdown.js" defer></script>
+</body>
+
+</html>

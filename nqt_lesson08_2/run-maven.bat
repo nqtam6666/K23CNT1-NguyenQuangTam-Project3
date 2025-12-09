@@ -1,0 +1,6 @@
+@echo off
+echo Setting MAVEN_OPTS environment variable...
+set MAVEN_OPTS=-Dorg.apache.tomcat.util.http.fileupload.FileCountLimit=10000 -Dorg.apache.tomcat.util.http.fileupload.FileSizeThreshold=0
+echo Running application with Maven...
+mvn spring-boot:run
+

@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${nqtTieuDe ?: 'Hotel NQT'} + ' - ' + ${nqtWebsiteName ?: 'Trải nghiệm sang trọng đẳng cấp'}">Hotel NQT - Trải nghiệm sang trọng đẳng cấp</title>
+    <meta name="description" th:content="${nqtTieuDe ?: 'Khách sạn cao cấp với dịch vụ tinh tế, phòng nghỉ sang trọng và trải nghiệm độc quyền'}">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link th:with="fontName=${#strings.replace(nqtWebsiteFont ?: 'Inter', ' ', '+')}" 
+          th:href="@{'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=' + ${fontName} + ':wght@300;400;500;600;700&display=swap'}" 
+          rel="stylesheet">
+
+    <style th:inline="css">
+        :root {
+            --color-charcoal: #1a1a1a;
+            --color-stone: #2d2d2d;
+            --color-beige: #f5f3f0;
+            --color-gold: #d4af37;
+            --color-copper: #b87333;
+            --color-primary: /*[[${nqtWebsiteColor ?: '#d97706'}]]*/ #d97706;
+        }
+
+        * {
+            font-family: /*[[${nqtWebsiteFont ?: 'Inter'}]]*/ 'Inter', sans-serif;
+        }
+
+        .font-serif {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* Glassmorphism Effect */
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+
+        .glass-dark {
+            background: rgba(26, 26, 26, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-12px) scale(1.02);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Hero Background with Parallax */
+        .hero-bg {
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.85) 0%, rgba(45, 45, 45, 0.75) 100%),
+                        url('https://images.unsplash.com/photo-1566073771259-6a0d3b5b0a78?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80') center/cover no-repeat;
+            background-attachment: fixed;
+            min-height: 100vh;
+            position: relative;
+            overflow: visible;
+            z-index: 1;
+        }
+
+        .hero-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(180deg, rgba(26, 26, 26, 0.3) 0%, rgba(26, 26, 26, 0.7) 100%);
+            z-index: 1;
+        }
+
+        /* Liquid Glass Animation */
+        @keyframes liquid-shift {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(2deg); }
+        }
+
+        .liquid-glass {
+            animation: liquid-shift 8s ease-in-out infinite;
+            position: relative;
+            z-index: 30;
+        }
+
+        .liquid-glass > div {
+            position: relative;
+            z-index: 30;
+        }
+
+        /* Smooth Scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--color-beige);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--color-gold);
+            border-radius: 5px;
+        }
+
+        /* Gold Accent - Use setting color */
+        .gold-accent {
+            color: var(--color-primary) !important;
+        }
+        
+        /* Primary color gradient */
+        .bg-primary-gradient {
+            background: linear-gradient(to right, var(--color-primary), 
+                color-mix(in srgb, var(--color-primary) 80%, black));
+        }
+        
+        .bg-primary-gradient-br {
+            background: linear-gradient(to bottom right, var(--color-primary), 
+                color-mix(in srgb, var(--color-primary) 80%, black));
+        }
+        
+        .text-primary {
+            color: var(--color-primary);
+        }
+        
+        .border-primary {
+            border-color: var(--color-primary);
+        }
+        
+        .hover-primary:hover {
+            color: var(--color-primary);
+        }
+
+        .gold-border {
+            border-color: var(--color-gold);
+        }
+
+        /* Hover Effects */
+        .hover-glow:hover {
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.3);
+        }
+
+        /* Fade In Animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        /* Room Card Image */
+        .room-image {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .room-image::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.3) 100%);
+        }
+
+        /* Trust Badge */
+        .trust-badge {
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .trust-badge:hover {
+            transform: scale(1.1);
+        }
+
+        /* Trust Badges Section - Ensure it's above hero */
+        section.bg-gradient-to-b.from-gray-50 {
+            position: relative;
+            z-index: 100;
+        }
+
+        /* Testimonial Card */
+        .testimonial-card {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .testimonial-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        /* VIP CTA */
+        .vip-cta {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(184, 115, 51, 0.1) 100%);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(212, 175, 55, 0.3);
+        }
+
+        /* Navigation */
+        .nav-glass {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        /* Input Focus */
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            ring: 2px;
+            ring-color: var(--color-gold);
+            border-color: var(--color-gold);
+        }
+    </style>
+</head>
+
+<body class="bg-white antialiased">
+    <!-- Navigation -->
+    <nav class="nav-glass fixed top-0 left-0 right-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo -->
+                <a href="/nqtTrangChu" class="flex items-center space-x-3 group">
+                    <div class="w-12 h-12 rounded-lg flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all overflow-hidden" 
+                        th:style="'background: linear-gradient(to bottom right, ' + ${nqtWebsiteColor ?: '#d97706'} + ', ' + ${#strings.replace(nqtWebsiteColor ?: '#d97706', '#', '')} + 'cc);'">
+                        <img th:src="${nqtWebsiteLogo}" alt="Logo" class="w-full h-full object-cover"
+                            th:if="${nqtWebsiteLogo != null and nqtWebsiteLogo != ''}">
+                        <span class="text-white font-serif font-bold text-xl" 
+                            th:unless="${nqtWebsiteLogo != null and nqtWebsiteLogo != ''}"
+                            th:text="${#strings.substring(nqtWebsiteName ?: 'Hotel NQT', 0, 1)}">H</span>
+                    </div>
+                    <span class="text-2xl font-serif font-bold text-gray-900" th:text="${nqtWebsiteName ?: 'Hotel NQT'}">Hotel NQT</span>
+                </a>
+
+                <!-- Desktop Menu -->
+                <div class="hidden lg:flex items-center space-x-8">
+                    <a href="/nqtPhong" class="text-gray-700 hover:text-amber-700 font-medium transition-colors">Phòng</a>
+                    <a href="/nqtLoaiPhong" class="text-gray-700 hover:text-amber-700 font-medium transition-colors">Loại phòng</a>
+                    <a href="/nqtDichVu" class="text-gray-700 hover:text-amber-700 font-medium transition-colors">Dịch vụ</a>
+                    <a href="/nqtTinTuc" class="text-gray-700 hover:text-amber-700 font-medium transition-colors">Tin tức</a>
+                    <a href="/nqtLienHe" class="text-gray-700 hover:text-amber-700 font-medium transition-colors">Liên hệ</a>
+                </div>
+
+                <!-- User Actions -->
+                <div class="flex items-center space-x-4">
+                    <th:block th:if="${session.nqtCustomerUser == null}">
+                        <a href="/nqtDangNhap" class="text-gray-700 hover:text-amber-700 font-medium transition-colors">Đăng nhập</a>
+                        <a href="/nqtDangKy" class="text-white px-6 py-2.5 rounded-lg font-medium hover:shadow-lg transition-all hover:scale-105"
+                            th:style="'background: linear-gradient(to right, ' + ${nqtWebsiteColor ?: '#d97706'} + ', ' + ${#strings.replace(nqtWebsiteColor ?: '#d97706', '#', '')} + 'cc);'">
+                            Đăng ký
+                        </a>
+                    </th:block>
+                    <th:block th:if="${session.nqtCustomerUser != null}">
+                        <div class="relative group">
+                            <button class="flex items-center space-x-2 text-gray-700 hover:text-amber-700 transition-colors">
+                                <div class="w-9 h-9 rounded-full flex items-center justify-center"
+                                    th:style="'background: linear-gradient(to bottom right, ' + ${nqtWebsiteColor ?: '#d97706'} + ', ' + ${#strings.replace(nqtWebsiteColor ?: '#d97706', '#', '')} + 'cc);'">
+                                    <span class="text-white font-semibold text-sm" th:text="${#strings.substring(session.nqtCustomerUser.nqtHoVaTen, 0, 1)}">U</span>
+                                </div>
+                                <span class="font-medium hidden md:block" th:text="${session.nqtCustomerUser.nqtHoVaTen}">User</span>
+                            </button>
+                            <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 border border-gray-100">
+                                <a href="/nqtTaiKhoan" class="block px-4 py-2.5 text-gray-700 hover:bg-amber-50 rounded-t-lg transition-colors">Tài khoản</a>
+                                <a href="/nqtDatPhongCuaToi" class="block px-4 py-2.5 text-gray-700 hover:bg-amber-50 transition-colors">Đặt phòng của tôi</a>
+                                <a href="/nqtDangXuat" class="block px-4 py-2.5 text-red-600 hover:bg-red-50 rounded-b-lg transition-colors">Đăng xuất</a>
+                            </div>
+                        </div>
+                    </th:block>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-bg flex items-center justify-center relative" style="padding-top: 80px;">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10" style="z-index: 10;">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <!-- Left: Headline -->
+                <div class="text-white fade-in-up">
+                    <h1 class="font-serif text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
+                        Trải nghiệm <span class="gold-accent">sang trọng</span><br>đẳng cấp thế giới
+                    </h1>
+                    <p class="text-xl md:text-2xl text-gray-200 mb-8 leading-relaxed">
+                        Nơi hội tụ tinh hoa kiến trúc, nghệ thuật phục vụ và những khoảnh khắc đáng nhớ nhất
+                    </p>
+                    <div class="flex flex-wrap gap-4">
+                        <a href="#rooms" class="text-white px-8 py-4 rounded-lg font-semibold hover:shadow-2xl transition-all hover:scale-105 hover-glow"
+                            th:style="'background: linear-gradient(to right, ' + ${nqtWebsiteColor ?: '#d97706'} + ', ' + ${#strings.replace(nqtWebsiteColor ?: '#d97706', '#', '')} + 'cc);'">
+                            Khám phá phòng
+                        </a>
+                        <a href="#booking" class="glass text-white px-8 py-4 rounded-lg font-semibold hover:bg-white hover:text-gray-900 transition-all border-2 border-white">
+                            Đặt phòng ngay
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Right: Booking Form Glass Panel -->
+                <div class="liquid-glass relative" style="z-index: 30;">
+                    <div class="glass-dark rounded-2xl p-8 md:p-10 shadow-2xl relative" style="z-index: 30;">
+                        <h2 class="font-serif text-3xl text-white mb-6 text-center">Đặt phòng của bạn</h2>
+                        <form th:action="@{/nqtDatPhong}" method="get" class="space-y-5">
+                            <div>
+                                <label for="checkin" class="block text-gray-200 text-sm font-medium mb-2">Ngày đến</label>
+                                <input type="date" id="checkin" name="ngayDen" required
+                                    class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:bg-white/20 focus:border-amber-500 transition-all"
+                                    style="color-scheme: dark;">
+                            </div>
+                            <div>
+                                <label for="checkout" class="block text-gray-200 text-sm font-medium mb-2">Ngày đi</label>
+                                <input type="date" id="checkout" name="ngayDi" required
+                                    class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:bg-white/20 focus:border-amber-500 transition-all"
+                                    style="color-scheme: dark;">
+                            </div>
+                            <div>
+                                <label for="guests" class="block text-gray-200 text-sm font-medium mb-2">Số khách</label>
+                                <select id="guests" name="soKhach" required
+                                    class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:bg-white/20 focus:border-amber-500 transition-all">
+                                    <option value="1" class="bg-gray-800">1 khách</option>
+                                    <option value="2" class="bg-gray-800">2 khách</option>
+                                    <option value="3" class="bg-gray-800">3 khách</option>
+                                    <option value="4" class="bg-gray-800">4 khách</option>
+                                    <option value="5+" class="bg-gray-800">5+ khách</option>
+                                </select>
+                            </div>
+                            <button type="submit"
+                                class="w-full text-white py-4 rounded-lg font-semibold hover:shadow-2xl transition-all hover:scale-105 hover-glow"
+                                th:style="'background: linear-gradient(to right, ' + ${nqtWebsiteColor ?: '#d97706'} + ', ' + ${#strings.replace(nqtWebsiteColor ?: '#d97706', '#', '')} + 'cc);'">
+                                Tìm phòng phù hợp
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trust Badges -->
+    <section class="bg-gradient-to-b from-gray-50 to-white py-12 border-b border-gray-200 relative" style="z-index: 40;">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative" style="z-index: 40;">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                <div class="trust-badge">
+                    <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-amber-600 to-amber-800 rounded-full flex items-center justify-center shadow-lg">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 mb-1">Đặt phòng an toàn</h3>
+                    <p class="text-sm text-gray-600">Bảo mật thông tin</p>
+                </div>
+                <div class="trust-badge">
+                    <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-amber-600 to-amber-800 rounded-full flex items-center justify-center shadow-lg">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 mb-1">Giá tốt nhất</h3>
+                    <p class="text-sm text-gray-600">Đảm bảo giá ưu đãi</p>
+                </div>
+                <div class="trust-badge">
+                    <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-amber-600 to-amber-800 rounded-full flex items-center justify-center shadow-lg">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 mb-1">Hỗ trợ 24/7</h3>
+                    <p class="text-sm text-gray-600">Concierge luôn sẵn sàng</p>
+                </div>
+                <div class="trust-badge">
+                    <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-amber-600 to-amber-800 rounded-full flex items-center justify-center shadow-lg">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 mb-1">Thành viên VIP</h3>
+                    <p class="text-sm text-gray-600">Quyền lợi độc quyền</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Room Showcase -->
+    <section id="rooms" class="py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="font-serif text-4xl md:text-5xl font-bold text-gray-900 mb-4">Phòng nghỉ <span class="gold-accent">cao cấp</span></h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">Mỗi phòng là một tác phẩm nghệ thuật, kết hợp hoàn hảo giữa thiết kế tinh tế và tiện nghi hiện đại</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div th:each="room : ${featuredRooms}" class="glass-card rounded-2xl overflow-hidden group cursor-pointer">
+                    <div class="room-image h-64 flex items-center justify-center relative">
+                        <span class="text-white text-7xl font-serif font-bold z-10" th:text="${room.nqtSoPhong}">101</span>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-start justify-between mb-3">
+                            <div>
+                                <h3 class="font-serif text-2xl font-bold text-gray-900 mb-1" th:text="${room.nqtTenPhong}">Phòng</h3>
+                                <p class="text-gray-600 text-sm" th:text="${room.nqtLoaiPhong.nqtTenLoaiPhong}">Loại phòng</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 mb-4">
+                            <svg class="w-5 h-5 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                            </svg>
+                            <span class="text-sm text-gray-600" th:text="'Sức chứa: ' + ${room.nqtLoaiPhong.nqtSoNguoi} + ' người'">2 người</span>
+                        </div>
+                        <div class="flex items-center justify-between pt-4 border-t border-gray-200">
+                            <div>
+                                <p class="text-sm text-gray-500">Từ</p>
+                                <p class="text-2xl font-bold gold-accent" th:text="${#numbers.formatDecimal(room.nqtLoaiPhong.nqtGia, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">1,000,000 VNĐ</p>
+                            </div>
+                            <a th:href="@{/nqtPhong/{id}(id=${room.nqtId})}"
+                                class="bg-gradient-to-r from-amber-600 to-amber-800 text-white px-6 py-2.5 rounded-lg font-semibold hover:shadow-lg transition-all hover:scale-105">
+                                Xem chi tiết
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-12">
+                <a href="/nqtPhong"
+                    class="inline-block glass-card px-8 py-4 rounded-lg font-semibold text-gray-900 hover:shadow-xl transition-all">
+                    Xem tất cả phòng →
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Storytelling / Experience Section -->
+    <section class="py-24 bg-gradient-to-b from-white to-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-2 gap-16 items-center">
+                <div class="order-2 lg:order-1">
+                    <div class="glass-card rounded-2xl p-8 md:p-12">
+                        <h2 class="font-serif text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                            Trải nghiệm <span class="gold-accent">độc quyền</span>
+                        </h2>
+                        <p class="text-lg text-gray-700 mb-6 leading-relaxed">
+                            Tại <span th:text="${nqtWebsiteName ?: 'Hotel NQT'}">Hotel NQT</span>, chúng tôi không chỉ cung cấp chỗ nghỉ - chúng tôi tạo ra những khoảnh khắc đáng nhớ. 
+                            Từ spa thư giãn đến ẩm thực tinh tế, mỗi chi tiết được chăm chút để mang đến trải nghiệm hoàn hảo.
+                        </p>
+                        <div class="space-y-4 mb-8">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 bg-gradient-to-br from-amber-600 to-amber-800 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-gray-900 mb-1">Spa & Wellness</h3>
+                                    <p class="text-gray-600">Thư giãn với các liệu pháp spa cao cấp được thiết kế riêng</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 bg-gradient-to-br from-amber-600 to-amber-800 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-gray-900 mb-1">Ẩm thực tinh tế</h3>
+                                    <p class="text-gray-600">Thưởng thức các món ăn đẳng cấp từ các đầu bếp hàng đầu</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 bg-gradient-to-br from-amber-600 to-amber-800 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-gray-900 mb-1">Dịch vụ cá nhân hóa</h3>
+                                    <p class="text-gray-600">Concierge 24/7 sẵn sàng đáp ứng mọi nhu cầu của bạn</p>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="/nqtDichVu"
+                            class="inline-block bg-gradient-to-r from-amber-600 to-amber-800 text-white px-8 py-3 rounded-lg font-semibold hover:shadow-lg transition-all hover:scale-105">
+                            Khám phá dịch vụ
+                        </a>
+                    </div>
+                </div>
+                <div class="order-1 lg:order-2">
+                    <div class="relative">
+                        <div class="glass-card rounded-2xl p-8 md:p-12 text-center">
+                            <blockquote class="font-serif text-2xl md:text-3xl text-gray-900 mb-6 italic">
+                                "Một nơi nghỉ dưỡng không chỉ là chỗ ở, mà là nơi tạo ra những kỷ niệm đẹp nhất trong cuộc đời bạn."
+                            </blockquote>
+                            <div class="flex items-center justify-center gap-3">
+                                <div class="w-12 h-12 bg-gradient-to-br from-amber-600 to-amber-800 rounded-full"></div>
+                                <div class="text-left">
+                                    <p class="font-semibold text-gray-900" th:text="${nqtWebsiteName ?: 'Hotel NQT'}">Hotel NQT</p>
+                                    <p class="text-sm text-gray-600">Tinh hoa nghệ thuật phục vụ</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Showcase -->
+    <section th:if="${services != null and !services.isEmpty()}" class="py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="font-serif text-4xl md:text-5xl font-bold text-gray-900 mb-4">Dịch vụ <span class="gold-accent">đặc biệt</span></h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">Những trải nghiệm độc quyền dành riêng cho bạn</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div th:each="service : ${services}" class="glass-card rounded-xl p-6 text-center group">
+                    <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-amber-600 to-amber-800 rounded-full flex items-center justify-center">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 mb-2" th:text="${service.nqtTen}">Dịch vụ</h3>
+                    <p class="text-sm text-gray-600 mb-4" th:text="${service.nqtDonGia != null ? (#numbers.formatDecimal(service.nqtDonGia, 0, 'COMMA', 0, 'POINT') + ' VNĐ') : 'Liên hệ'}">Giá</p>
+                    <a th:href="@{/nqtDichVu/{id}(id=${service.nqtId})}"
+                        class="text-amber-700 font-medium hover:underline">Tìm hiểu thêm →</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section th:if="${testimonials != null and !testimonials.isEmpty()}" class="py-24 bg-gradient-to-b from-gray-50 to-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="font-serif text-4xl md:text-5xl font-bold text-gray-900 mb-4">Khách hàng <span class="gold-accent">nói gì</span></h2>
+                <p class="text-xl text-gray-600">Những trải nghiệm thực tế từ khách hàng của chúng tôi</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div th:each="testimonial : ${testimonials}" class="testimonial-card rounded-2xl p-8">
+                    <div class="flex items-center gap-1 mb-4">
+                        <svg th:each="i : ${#numbers.sequence(1, 5)}" class="w-5 h-5 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                        </svg>
+                    </div>
+                    <p class="text-gray-700 mb-6 italic leading-relaxed" th:text="${testimonial.nqtNoiDungDanhGia}">"Trải nghiệm tuyệt vời..."</p>
+                    <div class="flex items-center gap-3 pt-4 border-t border-gray-200">
+                        <div class="w-10 h-10 bg-gradient-to-br from-amber-600 to-amber-800 rounded-full"></div>
+                        <div>
+                            <p class="font-semibold text-gray-900" th:text="${testimonial.nqtDatPhong.nqtNguoiDung.nqtHoVaTen}">Khách hàng</p>
+                            <p class="text-sm text-gray-600" th:text="${testimonial.nqtDatPhong.nqtPhong.nqtTenPhong}">Phòng</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- VIP Membership CTA -->
+    <section class="py-24 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-20" style="background-image: url('data:image/svg+xml;charset=utf-8,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%23d4af37%22%20fill-opacity%3D%220.05%22%3E%3Cpath%20d%3D%22M36%2034v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6%2034v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6%204V0H4v4H0v2h4v4h2V6h4V4H6z%22%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E');"></div>
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="vip-cta rounded-3xl p-8 md:p-12 text-center">
+                <div class="inline-block w-20 h-20 bg-gradient-to-br from-amber-600 to-amber-800 rounded-full flex items-center justify-center mb-6 shadow-2xl">
+                    <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+                    </svg>
+                </div>
+                <h2 class="font-serif text-4xl md:text-5xl font-bold text-white mb-4">Thành viên <span class="gold-accent">VIP</span></h2>
+                <p class="text-xl text-gray-200 mb-8 max-w-2xl mx-auto">
+                    Trở thành thành viên VIP và tận hưởng những đặc quyền độc quyền: nâng cấp phòng miễn phí, 
+                    early access, giá ưu đãi đặc biệt và nhiều hơn nữa.
+                </p>
+                <div class="grid md:grid-cols-3 gap-6 mb-8 text-left">
+                    <div class="glass-dark rounded-xl p-6">
+                        <h3 class="font-semibold text-white mb-2">Nâng cấp phòng</h3>
+                        <p class="text-gray-300 text-sm">Miễn phí khi có sẵn</p>
+                    </div>
+                    <div class="glass-dark rounded-xl p-6">
+                        <h3 class="font-semibold text-white mb-2">Early Access</h3>
+                        <p class="text-gray-300 text-sm">Ưu tiên đặt phòng</p>
+                    </div>
+                    <div class="glass-dark rounded-xl p-6">
+                        <h3 class="font-semibold text-white mb-2">Giá ưu đãi</h3>
+                        <p class="text-gray-300 text-sm">Giảm giá đặc biệt</p>
+                    </div>
+                </div>
+                <a href="/nqtDangKy"
+                    class="inline-block bg-gradient-to-r from-amber-600 to-amber-800 text-white px-10 py-4 rounded-lg font-semibold text-lg hover:shadow-2xl transition-all hover:scale-105 hover-glow">
+                    Tham gia VIP ngay
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+                <div>
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div class="w-12 h-12 bg-gradient-to-br from-amber-600 to-amber-800 rounded-lg flex items-center justify-center overflow-hidden">
+                            <img th:src="${nqtWebsiteLogo}" alt="Logo" class="w-full h-full object-cover"
+                                th:if="${nqtWebsiteLogo != null and nqtWebsiteLogo != ''}">
+                            <span class="text-white font-serif font-bold text-xl" 
+                                th:unless="${nqtWebsiteLogo != null and nqtWebsiteLogo != ''}"
+                                th:text="${#strings.substring(nqtWebsiteName ?: 'Hotel NQT', 0, 1)}">H</span>
+                        </div>
+                        <span class="text-2xl font-serif font-bold" th:text="${nqtWebsiteName ?: 'Hotel NQT'}">Hotel NQT</span>
+                    </div>
+                    <p class="text-gray-400 mb-4">Khách sạn cao cấp với dịch vụ tinh tế và trải nghiệm độc quyền.</p>
+                    <div class="flex space-x-4">
+                        <a th:href="${nqtWebsiteFacebook ?: '#'}" target="_blank" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-amber-600 transition-colors"
+                            th:if="${nqtWebsiteFacebook != null and nqtWebsiteFacebook != '' and nqtWebsiteFacebook != '#'}">
+                            <span class="text-sm">FB</span>
+                        </a>
+                        <a th:href="${nqtWebsiteZalo ?: '#'}" target="_blank" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-amber-600 transition-colors"
+                            th:if="${nqtWebsiteZalo != null and nqtWebsiteZalo != '' and nqtWebsiteZalo != '#'}">
+                            <span class="text-sm">ZL</span>
+                        </a>
+                        <a th:href="${nqtWebsiteLink ?: '#'}" target="_blank" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-amber-600 transition-colors"
+                            th:if="${nqtWebsiteLink != null and nqtWebsiteLink != '' and nqtWebsiteLink != '#'}">
+                            <span class="text-sm">WS</span>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-lg mb-4">Về chúng tôi</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="/nqtGioiThieu" class="hover:text-amber-500 transition-colors">Giới thiệu</a></li>
+                        <li><a href="/nqtLienHe" class="hover:text-amber-500 transition-colors">Liên hệ</a></li>
+                        <li><a href="/nqtTinTuc" class="hover:text-amber-500 transition-colors">Tin tức</a></li>
+                        <li><a href="#" class="hover:text-amber-500 transition-colors">Tuyển dụng</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-lg mb-4">Dịch vụ</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="/nqtPhong" class="hover:text-amber-500 transition-colors">Phòng nghỉ</a></li>
+                        <li><a href="/nqtDichVu" class="hover:text-amber-500 transition-colors">Dịch vụ</a></li>
+                        <li><a href="/nqtDatPhong" class="hover:text-amber-500 transition-colors">Đặt phòng</a></li>
+                        <li><a href="#" class="hover:text-amber-500 transition-colors">Spa & Wellness</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-lg mb-4">Hỗ trợ</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li th:if="${nqtWebsiteFAQ != null and nqtWebsiteFAQ != '' and nqtWebsiteFAQ != '#'}">
+                            <a th:href="${nqtWebsiteFAQ}" class="hover:text-amber-500 transition-colors">Câu hỏi thường gặp</a>
+                        </li>
+                        <li th:each="link : ${nqtWebsiteSupportLinksList}">
+                            <a th:href="${link[1]}" th:text="${link[0]}" class="hover:text-amber-500 transition-colors">Link</a>
+                        </li>
+                        <li th:if="${nqtWebsiteSupportLinksList == null or nqtWebsiteSupportLinksList.isEmpty()}">
+                            <a href="#" class="hover:text-amber-500 transition-colors">Câu hỏi thường gặp</a>
+                        </li>
+                        <li th:if="${nqtWebsiteSupportLinksList == null or nqtWebsiteSupportLinksList.isEmpty()}">
+                            <a href="#" class="hover:text-amber-500 transition-colors">Chính sách hủy</a>
+                        </li>
+                        <li th:if="${nqtWebsiteSupportLinksList == null or nqtWebsiteSupportLinksList.isEmpty()}">
+                            <a href="#" class="hover:text-amber-500 transition-colors">Điều khoản sử dụng</a>
+                        </li>
+                        <li th:if="${nqtWebsiteSupportLinksList == null or nqtWebsiteSupportLinksList.isEmpty()}">
+                            <a href="#" class="hover:text-amber-500 transition-colors">Bảo mật</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 pt-8 text-center text-gray-400">
+                <p>&copy; <span th:text="${#dates.year(#dates.createNow())}">2024</span> <span th:text="${nqtWebsiteName ?: 'Hotel NQT'}">Hotel NQT</span>. All rights reserved. Developed by Nguyễn Quang Tâm - K23CNT1</p>
+                <p class="mt-2"><span th:text="${nqtWebsiteAddress ?: '123 Đường ABC, Quận XYZ, Hà Nội, Việt Nam'}">123 Đường ABC, Quận XYZ, Hà Nội, Việt Nam</span> | Tel: <span th:text="${nqtWebsitePhone ?: '(84) 123-456-789'}">(84) 123-456-789</span> | Email: <span th:text="${nqtWebsiteEmail ?: 'contact@hotelnqt.com'}">contact@hotelnqt.com</span></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Smooth Scroll Script -->
+    <script>
+        // Set minimum date to today for date inputs
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            const checkinInput = document.getElementById('checkin');
+            const checkoutInput = document.getElementById('checkout');
+            
+            if (checkinInput) {
+                checkinInput.setAttribute('min', today);
+                checkinInput.addEventListener('change', function() {
+                    if (checkoutInput) {
+                        checkoutInput.setAttribute('min', this.value);
+                    }
+                });
+            }
+            
+            if (checkoutInput) {
+                checkoutInput.setAttribute('min', today);
+            }
+        });
+
+        // Parallax effect for hero section
+        window.addEventListener('scroll', function() {
+            const scrolled = window.pageYOffset;
+            const hero = document.querySelector('.hero-bg');
+            if (hero) {
+                hero.style.transform = `translateY(${scrolled * 0.5}px)`;
+            }
+        });
+        
+        // Apply dynamic color from settings to all gradient elements
+        document.addEventListener('DOMContentLoaded', function() {
+            const primaryColor = /*[[${nqtWebsiteColor ?: '#d97706'}]]*/ '#d97706';
+            // Create darker version for gradient
+            function hexToRgb(hex) {
+                const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                return result ? {
+                    r: parseInt(result[1], 16),
+                    g: parseInt(result[2], 16),
+                    b: parseInt(result[3], 16)
+                } : null;
+            }
+            function darkenColor(hex, percent) {
+                const rgb = hexToRgb(hex);
+                if (!rgb) return hex;
+                const r = Math.max(0, Math.floor(rgb.r * (1 - percent / 100)));
+                const g = Math.max(0, Math.floor(rgb.g * (1 - percent / 100)));
+                const b = Math.max(0, Math.floor(rgb.b * (1 - percent / 100)));
+                return `rgb(${r}, ${g}, ${b})`;
+            }
+            const primaryColorDark = darkenColor(primaryColor, 20);
+            
+            // Find all elements with amber gradient classes
+            const allElements = document.querySelectorAll('*');
+            allElements.forEach(function(el) {
+                const classes = el.className;
+                if (typeof classes === 'string') {
+                    // Check for gradient classes
+                    if (classes.includes('from-amber-600') && classes.includes('to-amber-800')) {
+                        if (classes.includes('bg-gradient-to-r')) {
+                            el.style.background = `linear-gradient(to right, ${primaryColor}, ${primaryColorDark})`;
+                            el.style.backgroundImage = `linear-gradient(to right, ${primaryColor}, ${primaryColorDark})`;
+                        } else if (classes.includes('bg-gradient-to-br')) {
+                            el.style.background = `linear-gradient(to bottom right, ${primaryColor}, ${primaryColorDark})`;
+                            el.style.backgroundImage = `linear-gradient(to bottom right, ${primaryColor}, ${primaryColorDark})`;
+                        }
+                    }
+                    // Apply to hover text colors
+                    if (classes.includes('hover:text-amber-500') || classes.includes('hover:text-amber-700')) {
+                        el.addEventListener('mouseenter', function() {
+                            this.style.color = primaryColor;
+                        });
+                        el.addEventListener('mouseleave', function() {
+                            this.style.color = '';
+                        });
+                    }
+                    // Apply to hover background
+                    if (classes.includes('hover:bg-amber-600')) {
+                        el.addEventListener('mouseenter', function() {
+                            this.style.backgroundColor = primaryColor;
+                        });
+                        el.addEventListener('mouseleave', function() {
+                            this.style.backgroundColor = '';
+                        });
+                    }
+                }
+            });
+            
+            // Apply to gold-accent class immediately
+            const goldAccents = document.querySelectorAll('.gold-accent');
+            goldAccents.forEach(function(el) {
+                el.style.color = primaryColor;
+                el.style.setProperty('color', primaryColor, 'important');
+            });
+            
+            // Also update CSS variable for gold-accent
+            document.documentElement.style.setProperty('--color-primary', primaryColor);
+            
+            // Apply color to all elements with inline style that use nqtWebsiteColor
+            const styleElements = document.querySelectorAll('[th\\:style*="nqtWebsiteColor"]');
+            styleElements.forEach(function(el) {
+                const style = el.getAttribute('th:style') || el.getAttribute('style') || '';
+                if (style.includes('nqtWebsiteColor')) {
+                    // This will be processed by Thymeleaf, but we ensure it's applied
+                    const computedStyle = window.getComputedStyle(el);
+                    if (computedStyle.background.includes('rgb') || computedStyle.background.includes('#')) {
+                        // Already applied by Thymeleaf
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
+

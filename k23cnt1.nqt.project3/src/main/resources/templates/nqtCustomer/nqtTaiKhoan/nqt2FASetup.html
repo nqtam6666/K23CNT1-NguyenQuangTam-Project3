@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="'Thiết lập 2FA - ' + ${nqtWebsiteName ?: 'Hotel NQT'}">Thiết lập 2FA - Hotel NQT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link th:with="fontName=${#strings.replace(nqtWebsiteFont ?: 'Inter', ' ', '+')}" 
+          th:href="@{'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=' + ${fontName} + ':wght@300;400;500;600;700&display=swap'}" 
+          rel="stylesheet">
+    <style th:inline="css">
+        * {
+            font-family: /*[[${nqtWebsiteFont ?: 'Inter'}]]*/ 'Inter', sans-serif;
+        }
+        :root {
+            --color-primary: /*[[${nqtWebsiteColor ?: '#d97706'}]]*/ #d97706;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-white min-h-screen py-12 px-4">
+    <div class="max-w-2xl mx-auto">
+        <div class="bg-white rounded-2xl shadow-xl p-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Xác thực 2 yếu tố (2FA)</h2>
+
+            <div th:if="${nqtError}" class="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                <span th:text="${nqtError}"></span>
+            </div>
+
+            <div th:if="${nqtSuccess}"
+                class="mb-6 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
+                <span th:text="${nqtSuccess}"></span>
+            </div>
+
+            <!-- If 2FA is already enabled -->
+            <div th:if="${nqt2faEnabled}" class="space-y-6">
+                <div class="bg-green-50 border border-green-200 rounded-lg p-6">
+                    <div class="flex items-center mb-4">
+                        <svg class="w-8 h-8 text-green-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <h3 class="text-lg font-semibold text-green-800">2FA đã được bật</h3>
+                    </div>
+                    <p class="text-green-700 mb-4">Tài khoản của bạn đã được bảo vệ bằng xác thực 2 yếu tố.</p>
+                    
+                    <form th:action="@{/nqtTaiKhoan/disable-2fa}" method="post" class="mt-4">
+                        <div class="mb-4">
+                            <label for="disableCode" class="block text-sm font-medium text-gray-700 mb-2">Nhập mã 2FA để tắt</label>
+                            <input type="text" id="disableCode" name="nqt2faCode" maxlength="6" pattern="[0-9]{6}" required
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 text-center text-xl tracking-widest"
+                                placeholder="000000">
+                        </div>
+                        <button type="submit" class="px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors">
+                            Tắt 2FA
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Setup 2FA -->
+            <div th:unless="${nqt2faEnabled}" class="space-y-6">
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
+                    <h3 class="text-lg font-semibold text-blue-800 mb-2">Hướng dẫn thiết lập</h3>
+                    <ol class="list-decimal list-inside space-y-2 text-blue-700">
+                        <li>Tải ứng dụng Google Authenticator hoặc Authy trên điện thoại</li>
+                        <li>Quét mã QR bên dưới hoặc nhập mã secret thủ công</li>
+                        <li>Nhập mã 6 số từ ứng dụng để xác nhận</li>
+                    </ol>
+                </div>
+
+                <div class="text-center">
+                    <img th:src="${nqtQrCode}" alt="QR Code" class="mx-auto mb-4 border-2 border-gray-200 rounded-lg p-4 bg-white">
+                    <p class="text-sm text-gray-600 mb-2">Quét mã QR bằng ứng dụng xác thực</p>
+                    <div class="bg-gray-100 rounded-lg p-4 mb-4">
+                        <p class="text-xs text-gray-500 mb-1">Hoặc nhập mã thủ công:</p>
+                        <code class="text-sm font-mono text-gray-800" th:text="${nqtSecret}"></code>
+                        <button onclick="copySecret()" class="ml-2 text-xs text-blue-600 hover:text-blue-800">Sao chép</button>
+                    </div>
+                </div>
+
+                <form th:action="@{/nqtTaiKhoan/enable-2fa}" method="post">
+                    <div class="mb-4">
+                        <label for="nqt2faCode" class="block text-sm font-medium text-gray-700 mb-2">Nhập mã xác thực 6 số</label>
+                        <input type="text" id="nqt2faCode" name="nqt2faCode" maxlength="6" pattern="[0-9]{6}" required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-center text-2xl tracking-widest"
+                            placeholder="000000" autocomplete="off">
+                        <p class="mt-2 text-xs text-gray-500">Nhập mã 6 số từ ứng dụng Google Authenticator</p>
+                    </div>
+                    <div class="flex space-x-4">
+                        <button type="submit"
+                            class="flex-1 py-3 px-4 text-white font-semibold rounded-lg transition-all transform hover:scale-105"
+                            th:style="'background: linear-gradient(to right, ' + ${nqtWebsiteColor ?: '#d97706'} + ', ' + ${#strings.replace(nqtWebsiteColor ?: '#d97706', '#', '')} + 'cc);'">
+                            Kích hoạt 2FA
+                        </button>
+                        <a href="/nqtTaiKhoan" class="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold rounded-lg transition-colors flex items-center">
+                            Hủy
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function copySecret() {
+            const secret = document.querySelector('code').textContent;
+            navigator.clipboard.writeText(secret).then(() => {
+                alert('Đã sao chép mã secret!');
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const codeInput = document.getElementById('nqt2faCode');
+            if (codeInput) {
+                codeInput.focus();
+                codeInput.addEventListener('input', function(e) {
+                    if (e.target.value.length === 6) {
+                        e.target.form.submit();
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
+

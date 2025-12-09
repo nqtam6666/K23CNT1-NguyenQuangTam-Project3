@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="'Đăng ký - ' + ${nqtWebsiteName ?: 'Hotel NQT'}">Đăng ký - Hotel NQT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link th:with="fontName=${#strings.replace(nqtWebsiteFont ?: 'Inter', ' ', '+')}" 
+          th:href="@{'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=' + ${fontName} + ':wght@300;400;500;600;700&display=swap'}" 
+          rel="stylesheet">
+    <style th:inline="css">
+        .font-serif { font-family: 'Playfair Display', serif; }
+        * {
+            font-family: /*[[${nqtWebsiteFont ?: 'Inter'}]]*/ 'Inter', sans-serif;
+        }
+        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3); }
+        :root {
+            --color-primary: /*[[${nqtWebsiteColor ?: '#d97706'}]]*/ #d97706;
+        }
+        .link-login {
+            transition: color 0.3s ease;
+        }
+        .link-login:hover {
+            opacity: 0.8;
+        }
+        .btn-register {
+            min-height: 48px;
+            display: block;
+            width: 100%;
+        }
+        .btn-register:focus {
+            outline: 2px solid var(--color-primary);
+            outline-offset: 2px;
+        }
+        .input-focus:focus {
+            outline: none;
+            border-color: var(--color-primary);
+        }
+        .input-focus:focus {
+            --tw-ring-color: var(--color-primary);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-white">
+    <div class="min-h-screen flex items-center justify-center py-12 px-4">
+        <div class="max-w-md w-full">
+            <div class="text-center mb-8">
+                <a href="/nqtTrangChu" class="inline-block mb-6">
+                    <div class="flex items-center space-x-3 justify-center">
+                        <div class="w-12 h-12 rounded-lg flex items-center justify-center shadow-lg overflow-hidden"
+                            th:style="'background: linear-gradient(to bottom right, ' + ${nqtWebsiteColor ?: '#d97706'} + ', ' + ${#strings.replace(nqtWebsiteColor ?: '#d97706', '#', '')} + 'cc);'">
+                            <img th:src="${nqtWebsiteLogo}" alt="Logo" class="w-full h-full object-cover"
+                                th:if="${nqtWebsiteLogo != null and nqtWebsiteLogo != ''}">
+                            <span class="text-white font-serif font-bold text-xl" 
+                                th:unless="${nqtWebsiteLogo != null and nqtWebsiteLogo != ''}"
+                                th:text="${#strings.substring(nqtWebsiteName ?: 'Hotel NQT', 0, 1)}">H</span>
+                        </div>
+                        <span class="text-2xl font-serif font-bold text-gray-900" th:text="${nqtWebsiteName ?: 'Hotel NQT'}">Hotel NQT</span>
+                    </div>
+                </a>
+                <h2 class="font-serif text-4xl font-bold text-gray-900 mb-2">Đăng ký</h2>
+                <p class="text-gray-600">Tạo tài khoản để trải nghiệm dịch vụ tốt nhất</p>
+            </div>
+
+            <div class="glass-card rounded-2xl shadow-xl p-8">
+                <div th:if="${nqtError}" class="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                    <span th:text="${nqtError}">Error message</span>
+                </div>
+
+                <form th:action="@{/nqtDangKy}" method="post" class="space-y-5">
+                    <div>
+                        <label for="nqtHoVaTen" class="block text-sm font-medium text-gray-700 mb-2">Họ và tên <span class="text-red-500">*</span></label>
+                        <input type="text" id="nqtHoVaTen" name="nqtHoVaTen" required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 transition-all input-focus"
+                            placeholder="Nhập họ và tên">
+                    </div>
+
+                    <div>
+                        <label for="nqtTaiKhoan" class="block text-sm font-medium text-gray-700 mb-2">Tài khoản <span class="text-red-500">*</span></label>
+                        <input type="text" id="nqtTaiKhoan" name="nqtTaiKhoan" required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 transition-all input-focus"
+                            placeholder="Nhập tài khoản">
+                    </div>
+
+                    <div>
+                        <label for="nqtEmail" class="block text-sm font-medium text-gray-700 mb-2">Email <span class="text-red-500">*</span></label>
+                        <input type="email" id="nqtEmail" name="nqtEmail" required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 transition-all input-focus"
+                            placeholder="Nhập email">
+                    </div>
+
+                    <div>
+                        <label for="nqtSoDienThoai" class="block text-sm font-medium text-gray-700 mb-2">Số điện thoại</label>
+                        <input type="tel" id="nqtSoDienThoai" name="nqtSoDienThoai"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 transition-all input-focus"
+                            placeholder="Nhập số điện thoại">
+                    </div>
+
+                    <div>
+                        <label for="nqtDiaChi" class="block text-sm font-medium text-gray-700 mb-2">Địa chỉ</label>
+                        <input type="text" id="nqtDiaChi" name="nqtDiaChi"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 transition-all input-focus"
+                            placeholder="Nhập địa chỉ">
+                    </div>
+
+                    <div>
+                        <label for="nqtMatKhau" class="block text-sm font-medium text-gray-700 mb-2">Mật khẩu <span class="text-red-500">*</span></label>
+                        <input type="password" id="nqtMatKhau" name="nqtMatKhau" required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 transition-all input-focus"
+                            placeholder="Nhập mật khẩu">
+                    </div>
+
+                    <div>
+                        <label for="nqtMatKhauXacNhan" class="block text-sm font-medium text-gray-700 mb-2">Xác nhận mật khẩu <span class="text-red-500">*</span></label>
+                        <input type="password" id="nqtMatKhauXacNhan" name="nqtMatKhauXacNhan" required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 transition-all input-focus"
+                            placeholder="Nhập lại mật khẩu">
+                    </div>
+
+                    <button type="submit"
+                        class="w-full text-white py-3 rounded-lg font-semibold hover:shadow-lg transition-all transform hover:scale-105 btn-register"
+                        th:style="'background: linear-gradient(to right, ' + ${nqtWebsiteColor ?: '#d97706'} + ', ' + ${#strings.replace(nqtWebsiteColor ?: '#d97706', '#', '')} + 'cc);'"
+                        style="background: linear-gradient(to right, #d97706, #d97706cc);">
+                        Đăng ký
+                    </button>
+                </form>
+
+                <div class="mt-6 text-center">
+                    <p class="text-gray-600">
+                        Đã có tài khoản?
+                        <a href="/nqtDangNhap" class="font-semibold hover:underline link-login"
+                           th:style="'color: ' + ${nqtWebsiteColor ?: '#d97706'} + ';'"
+                           style="color: #d97706;">Đăng nhập ngay</a>
+                    </p>
+                </div>
+
+                <div class="mt-4 text-center">
+                    <a href="/nqtTrangChu" class="text-gray-500 hover:text-gray-700 text-sm">← Quay về trang chủ</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const primaryColor = /*[[${nqtWebsiteColor ?: '#d97706'}]]*/ '#d97706';
+            const primaryColorDark = primaryColor + 'cc';
+            const registerButton = document.querySelector('.btn-register');
+            if (registerButton) {
+                registerButton.style.background = 'linear-gradient(to right, ' + primaryColor + ', ' + primaryColorDark + ')';
+            }
+            
+            // Apply focus color to inputs
+            const inputs = document.querySelectorAll('.input-focus');
+            inputs.forEach(function(input) {
+                input.addEventListener('focus', function() {
+                    this.style.borderColor = primaryColor;
+                    this.style.boxShadow = '0 0 0 2px ' + primaryColor + '40';
+                });
+                input.addEventListener('blur', function() {
+                    this.style.borderColor = '';
+                    this.style.boxShadow = '';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{admin/layout :: layout(nqtTitle='Cron Log')}">
+
+<body>
+    <div th:fragment="content">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-semibold text-gray-800 flex items-center">
+                <i class="bi bi-clock-history mr-2"></i> Cron Log
+            </h2>
+            <div class="flex space-x-2">
+                <a th:href="@{/admin/cron-log/clear-all}"
+                    class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg shadow-sm transition-colors flex items-center"
+                    onclick="return confirm('Bạn có chắc chắn muốn xóa tất cả log?');">
+                    <i class="bi bi-trash mr-2"></i> Xóa tất cả
+                </a>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="mb-4 flex space-x-4">
+            <select
+                class="px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-700"
+                onchange="window.location.href = '/admin/cron-log?status=' + this.value">
+                <option value="">-- Tất cả Trạng thái --</option>
+                <option value="SUCCESS" th:selected="${selectedStatus == 'SUCCESS'}">SUCCESS</option>
+                <option value="ERROR" th:selected="${selectedStatus == 'ERROR'}">ERROR</option>
+                <option value="WARNING" th:selected="${selectedStatus == 'WARNING'}">WARNING</option>
+            </select>
+            <input type="text" 
+                placeholder="Tìm theo tên task..."
+                class="px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-700"
+                th:value="${selectedTaskName}"
+                onkeypress="if(event.key === 'Enter') { window.location.href = '/admin/cron-log?taskName=' + this.value; }">
+            <button onclick="window.location.href = '/admin/cron-log?taskName=' + document.querySelector('input[placeholder=\"Tìm theo tên task...\"]').value"
+                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors">
+                <i class="bi bi-search"></i> Tìm
+            </button>
+            <a th:href="@{/admin/cron-log}"
+                class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white font-medium rounded-lg shadow-sm transition-colors">
+                <i class="bi bi-arrow-clockwise"></i> Reset
+            </a>
+        </div>
+
+        <!-- Stats -->
+        <div class="mb-4 grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="bg-white p-4 rounded-lg shadow">
+                <div class="text-sm text-gray-600">Tổng số log</div>
+                <div class="text-2xl font-bold text-gray-800" th:text="${totalLogs ?: 0}">0</div>
+            </div>
+            <div class="bg-green-50 p-4 rounded-lg shadow">
+                <div class="text-sm text-green-600">SUCCESS</div>
+                <div class="text-2xl font-bold text-green-800" th:text="${totalSuccess ?: 0}">0</div>
+            </div>
+            <div class="bg-red-50 p-4 rounded-lg shadow">
+                <div class="text-sm text-red-600">ERROR</div>
+                <div class="text-2xl font-bold text-red-800" th:text="${totalError ?: 0}">0</div>
+            </div>
+            <div class="bg-yellow-50 p-4 rounded-lg shadow">
+                <div class="text-sm text-yellow-600">WARNING</div>
+                <div class="text-2xl font-bold text-yellow-800" th:text="${totalWarning ?: 0}">0</div>
+            </div>
+        </div>
+
+        <div class="bg-white shadow-md rounded-lg overflow-hidden">
+            <div class="overflow-x-auto">
+                <table id="nqtDataTable" class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                ID</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Task Name</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Trạng thái</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Thông báo</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Số bản ghi</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Thời gian (ms)</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Thời gian</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr th:each="item : ${nqtList}" class="hover:bg-gray-50 transition-colors">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${item.nqtId}"></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+                                th:text="${item.nqtTaskName}"></td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span th:if="${item.nqtStatus == 'SUCCESS'}"
+                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">SUCCESS</span>
+                                <span th:if="${item.nqtStatus == 'ERROR'}"
+                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">ERROR</span>
+                                <span th:if="${item.nqtStatus == 'WARNING'}"
+                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">WARNING</span>
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-500" th:text="${item.nqtMessage}"></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
+                                th:text="${item.nqtRecordsProcessed != null ? item.nqtRecordsProcessed : '-'}"></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
+                                th:text="${item.nqtExecutionTime != null ? item.nqtExecutionTime : '-'}"></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
+                                th:text="${#temporals.format(item.nqtCreatedAt, 'dd/MM/yyyy HH:mm:ss')}"></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <button th:if="${item.nqtErrorDetails != null}"
+                                    onclick="showErrorDetails([[${item.nqtErrorDetails}]])"
+                                    class="text-red-600 hover:text-red-900 mr-3" title="Xem chi tiết lỗi">
+                                    <i class="bi bi-exclamation-triangle"></i>
+                                </button>
+                                <a th:href="@{/admin/cron-log/delete/{id}(id=${item.nqtId})}"
+                                    class="text-red-600 hover:text-red-900 btn-delete" title="Xóa"
+                                    onclick="return confirm('Bạn có chắc chắn muốn xóa?');">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <div th:if="${totalPages != null && totalPages > 1}" class="mt-4 flex justify-center">
+            <div class="flex space-x-2">
+                <a th:if="${currentPage > 0}"
+                    th:href="@{/admin/cron-log(page=${currentPage - 1})}"
+                    class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg">Trước</a>
+                <span class="px-4 py-2 bg-blue-600 text-white rounded-lg"
+                    th:text="'Trang ' + (${currentPage} + 1) + ' / ' + ${totalPages}">Trang 1 / 1</span>
+                <a th:if="${currentPage < totalPages - 1}"
+                    th:href="@{/admin/cron-log(page=${currentPage + 1})}"
+                    class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg">Sau</a>
+            </div>
+        </div>
+
+        <!-- Error Details Modal -->
+        <div id="errorModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+            <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 shadow-lg rounded-md bg-white">
+                <div class="mt-3">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-medium text-gray-900">Chi tiết lỗi</h3>
+                        <button onclick="closeErrorModal()" class="text-gray-400 hover:text-gray-600">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </div>
+                    <div class="mt-2">
+                        <pre id="errorDetails" class="bg-gray-100 p-4 rounded text-xs overflow-auto max-h-96"></pre>
+                    </div>
+                    <div class="mt-4 flex justify-end">
+                        <button onclick="closeErrorModal()"
+                            class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg">Đóng</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showErrorDetails(errorDetails) {
+            document.getElementById('errorDetails').textContent = errorDetails;
+            document.getElementById('errorModal').classList.remove('hidden');
+        }
+
+        function closeErrorModal() {
+            document.getElementById('errorModal').classList.add('hidden');
+        }
+    </script>
+</body>
+
+</html>
+

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="'Lỗi - ' + ${nqtWebsiteName ?: 'Hotel NQT'}">Lỗi - Hotel NQT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link th:with="fontName=${#strings.replace(nqtWebsiteFont ?: 'Inter', ' ', '+')}" 
+          th:href="@{'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=' + ${fontName} + ':wght@300;400;500;600;700&display=swap'}" 
+          rel="stylesheet">
+    <style th:inline="css">
+        .font-serif { font-family: 'Playfair Display', serif; }
+        * {
+            font-family: /*[[${nqtWebsiteFont ?: 'Inter'}]]*/ 'Inter', sans-serif;
+        }
+        :root {
+            --color-primary: /*[[${nqtWebsiteColor ?: '#d97706'}]]*/ #d97706;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-white min-h-screen flex items-center justify-center py-12 px-4">
+    <div class="max-w-2xl w-full">
+        <div class="text-center mb-8">
+            <a href="/nqtTrangChu" class="inline-block mb-6">
+                <div class="flex items-center space-x-3 justify-center">
+                    <div class="w-12 h-12 rounded-lg flex items-center justify-center shadow-lg overflow-hidden"
+                        th:style="'background: linear-gradient(to bottom right, ' + ${nqtWebsiteColor ?: '#d97706'} + ', ' + ${#strings.replace(nqtWebsiteColor ?: '#d97706', '#', '')} + 'cc);'">
+                        <img th:src="${nqtWebsiteLogo}" alt="Logo" class="w-full h-full object-cover"
+                            th:if="${nqtWebsiteLogo != null and nqtWebsiteLogo != ''}">
+                        <span class="text-white font-serif font-bold text-xl" 
+                            th:unless="${nqtWebsiteLogo != null and nqtWebsiteLogo != ''}"
+                            th:text="${#strings.substring(nqtWebsiteName ?: 'Hotel NQT', 0, 1)}">H</span>
+                    </div>
+                    <span class="text-2xl font-serif font-bold text-gray-900" th:text="${nqtWebsiteName ?: 'Hotel NQT'}">Hotel NQT</span>
+                </div>
+            </a>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-xl p-8 border-l-4" 
+             th:style="'border-left-color: ' + ${nqtWebsiteColor ?: '#d97706'} + ';'"
+             style="border-left-color: #d97706;">
+            <div class="flex items-center mb-6">
+                <div class="flex-shrink-0 mr-4" th:style="'color: ' + ${nqtWebsiteColor ?: '#d97706'} + ';'">
+                    <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="font-serif text-3xl font-bold text-gray-900 mb-2">Đã xảy ra lỗi!</h1>
+                    <p class="text-gray-600">Xin lỗi vì sự bất tiện này. Chúng tôi đang xử lý vấn đề.</p>
+                </div>
+            </div>
+            
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                <p class="text-red-800 font-semibold mb-2">Chi tiết lỗi:</p>
+                <p class="text-red-700 text-sm" th:text="${error ?: 'Đã xảy ra lỗi không xác định'}">Đã xảy ra lỗi không xác định</p>
+            </div>
+            
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="/nqtTrangChu" 
+                   class="inline-block text-center px-6 py-3 rounded-lg font-semibold text-white transition-all transform hover:scale-105"
+                   th:style="'background: linear-gradient(to right, ' + ${nqtWebsiteColor ?: '#d97706'} + ', ' + ${#strings.replace(nqtWebsiteColor ?: '#d97706', '#', '')} + 'cc);'">
+                    ← Về trang chủ
+                </a>
+                <button onclick="window.history.back()" 
+                        class="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-all">
+                    Quay lại
+                </button>
+            </div>
+
+            <div class="mt-8 pt-6 border-t border-gray-200">
+                <p class="text-sm text-gray-500 text-center">
+                    Nếu vấn đề vẫn tiếp tục, vui lòng 
+                    <a th:href="@{/nqtLienHe}" class="font-semibold underline" th:style="'color: ' + ${nqtWebsiteColor ?: '#d97706'} + ';'">liên hệ với chúng tôi</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

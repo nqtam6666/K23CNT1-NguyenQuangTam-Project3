@@ -1,0 +1,103 @@
+package k23cnt1.nqt.project3.nqtConfig;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import k23cnt1.nqt.project3.nqtEntity.NqtNguoiDung;
+import k23cnt1.nqt.project3.nqtRepository.NqtNguoiDungRepository;
+import k23cnt1.nqt.project3.nqtService.NqtJwtService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
+import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.util.Optional;
+
+@Component
+public class NqtOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
+
+    @Autowired
+    private NqtNguoiDungRepository nqtNguoiDungRepository;
+
+    @Autowired
+    private NqtJwtService jwtService;
+
+    @Override
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
+            Authentication authentication) throws IOException, ServletException {
+        
+        try {
+            // Check if response is already committed
+            if (response.isCommitted()) {
+                return;
+            }
+            
+            OAuth2User oauth2User = (OAuth2User) authentication.getPrincipal();
+            String email = oauth2User.getAttribute("email");
+            
+            // Handle missing email
+            if (email == null || email.isEmpty()) {
+                getRedirectStrategy().sendRedirect(request, response, "/nqtDangNhap?error=oauth2_no_email");
+                return;
+            }
+            
+            String name = oauth2User.getAttribute("name");
+            if (name == null) {
+                name = email;
+            }
+
+            // Find or create user
+            Optional<NqtNguoiDung> userOptional = nqtNguoiDungRepository.findByNqtEmail(email);
+            NqtNguoiDung user;
+
+            if (userOptional.isPresent()) {
+                user = userOptional.get();
+            } else {
+                // Create new user from OAuth2
+                user = new NqtNguoiDung();
+                user.setNqtEmail(email);
+                user.setNqtHoVaTen(name);
+                user.setNqtTaiKhoan(email);
+                user.setNqtVaiTro((byte) 0); // Default to customer
+                user.setNqtStatus(true);
+                user.setNqtCapBac("KhachThuong");
+                user.setNqtMatKhau(""); // OAuth users don't need password
+                user = nqtNguoiDungRepository.save(user);
+            }
+
+            // Generate JWT token
+            String token = jwtService.generateToken(user.getNqtTaiKhoan(), user.getNqtId(), user.getNqtVaiTro());
+
+            // Set JWT in cookie
+            Cookie jwtCookie = new Cookie("jwt", token);
+            jwtCookie.setHttpOnly(true);
+            jwtCookie.setPath("/");
+            jwtCookie.setMaxAge(86400); // 24 hours
+            response.addCookie(jwtCookie);
+
+            // Set session for backward compatibility
+            request.getSession().setAttribute("nqtCustomerUser", user);
+            if (user.getNqtVaiTro() != null && (user.getNqtVaiTro() == 99 || user.getNqtVaiTro() == 1)) {
+                request.getSession().setAttribute("nqtAdminUser", user);
+                request.getSession().setAttribute("nqtAdminSession", user.getNqtTaiKhoan());
+            }
+
+            // Check again if response is committed before redirect
+            if (!response.isCommitted()) {
+                // Always redirect to customer site (not admin) when logging in from customer site
+                // Admin can access admin panel via the "Admin" button in navigation
+                getRedirectStrategy().sendRedirect(request, response, "/nqtTrangChu");
+            }
+        } catch (Exception e) {
+            // Log error and redirect to login with error message
+            e.printStackTrace();
+            if (!response.isCommitted()) {
+                getRedirectStrategy().sendRedirect(request, response, "/nqtDangNhap?error=oauth2_error");
+            }
+        }
+    }
+}
+

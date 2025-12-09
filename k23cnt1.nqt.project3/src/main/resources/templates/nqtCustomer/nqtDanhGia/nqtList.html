@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đánh giá của tôi - Hotel NQT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .font-serif { font-family: 'Playfair Display', serif; }
+        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3); transition: all 0.4s; }
+        .glass-card:hover { transform: translateY(-4px); box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1); }
+        .gold-accent { color: #d4af37; }
+        .nav-glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-white">
+    <nav class="nav-glass fixed top-0 left-0 right-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <a href="/nqtTrangChu" class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-amber-600 to-amber-800 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-serif font-bold">H</span>
+                    </div>
+                    <span class="text-xl font-serif font-bold text-gray-900">Hotel NQT</span>
+                </a>
+                <a href="/nqtTrangChu" class="text-gray-700 hover:text-amber-700">← Trang chủ</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="pt-20 pb-16">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h1 class="font-serif text-4xl font-bold text-gray-900 mb-4">Đánh giá <span class="gold-accent">của tôi</span></h1>
+                <p class="text-gray-600">Tất cả đánh giá bạn đã viết</p>
+            </div>
+
+            <div th:if="${reviews != null and !reviews.isEmpty()}" class="space-y-6">
+                <div th:each="review : ${reviews}" class="glass-card rounded-2xl p-6">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex-1">
+                            <h3 class="font-serif text-xl font-bold text-gray-900 mb-2" th:text="'Đặt phòng #' + ${review.nqtDatPhong.nqtId}">Đặt phòng #123</h3>
+                            <p class="text-gray-600 mb-2" th:text="${review.nqtDatPhong.nqtPhong.nqtTenPhong} + ' - ' + ${review.nqtDatPhong.nqtPhong.nqtSoPhong}">Phòng Deluxe - 101</p>
+                            <p class="text-sm text-gray-500 mb-4" th:text="'Ngày đánh giá: ' + ${#temporals.format(review.nqtNgayDanhGia, 'dd/MM/yyyy HH:mm')}">Ngày đánh giá: 01/01/2024</p>
+                        </div>
+                        <div>
+                            <span th:if="${review.nqtStatus == true}" class="inline-block bg-green-100 text-green-800 px-4 py-2 rounded-full font-semibold text-sm">Đã duyệt</span>
+                            <span th:if="${review.nqtStatus == false}" class="inline-block bg-yellow-100 text-yellow-800 px-4 py-2 rounded-full font-semibold text-sm">Chờ duyệt</span>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                        <p class="text-gray-700" th:text="${review.nqtNoiDungDanhGia}">Nội dung đánh giá...</p>
+                    </div>
+                    <a th:href="@{/nqtDatPhongCuaToi/{id}(id=${review.nqtDatPhong.nqtId})}"
+                        class="text-amber-700 font-medium hover:underline">
+                        Xem chi tiết đặt phòng →
+                    </a>
+                </div>
+            </div>
+
+            <div th:if="${reviews == null or reviews.isEmpty()}" class="text-center py-16">
+                <svg class="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+                </svg>
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">Bạn chưa có đánh giá nào</h3>
+                <p class="text-gray-600 mb-6">Hãy đặt phòng và chia sẻ trải nghiệm của bạn</p>
+                <a href="/nqtDatPhongCuaToi" class="inline-block bg-gradient-to-r from-amber-600 to-amber-800 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-all">
+                    Xem đặt phòng của tôi
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

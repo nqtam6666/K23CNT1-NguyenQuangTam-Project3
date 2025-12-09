@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="'Giới thiệu - ' + ${nqtWebsiteName ?: 'Hotel NQT'}">Giới thiệu - Hotel NQT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link th:with="fontName=${#strings.replace(nqtWebsiteFont ?: 'Inter', ' ', '+')}" 
+          th:href="@{'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=' + ${fontName} + ':wght@300;400;500;600;700&display=swap'}" 
+          rel="stylesheet">
+    <style th:inline="css">
+        .font-serif { font-family: 'Playfair Display', serif; }
+        * {
+            font-family: /*[[${nqtWebsiteFont ?: 'Inter'}]]*/ 'Inter', sans-serif;
+        }
+        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3); }
+        .gold-accent { 
+            color: /*[[${nqtWebsiteColor ?: '#d97706'}]]*/ #d97706;
+        }
+        .nav-glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); }
+        :root {
+            --color-primary: /*[[${nqtWebsiteColor ?: '#d97706'}]]*/ #d97706;
+        }
+        .bullet-point {
+            color: var(--color-primary);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-white">
+    <nav class="nav-glass fixed top-0 left-0 right-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <a href="/nqtTrangChu" class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-lg flex items-center justify-center shadow-lg overflow-hidden"
+                        th:style="'background: linear-gradient(to bottom right, ' + ${nqtWebsiteColor ?: '#d97706'} + ', ' + ${#strings.replace(nqtWebsiteColor ?: '#d97706', '#', '')} + 'cc);'">
+                        <img th:src="${nqtWebsiteLogo}" alt="Logo" class="w-full h-full object-cover"
+                            th:if="${nqtWebsiteLogo != null and nqtWebsiteLogo != ''}">
+                        <span class="text-white font-serif font-bold" 
+                            th:unless="${nqtWebsiteLogo != null and nqtWebsiteLogo != ''}"
+                            th:text="${#strings.substring(nqtWebsiteName ?: 'Hotel NQT', 0, 1)}">H</span>
+                    </div>
+                    <span class="text-xl font-serif font-bold text-gray-900" th:text="${nqtWebsiteName ?: 'Hotel NQT'}">Hotel NQT</span>
+                </a>
+                <a href="/nqtTrangChu" class="text-gray-700 transition-colors"
+                   th:style="'color: ' + ${nqtWebsiteColor ?: '#d97706'} + ';'"
+                   style="color: #d97706;">← Trang chủ</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="pt-20 pb-16">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h1 class="font-serif text-4xl md:text-5xl font-bold text-gray-900 mb-4">Về <span class="gold-accent">chúng tôi</span></h1>
+                <p class="text-xl text-gray-600" th:text="'Khám phá câu chuyện của ' + ${nqtWebsiteName ?: 'Hotel NQT'}">Khám phá câu chuyện của Hotel NQT</p>
+            </div>
+
+            <div class="glass-card rounded-2xl p-8 md:p-12 space-y-8">
+                <div>
+                    <h2 class="font-serif text-3xl font-bold text-gray-900 mb-4">Sứ mệnh của chúng tôi</h2>
+                    <p class="text-gray-700 leading-relaxed">
+                        <span th:text="${nqtWebsiteName ?: 'Hotel NQT'}">Hotel NQT</span> cam kết mang đến trải nghiệm nghỉ dưỡng đẳng cấp thế giới, nơi mỗi chi tiết được chăm chút để tạo ra những khoảnh khắc đáng nhớ nhất cho khách hàng.
+                    </p>
+                </div>
+
+                <div>
+                    <h2 class="font-serif text-3xl font-bold text-gray-900 mb-4">Giá trị cốt lõi</h2>
+                    <ul class="space-y-3 text-gray-700">
+                        <li class="flex items-start gap-3">
+                            <span class="bullet-point font-bold">•</span>
+                            <span><strong>Sang trọng:</strong> Mỗi không gian được thiết kế với sự tinh tế và đẳng cấp</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="bullet-point font-bold">•</span>
+                            <span><strong>Riêng tư:</strong> Đảm bảo không gian riêng tư và yên tĩnh cho mọi khách hàng</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="bullet-point font-bold">•</span>
+                            <span><strong>Phục vụ cá nhân hóa:</strong> Dịch vụ được tùy chỉnh theo nhu cầu của từng khách hàng</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h2 class="font-serif text-3xl font-bold text-gray-900 mb-4">Liên hệ</h2>
+                    <div class="space-y-3 text-gray-700">
+                        <p><strong>Địa chỉ:</strong> <span th:text="${nqtWebsiteAddress ?: '123 Đường ABC, Quận XYZ, Hà Nội, Việt Nam'}">123 Đường ABC, Quận XYZ, Hà Nội, Việt Nam</span></p>
+                        <p><strong>Điện thoại:</strong> <span th:text="${nqtWebsitePhone ?: '(84) 123-456-789'}">(84) 123-456-789</span></p>
+                        <p><strong>Email:</strong> <span th:text="${nqtWebsiteEmail ?: 'contact@hotelnqt.com'}">contact@hotelnqt.com</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

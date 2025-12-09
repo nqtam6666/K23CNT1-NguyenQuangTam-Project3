@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{admin/layout :: layout(nqtTitle='Form Đơn giá Dịch vụ')}">
+
+<body>
+    <div th:fragment="content">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-semibold text-gray-800 flex items-center">
+                <i class="bi bi-tag mr-2"></i>
+                <span th:text="${nqtId != null ? 'Cập nhật Đơn giá Dịch vụ' : 'Thêm mới Đơn giá Dịch vụ'}"></span>
+            </h2>
+            <a th:href="@{/admin/don-gia-dich-vu}"
+                class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white font-medium rounded-lg shadow-sm transition-colors flex items-center">
+                <i class="bi bi-arrow-left mr-2"></i> Quay lại
+            </a>
+        </div>
+
+        <div class="bg-white shadow-md rounded-lg overflow-hidden">
+            <div class="p-6">
+                <form
+                    th:action="${nqtId != null ? '/admin/don-gia-dich-vu/edit/' + nqtId : '/admin/don-gia-dich-vu/create'}"
+                    th:object="${nqtRequest}" method="post">
+
+                    <div class="grid grid-cols-1 gap-6">
+                        <div>
+                            <label for="nqtDatPhongId" class="block text-sm font-medium text-gray-700 mb-1">Đặt
+                                phòng</label>
+                            <select
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                id="nqtDatPhongId" th:field="*{nqtDatPhongId}" required>
+                                <option value="">-- Chọn đặt phòng --</option>
+                                <option th:each="dp : ${nqtDatPhongList}" th:value="${dp.nqtId}"
+                                    th:text="'Mã: ' + ${dp.nqtId}"></option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="nqtDichVuId" class="block text-sm font-medium text-gray-700 mb-1">Dịch
+                                vụ</label>
+                            <select
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                id="nqtDichVuId" th:field="*{nqtDichVuId}" required>
+                                <option value="">-- Chọn dịch vụ --</option>
+                                <option th:each="dv : ${nqtDichVuList}" th:value="${dv.nqtId}"
+                                    th:data-price="${dv.nqtDonGia}"
+                                    th:text="${dv.nqtTen} + ' - ' + ${#numbers.formatDecimal(dv.nqtDonGia, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">
+                                </option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="nqtSoLuong" class="block text-sm font-medium text-gray-700 mb-1">Số
+                                lượng</label>
+                            <input type="number"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                id="nqtSoLuong" th:field="*{nqtSoLuong}" required min="1">
+                        </div>
+
+                        <!-- <div>
+                            <label for="nqtThanhTien" class="block text-sm font-medium text-gray-700 mb-1">Thành
+                                tiền</label>
+                            <input type="number"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-gray-100 cursor-not-allowed"
+                                id="nqtThanhTien" th:field="*{nqtThanhTien}" required step="0.01" readonly>
+                            <p class="mt-1 text-sm text-gray-500">Tự động tính toán (Số lượng * Đơn giá)</p>
+                        </div> -->
+                    </div>
+
+                    <div class="mt-6 flex items-center space-x-3">
+                        <button type="submit"
+                            class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors flex items-center">
+                            <i class="bi bi-save mr-2"></i> Lưu lại
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const dichVuSelect = document.getElementById('nqtDichVuId');
+            const soLuongInput = document.getElementById('nqtSoLuong');
+            const thanhTienInput = document.getElementById('nqtThanhTien');
+
+            function calculateTotal() {
+                const selectedOption = dichVuSelect.options[dichVuSelect.selectedIndex];
+                const price = parseFloat(selectedOption.getAttribute('data-price')) || 0;
+                const quantity = parseFloat(soLuongInput.value) || 0;
+
+                const total = price * quantity;
+                thanhTienInput.value = total;
+            }
+
+            dichVuSelect.addEventListener('change', calculateTotal);
+            soLuongInput.addEventListener('input', calculateTotal);
+        });
+    </script>
+</body>
+
+</html>

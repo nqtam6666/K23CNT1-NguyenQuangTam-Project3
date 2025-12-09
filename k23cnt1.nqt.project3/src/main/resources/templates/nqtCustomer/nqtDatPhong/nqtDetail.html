@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="'Chi tiết đặt phòng - ' + ${nqtWebsiteName ?: 'Hotel NQT'}">Chi tiết đặt phòng - Hotel NQT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link th:with="fontName=${#strings.replace(nqtWebsiteFont ?: 'Inter', ' ', '+')}" 
+          th:href="@{'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=' + ${fontName} + ':wght@300;400;500;600;700&display=swap'}" 
+          rel="stylesheet">
+    <style th:inline="css">
+        .font-serif { font-family: 'Playfair Display', serif; }
+        * {
+            font-family: /*[[${nqtWebsiteFont ?: 'Inter'}]]*/ 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+            letter-spacing: normal !important;
+            word-spacing: normal !important;
+        }
+        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3); }
+        .gold-accent { 
+            color: /*[[${nqtWebsiteColor ?: '#d97706'}]]*/ #d97706;
+        }
+        .nav-glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); }
+        :root {
+            --color-primary: /*[[${nqtWebsiteColor ?: '#d97706'}]]*/ #d97706;
+        }
+        .btn-primary {
+            background: linear-gradient(to right, var(--color-primary), var(--color-primary)cc);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-white">
+    <nav class="nav-glass fixed top-0 left-0 right-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <a href="/nqtTrangChu" class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-lg flex items-center justify-center shadow-lg overflow-hidden"
+                        th:style="'background: linear-gradient(to bottom right, ' + ${nqtWebsiteColor ?: '#d97706'} + ', ' + ${#strings.replace(nqtWebsiteColor ?: '#d97706', '#', '')} + 'cc);'">
+                        <img th:src="${nqtWebsiteLogo}" alt="Logo" class="w-full h-full object-cover"
+                            th:if="${nqtWebsiteLogo != null and nqtWebsiteLogo != ''}">
+                        <span class="text-white font-serif font-bold" 
+                            th:unless="${nqtWebsiteLogo != null and nqtWebsiteLogo != ''}"
+                            th:text="${#strings.substring(nqtWebsiteName ?: 'Hotel NQT', 0, 1)}">H</span>
+                    </div>
+                    <span class="text-xl font-serif font-bold text-gray-900" th:text="${nqtWebsiteName ?: 'Hotel NQT'}">Hotel NQT</span>
+                </a>
+                <a href="/nqtDatPhongCuaToi" class="text-gray-700 transition-colors"
+                   th:style="'color: ' + ${nqtWebsiteColor ?: '#d97706'} + ';'"
+                   style="color: #d97706;">← Quay lại</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="pt-20 pb-16">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="mb-6">
+                <a href="/nqtDatPhongCuaToi" class="transition-colors"
+                   th:style="'color: ' + ${nqtWebsiteColor ?: '#d97706'} + ';'"
+                   style="color: #d97706;">← Quay lại danh sách</a>
+            </div>
+
+            <div th:if="${booking}" class="glass-card rounded-2xl p-8 md:p-12">
+                <div class="flex items-start justify-between mb-6">
+                    <div>
+                        <h1 class="font-serif text-3xl font-bold text-gray-900 mb-2">Chi tiết đặt phòng</h1>
+                        <p class="text-gray-600" th:text="'Mã đặt phòng: #' + ${booking.nqtId}">Mã: #123</p>
+                    </div>
+                    <div>
+                        <span th:if="${booking.nqtStatus == 0}" class="inline-block bg-yellow-100 text-yellow-800 px-4 py-2 rounded-full font-semibold">Chờ xác nhận</span>
+                        <span th:if="${booking.nqtStatus == 1}" class="inline-block bg-green-100 text-green-800 px-4 py-2 rounded-full font-semibold">Đã xác nhận</span>
+                        <span th:if="${booking.nqtStatus == 2}" class="inline-block bg-red-100 text-red-800 px-4 py-2 rounded-full font-semibold">Đã hủy</span>
+                    </div>
+                </div>
+
+                <div class="border-t border-gray-200 pt-6 mb-6">
+                    <h2 class="font-serif text-xl font-bold text-gray-900 mb-4">Thông tin phòng</h2>
+                    <div class="grid grid-cols-2 gap-6">
+                        <div>
+                            <p class="text-sm text-gray-500 mb-1">Tên phòng</p>
+                            <p class="text-lg font-semibold" th:text="${booking.nqtPhong.nqtTenPhong}">Phòng Deluxe</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 mb-1">Số phòng</p>
+                            <p class="text-lg font-semibold" th:text="${booking.nqtPhong.nqtSoPhong}">101</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 mb-1">Loại phòng</p>
+                            <p class="text-lg font-semibold" th:text="${booking.nqtPhong.nqtLoaiPhong.nqtTenLoaiPhong}">Deluxe</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 mb-1">Sức chứa</p>
+                            <p class="text-lg font-semibold" th:text="${booking.nqtPhong.nqtLoaiPhong.nqtSoNguoi} + ' người'">2 người</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="border-t border-gray-200 pt-6 mb-6">
+                    <h2 class="font-serif text-xl font-bold text-gray-900 mb-4">Thời gian lưu trú</h2>
+                    <div class="grid grid-cols-2 gap-6">
+                        <div>
+                            <p class="text-sm text-gray-500 mb-1">Ngày đến</p>
+                            <p class="text-lg font-semibold" th:text="${#temporals.format(booking.nqtNgayDen, 'dd/MM/yyyy')}">01/01/2024</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 mb-1">Ngày đi</p>
+                            <p class="text-lg font-semibold" th:text="${#temporals.format(booking.nqtNgayDi, 'dd/MM/yyyy')}">03/01/2024</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div th:if="${booking.nqtGhiChu}" class="border-t border-gray-200 pt-6 mb-6">
+                    <h2 class="font-serif text-xl font-bold text-gray-900 mb-4">Ghi chú</h2>
+                    <p class="text-gray-700" th:text="${booking.nqtGhiChu}">Ghi chú của khách hàng</p>
+                </div>
+
+                <div class="border-t border-gray-200 pt-6 mb-6">
+                    <h2 class="font-serif text-xl font-bold text-gray-900 mb-4">Tổng thanh toán</h2>
+                    <div class="flex justify-between items-center">
+                        <span class="text-xl font-semibold text-gray-900">Tổng cộng</span>
+                        <span class="text-3xl font-bold gold-accent" th:text="${#numbers.formatDecimal(booking.nqtTongTien, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">1,000,000 VNĐ</span>
+                    </div>
+                </div>
+
+                <!-- Review Section -->
+                <div th:if="${booking.nqtStatus == 1}" class="border-t border-gray-200 pt-6 mb-6">
+                    <h2 class="font-serif text-xl font-bold text-gray-900 mb-4">Đánh giá</h2>
+                    <div th:if="${hasReview == true}" class="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+                        <p class="text-green-800 font-semibold mb-2">✓ Bạn đã đánh giá đặt phòng này</p>
+                        <p class="text-gray-700" th:text="${review.nqtNoiDungDanhGia}">Nội dung đánh giá...</p>
+                        <p class="text-sm text-gray-500 mt-2" th:text="'Ngày đánh giá: ' + ${#temporals.format(review.nqtNgayDanhGia, 'dd/MM/yyyy HH:mm')}">Ngày đánh giá</p>
+                    </div>
+                    <div th:if="${hasReview == false}">
+                        <a th:href="@{/nqtDanhGia/dat-phong/{id}(id=${booking.nqtId})}"
+                            class="inline-block text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-all btn-primary"
+                            th:style="'background: linear-gradient(to right, ' + ${nqtWebsiteColor ?: '#d97706'} + ', ' + ${#strings.replace(nqtWebsiteColor ?: '#d97706', '#', '')} + 'cc);'"
+                            style="background: linear-gradient(to right, #d97706, #d97706cc);">
+                            Viết đánh giá
+                        </a>
+                    </div>
+                </div>
+
+                <div th:if="${booking.nqtStatus != 2}" class="border-t border-gray-200 pt-6">
+                    <form th:action="@{/nqtDatPhong/{id}/huy(id=${booking.nqtId})}" method="post">
+                        <button type="submit" onclick="return confirm('Bạn có chắc muốn hủy đặt phòng này?')"
+                            class="w-full bg-red-100 text-red-700 px-6 py-3 rounded-lg font-semibold hover:bg-red-200 transition">
+                            Hủy đặt phòng
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const primaryColor = /*[[${nqtWebsiteColor ?: '#d97706'}]]*/ '#d97706';
+            const primaryColorDark = primaryColor + 'cc';
+            
+            // Apply color to buttons
+            const buttons = document.querySelectorAll('.btn-primary');
+            buttons.forEach(function(btn) {
+                btn.style.background = 'linear-gradient(to right, ' + primaryColor + ', ' + primaryColorDark + ')';
+            });
+        });
+    </script>
+</body>
+</html>
+

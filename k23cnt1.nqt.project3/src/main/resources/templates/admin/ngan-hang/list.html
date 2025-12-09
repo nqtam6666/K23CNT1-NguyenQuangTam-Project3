@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{admin/layout :: layout(nqtTitle='Quản lý Ngân Hàng')}">
+
+<body>
+    <div th:fragment="content">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-semibold text-gray-800 flex items-center">
+                <i class="bi bi-bank mr-2"></i> Quản lý Ngân Hàng
+            </h2>
+            <a th:href="@{/admin/ngan-hang/create}"
+                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors flex items-center">
+                <i class="bi bi-plus-circle mr-2"></i> Thêm mới
+            </a>
+        </div>
+
+        <!-- Quick Filters -->
+        <div class="mb-4 flex space-x-4">
+            <select
+                class="nqt-filter-dropdown px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-700"
+                data-filter-column="6">
+                <option value="">-- Tất cả Trạng thái --</option>
+                <option value="Hoạt động">Hoạt động</option>
+                <option value="Không hoạt động">Không hoạt động</option>
+            </select>
+        </div>
+
+        <div class="bg-white shadow-md rounded-lg overflow-hidden">
+            <div class="overflow-x-auto">
+                <table id="nqtDataTable" class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                ID</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Tên ngân hàng</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Mã ngân hàng</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Số tài khoản</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Chủ tài khoản</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Thứ tự</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Trạng thái</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr th:each="item : ${nqtList}" class="hover:bg-gray-50 transition-colors">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${item.nqtId}"></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+                                th:text="${item.nqtTenNganHang}"></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
+                                th:text="${item.nqtMaNganHang}"></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
+                                th:text="${item.nqtSoTaiKhoan}"></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
+                                th:text="${item.nqtTenChuTaiKhoan}"></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
+                                th:text="${item.nqtThuTu}"></td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span th:if="${item.nqtStatus}"
+                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Hoạt
+                                    động</span>
+                                <span th:unless="${item.nqtStatus}"
+                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">Không
+                                    hoạt động</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <a th:href="@{/admin/ngan-hang/edit/{id}(id=${item.nqtId})}"
+                                    class="text-yellow-600 hover:text-yellow-900 mr-3" title="Sửa">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a th:href="@{/admin/ngan-hang/delete/{id}(id=${item.nqtId})}"
+                                    class="text-red-600 hover:text-red-900 btn-delete" title="Xóa"
+                                    onclick="return confirm('Bạn có chắc chắn muốn xóa?');">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+

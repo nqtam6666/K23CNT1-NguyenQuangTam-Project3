@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+    th:replace="~{admin/layout :: layout(nqtTitle=${nqtId != null ? 'Sửa Ngân Hàng' : 'Thêm Ngân Hàng'})}">
+
+<body>
+    <div th:fragment="content">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-semibold text-gray-800 flex items-center">
+                <i class="bi bi-bank mr-2"></i>
+                <span th:text="${nqtId != null ? 'Sửa Ngân Hàng' : 'Thêm Ngân Hàng'}"></span>
+            </h2>
+            <a th:href="@{/admin/ngan-hang}"
+                class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white font-medium rounded-lg shadow-sm transition-colors flex items-center">
+                <i class="bi bi-arrow-left mr-2"></i> Quay lại
+            </a>
+        </div>
+
+        <div class="bg-white shadow-md rounded-lg overflow-hidden">
+            <div class="p-6">
+                <form th:action="${nqtId != null ? '/admin/ngan-hang/edit/' + nqtId : '/admin/ngan-hang/create'}"
+                    th:object="${nqtRequest}" method="post">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tên ngân hàng <span
+                                    class="text-red-500">*</span></label>
+                            <input type="text"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                th:field="*{nqtTenNganHang}" required placeholder="VD: Vietcombank">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Mã ngân hàng (VietQR) <span
+                                    class="text-red-500">*</span></label>
+                            <input type="text"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                th:field="*{nqtMaNganHang}" required placeholder="VD: VCB, TCB, VPB"
+                                style="text-transform: uppercase;">
+                            <p class="mt-1 text-xs text-gray-500">Mã ngân hàng theo chuẩn VietQR (xem danh sách mã tại <a href="https://vietqr.io" target="_blank" class="text-blue-600">vietqr.io</a>)</p>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Số tài khoản <span
+                                    class="text-red-500">*</span></label>
+                            <input type="text"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                th:field="*{nqtSoTaiKhoan}" required placeholder="VD: 1234567890">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tên chủ tài khoản <span
+                                    class="text-red-500">*</span></label>
+                            <input type="text"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                th:field="*{nqtTenChuTaiKhoan}" required placeholder="VD: NGUYEN VAN A">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Chi nhánh</label>
+                            <input type="text"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                th:field="*{nqtChiNhanh}" placeholder="VD: Chi nhánh Hà Nội">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Thứ tự hiển thị</label>
+                            <input type="number" min="0"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                th:field="*{nqtThuTu}" placeholder="0">
+                            <p class="mt-1 text-xs text-gray-500">Số nhỏ hơn sẽ hiển thị trước</p>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Trạng thái</label>
+                            <select
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                th:field="*{nqtStatus}">
+                                <option th:value="true">Hoạt động</option>
+                                <option th:value="false">Không hoạt động</option>
+                            </select>
+                        </div>
+                        <div class="mb-4 md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Ghi chú</label>
+                            <textarea
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                th:field="*{nqtGhiChu}" rows="3" placeholder="Ghi chú về ngân hàng..."></textarea>
+                        </div>
+                    </div>
+                    <div class="mt-6 flex items-center space-x-3">
+                        <button type="submit"
+                            class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors flex items-center">
+                            <i class="bi bi-save mr-2"></i> Lưu
+                        </button>
+                        <a th:href="@{/admin/ngan-hang}"
+                            class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white font-medium rounded-lg shadow-sm transition-colors">Hủy</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
+

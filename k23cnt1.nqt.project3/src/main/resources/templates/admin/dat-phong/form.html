@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+    th:replace="~{admin/layout :: layout(nqtTitle=${nqtId != null ? 'Sửa Đặt Phòng' : 'Thêm Đặt Phòng'})}">
+
+<body>
+    <div th:fragment="content">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-semibold text-gray-800 flex items-center">
+                <i class="bi bi-calendar-check mr-2"></i>
+                <span th:text="${nqtId != null ? 'Sửa Đặt Phòng' : 'Thêm Đặt Phòng'}"></span>
+            </h2>
+            <a th:href="@{/admin/dat-phong}"
+                class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white font-medium rounded-lg shadow-sm transition-colors flex items-center">
+                <i class="bi bi-arrow-left mr-2"></i> Quay lại
+            </a>
+        </div>
+
+        <div class="bg-white shadow-md rounded-lg overflow-hidden">
+            <div class="p-6">
+                <form th:action="${nqtId != null ? '/admin/dat-phong/edit/' + nqtId : '/admin/dat-phong/create'}"
+                    th:object="${nqtRequest}" method="post">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Người dùng</label>
+                            <select
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                th:field="*{nqtNguoiDungId}" required>
+                                <option value="">-- Chọn người dùng --</option>
+                                <option th:each="nd : ${nqtNguoiDungList}" th:value="${nd.nqtId}"
+                                    th:text="${nd.nqtHoVaTen}"></option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Phòng</label>
+                            <select
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                th:field="*{nqtPhongId}" required>
+                                <option value="">-- Chọn phòng --</option>
+                                <option th:each="p : ${nqtPhongList}" th:value="${p.nqtId}" th:text="${p.nqtTenPhong}">
+                                </option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Ngày đến</label>
+                            <input type="date"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                name="nqtNgayDen" id="nqtNgayDen"
+                                th:value="${#temporals.format(nqtRequest.nqtNgayDen, 'yyyy-MM-dd')}" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Ngày đi</label>
+                            <input type="date"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                name="nqtNgayDi" id="nqtNgayDi"
+                                th:value="${#temporals.format(nqtRequest.nqtNgayDi, 'yyyy-MM-dd')}" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tổng tiền</label>
+                            <input type="number" step="0.01"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                th:field="*{nqtTongTien}">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Trạng thái</label>
+                            <select
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                th:field="*{nqtStatus}">
+                                <option value="0">Chờ thanh toán</option>
+                                <option value="1">Đã thanh toán</option>
+                                <option value="2">Hoàn tiền</option>
+                            </select>
+                        </div>
+                        <div class="col-span-1 md:col-span-2 mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Ghi chú</label>
+                            <textarea
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                th:field="*{nqtGhiChu}" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="mt-6 flex items-center space-x-3">
+                        <button type="submit"
+                            class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors flex items-center">
+                            <i class="bi bi-save mr-2"></i> Lưu
+                        </button>
+                        <a th:href="@{/admin/dat-phong}"
+                            class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white font-medium rounded-lg shadow-sm transition-colors">Hủy</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{admin/layout :: layout(nqtTitle='Quản lý Người dùng')}">
+
+<body>
+    <div th:fragment="content">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-semibold text-gray-800 flex items-center">
+                <i class="bi bi-people mr-2"></i> Quản lý Người dùng
+            </h2>
+            <div class="flex items-center space-x-2">
+                <!-- Bulk Actions -->
+                <div id="bulkActions" class="hidden flex items-center space-x-2">
+                    <span id="selectedCount" class="text-sm text-gray-600 font-medium">0 đã chọn</span>
+                    <select id="bulkActionSelect"
+                        class="px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-700">
+                        <option value="">-- Chọn hành động --</option>
+                        <option value="activate">Kích hoạt</option>
+                        <option value="deactivate">Vô hiệu hóa</option>
+                        <option value="delete">Xóa</option>
+                    </select>
+                    <button id="bulkActionBtn" onclick="executeBulkAction()"
+                        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors">
+                        Áp dụng
+                    </button>
+                    <button onclick="clearSelection()"
+                        class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white font-medium rounded-lg shadow-sm transition-colors">
+                        Bỏ chọn
+                    </button>
+                </div>
+                <a th:href="@{/admin/nguoi-dung/create}"
+                    class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors flex items-center">
+                    <i class="bi bi-plus-circle mr-2"></i> Thêm mới
+                </a>
+            </div>
+        </div>
+
+        <!-- Quick Filters -->
+        <div class="mb-4 flex space-x-4">
+            <select
+                class="nqt-filter-dropdown px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-700"
+                data-filter-column="5">
+                <option value="">-- Tất cả Vai trò --</option>
+                <option value="Admin">Admin</option>
+                <option value="Nhân viên">Nhân viên</option>
+                <option value="Người dùng">Người dùng</option>
+            </select>
+            <select
+                class="nqt-filter-dropdown px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-700"
+                data-filter-column="6">
+                <option value="">-- Tất cả Trạng thái --</option>
+                <option value="Hoạt động">Hoạt động</option>
+                <option value="Không hoạt động">Không hoạt động</option>
+            </select>
+        </div>
+
+        <div class="bg-white shadow-md rounded-lg overflow-hidden">
+            <div class="overflow-x-auto">
+                <table id="nqtDataTable" class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left">
+                                <input type="checkbox" id="selectAll" 
+                                    class="w-4 h-4 border-gray-300 rounded focus:ring-blue-500"
+                                    onchange="toggleSelectAll(this)">
+                            </th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                ID</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Họ và tên</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Tài khoản</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Số điện thoại</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Email</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Vai trò</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Trạng thái</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Cấp bậc</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr th:each="item : ${nqtList}" class="hover:bg-gray-50 transition-colors">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <input type="checkbox" class="row-checkbox w-4 h-4 border-gray-300 rounded focus:ring-blue-500"
+                                    th:value="${item.nqtId}" onchange="updateBulkActions()">
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${item.nqtId}"></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+                                th:text="${item.nqtHoVaTen}"></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${item.nqtTaiKhoan}">
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
+                                th:text="${item.nqtSoDienThoai}"></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${item.nqtEmail}">
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span th:if="${item.nqtVaiTro == 0}"
+                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">Người
+                                    dùng</span>
+                                <span th:if="${item.nqtVaiTro == 1}"
+                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Nhân
+                                    viên</span>
+                                <span th:if="${item.nqtVaiTro == 99}"
+                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Admin</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span th:if="${item.nqtStatus}"
+                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Hoạt
+                                    động</span>
+                                <span th:unless="${item.nqtStatus}"
+                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">Không
+                                    hoạt động</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span th:if="${item.nqtCapBac == 'KhachVip'}"
+                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">VIP</span>
+                                <span th:if="${item.nqtCapBac == 'KhachThuong'}"
+                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">Thường</span>
+                                <span th:if="${item.nqtCapBac == null or item.nqtCapBac == ''}"
+                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-400">-</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <a th:href="@{/admin/nguoi-dung/edit/{id}(id=${item.nqtId})}"
+                                    class="text-yellow-600 hover:text-yellow-900 mr-3" title="Sửa">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a th:href="@{/admin/nguoi-dung/delete/{id}(id=${item.nqtId})}"
+                                    class="text-red-600 hover:text-red-900 btn-delete" title="Xóa"
+                                    onclick="return confirm('Bạn có chắc chắn muốn xóa?');">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleSelectAll(checkbox) {
+            const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+            rowCheckboxes.forEach(cb => cb.checked = checkbox.checked);
+            updateBulkActions();
+        }
+
+        function updateBulkActions() {
+            const selected = document.querySelectorAll('.row-checkbox:checked');
+            const bulkActions = document.getElementById('bulkActions');
+            const selectedCount = document.getElementById('selectedCount');
+            
+            if (selected.length > 0) {
+                bulkActions.classList.remove('hidden');
+                selectedCount.textContent = selected.length + ' đã chọn';
+            } else {
+                bulkActions.classList.add('hidden');
+            }
+            
+            // Update select all checkbox
+            const allCheckboxes = document.querySelectorAll('.row-checkbox');
+            const selectAll = document.getElementById('selectAll');
+            if (allCheckboxes.length > 0) {
+                selectAll.checked = selected.length === allCheckboxes.length;
+            }
+        }
+
+        function clearSelection() {
+            document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = false);
+            document.getElementById('selectAll').checked = false;
+            updateBulkActions();
+        }
+
+        function executeBulkAction() {
+            const selected = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(cb => cb.value);
+            const action = document.getElementById('bulkActionSelect').value;
+            
+            if (selected.length === 0) {
+                alert('Vui lòng chọn ít nhất một mục!');
+                return;
+            }
+            
+            if (!action) {
+                alert('Vui lòng chọn hành động!');
+                return;
+            }
+            
+            let confirmMessage = '';
+            let actionUrl = '';
+            
+            switch(action) {
+                case 'activate':
+                    confirmMessage = 'Bạn có chắc chắn muốn kích hoạt ' + selected.length + ' mục đã chọn?';
+                    actionUrl = '/admin/nguoi-dung/bulk-activate';
+                    break;
+                case 'deactivate':
+                    confirmMessage = 'Bạn có chắc chắn muốn vô hiệu hóa ' + selected.length + ' mục đã chọn?';
+                    actionUrl = '/admin/nguoi-dung/bulk-deactivate';
+                    break;
+                case 'delete':
+                    confirmMessage = 'Bạn có chắc chắn muốn xóa ' + selected.length + ' mục đã chọn? Hành động này không thể hoàn tác!';
+                    actionUrl = '/admin/nguoi-dung/bulk-delete';
+                    break;
+            }
+            
+            if (confirm(confirmMessage)) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = actionUrl;
+                
+                selected.forEach(id => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'ids';
+                    input.value = id;
+                    form.appendChild(input);
+                });
+                
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Error</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 h-screen flex items-center justify-center">
+    <div class="container mx-auto px-4">
+        <div class="max-w-lg mx-auto bg-white p-8 rounded-lg shadow-lg border-l-4 border-red-500">
+            <div class="flex items-center mb-4">
+                <div class="flex-shrink-0 text-red-500 mr-3">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <h1 class="text-2xl font-bold text-gray-800">Đã xảy ra lỗi!</h1>
+            </div>
+            
+            <p class="text-gray-600 mb-6" th:text="${error}"></p>
+            
+            <hr class="border-gray-200 my-4">
+            
+            <p class="text-sm font-semibold text-gray-500 mb-2">Stack Trace:</p>
+            <div class="bg-gray-100 p-4 rounded text-xs text-gray-700 overflow-auto max-h-64 mb-6">
+                <pre th:text="${trace}"></pre>
+            </div>
+            
+            <div class="text-center">
+                <a href="/admin" class="inline-block px-6 py-2.5 bg-blue-600 text-white font-medium text-sm leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out">
+                    Quay lại Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

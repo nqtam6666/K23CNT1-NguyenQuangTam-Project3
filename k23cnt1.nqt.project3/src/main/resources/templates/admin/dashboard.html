@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{admin/layout :: layout(nqtTitle='Dashboard')}">
+
+<body>
+    <div th:fragment="content">
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800">Dashboard</h1>
+                <p class="text-gray-500 mt-1">Tổng quan về hoạt động kinh doanh của khách sạn</p>
+            </div>
+            <div class="flex space-x-2">
+                <a href="/admin/report/excel"
+                    class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 shadow-sm transition-colors flex items-center">
+                    <i class="bi bi-file-excel mr-2 text-green-600"></i> Xuất báo cáo Excel
+                </a>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+            <!-- Revenue Card -->
+            <div
+                class="bg-white rounded-xl shadow-sm p-6 border-l-4 border-green-500 hover:shadow-md transition-shadow">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <div class="text-sm font-semibold text-gray-500 uppercase tracking-wider">
+                            Doanh thu</div>
+                        <div class="text-2xl font-bold text-gray-800 mt-1"
+                            th:text="${#numbers.formatDecimal(nqtTongDoanhThu, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">0 VNĐ
+                        </div>
+                    </div>
+                    <div class="p-3 bg-green-100 rounded-full text-green-600">
+                        <i class="bi bi-currency-dollar text-2xl"></i>
+                    </div>
+                </div>
+                <div class="flex items-center text-sm">
+                    <span
+                        th:class="${nqtRevenueGrowth >= 0} ? 'text-green-500 font-medium flex items-center' : 'text-red-500 font-medium flex items-center'">
+                        <i
+                            th:class="${nqtRevenueGrowth >= 0} ? 'bi bi-arrow-up-short text-lg mr-1' : 'bi bi-arrow-down-short text-lg mr-1'"></i>
+                        <span th:text="${nqtRevenueGrowth} + '%'">0%</span>
+                    </span>
+                    <span class="text-gray-400 ml-2">so với tháng trước</span>
+                </div>
+            </div>
+
+            <!-- Bookings Card -->
+            <div
+                class="bg-white rounded-xl shadow-sm p-6 border-l-4 border-blue-500 hover:shadow-md transition-shadow relative overflow-hidden group">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <div class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Đặt
+                            phòng</div>
+                        <div class="text-2xl font-bold text-gray-800 mt-1"
+                            th:text="${#lists.size(nqtDatPhongList) ?: 0}">0</div>
+                    </div>
+                    <div class="p-3 bg-blue-100 rounded-full text-blue-600">
+                        <i class="bi bi-calendar-check text-2xl"></i>
+                    </div>
+                </div>
+                <div class="flex items-center text-sm">
+                    <span class="text-blue-500 font-medium flex items-center">
+                        <span th:text="${nqtNewBookingsCount}">0</span>
+                    </span>
+                    <span class="text-gray-400 ml-2">đặt phòng trong tháng này</span>
+                </div>
+                <a th:href="@{/admin/dat-phong}" class="absolute inset-0 z-10"></a>
+            </div>
+
+            <!-- Rooms Card -->
+            <div
+                class="bg-white rounded-xl shadow-sm p-6 border-l-4 border-indigo-500 hover:shadow-md transition-shadow relative overflow-hidden group">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <div class="text-sm font-semibold text-gray-500 uppercase tracking-wider">
+                            Phòng</div>
+                        <div class="text-2xl font-bold text-gray-800 mt-1" th:text="${#lists.size(nqtPhongList) ?: 0}">0
+                        </div>
+                    </div>
+                    <div class="p-3 bg-indigo-100 rounded-full text-indigo-600">
+                        <i class="bi bi-house-door text-2xl"></i>
+                    </div>
+                </div>
+                <div class="flex items-center text-sm">
+                    <span class="text-gray-500">Tổng số phòng hiện có</span>
+                </div>
+                <a th:href="@{/admin/phong}" class="absolute inset-0 z-10"></a>
+            </div>
+
+            <!-- Users Card -->
+            <div
+                class="bg-white rounded-xl shadow-sm p-6 border-l-4 border-orange-500 hover:shadow-md transition-shadow relative overflow-hidden group">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <div class="text-sm font-semibold text-gray-500 uppercase tracking-wider">
+                            Người dùng</div>
+                        <div class="text-2xl font-bold text-gray-800 mt-1"
+                            th:text="${#lists.size(nqtNguoiDungList) ?: 0}">0</div>
+                    </div>
+                    <div class="p-3 bg-orange-100 rounded-full text-orange-600">
+                        <i class="bi bi-people text-2xl"></i>
+                    </div>
+                </div>
+                <div class="flex items-center text-sm">
+                    <span class="text-gray-500">Thành viên đăng ký</span>
+                </div>
+                <a th:href="@{/admin/nguoi-dung}" class="absolute inset-0 z-10"></a>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <!-- <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+            <div class="bg-white rounded-xl shadow-sm p-6 lg:col-span-2">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">Biểu đồ doanh thu (Năm 2024)</h3>
+                <div class="relative h-80 w-full">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">Trạng thái phòng</h3>
+                <div class="relative h-64 w-full flex justify-center">
+                    <canvas id="statusChart"></canvas>
+                </div>
+                <div class="mt-4 space-y-2">
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-blue-500 mr-2"></span> Đã
+                            đặt</span>
+                        <span class="font-semibold text-gray-700">65%</span>
+                    </div>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-green-500 mr-2"></span>
+                            Trống</span>
+                        <span class="font-semibold text-gray-700">35%</span>
+                    </div>
+                </div>
+            </div>
+        </div>  -->
+
+        <!-- Recent Bookings Table (Optional/Placeholder) -->
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-8">
+            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="text-lg font-bold text-gray-800">Đặt phòng gần đây</h3>
+                <a href="/admin/dat-phong" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Xem tất cả</a>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-50 text-gray-600 text-xs uppercase tracking-wider">
+                            <th class="px-6 py-3 font-semibold">Mã ĐP</th>
+                            <th class="px-6 py-3 font-semibold">Khách hàng</th>
+                            <th class="px-6 py-3 font-semibold">Phòng</th>
+                            <th class="px-6 py-3 font-semibold">Ngày đến</th>
+                            <th class="px-6 py-3 font-semibold">Trạng thái</th>
+                            <th class="px-6 py-3 font-semibold">Tổng tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        <tr th:each="dp, iterStat : ${nqtDatPhongList}" th:if="${iterStat.index < 5}"
+                            class="hover:bg-gray-50 transition-colors">
+                            <td class="px-6 py-4 text-sm font-medium text-gray-900" th:text="'#' + ${dp.nqtId}"></td>
+                            <td class="px-6 py-4 text-sm text-gray-600" th:text="${dp.nqtTenNguoiDung}"></td>
+                            <td class="px-6 py-4 text-sm text-gray-600" th:text="${dp.nqtSoPhong}">
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-600"
+                                th:text="${#temporals.format(dp.nqtNgayDen, 'dd/MM/yyyy')}"></td>
+                            <td class="px-6 py-4">
+                                <span th:if="${dp.nqtStatus == 0}"
+                                    class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Chờ
+                                    thanh toán</span>
+                                <span th:if="${dp.nqtStatus == 1}"
+                                    class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Đã
+                                    thanh toán</span>
+                                <span th:if="${dp.nqtStatus == 2}"
+                                    class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Hủy/Hoàn
+                                    tiền</span>
+                            </td>
+                            <td class="px-6 py-4 text-sm font-bold text-gray-800"
+                                th:text="${#numbers.formatDecimal(dp.nqtTongTien, 0, 'COMMA', 0, 'POINT')} + ' đ'"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            // Revenue Chart
+            const ctxRevenue = document.getElementById('revenueChart').getContext('2d');
+            const monthlyRevenue = /*[[${nqtMonthlyRevenue}]]*/[];
+
+            new Chart(ctxRevenue, {
+                type: 'line',
+                data: {
+                    labels: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12'],
+                    datasets: [{
+                        label: 'Doanh thu (VNĐ)',
+                        data: monthlyRevenue,
+                        borderColor: '#4e73df',
+                        backgroundColor: 'rgba(78, 115, 223, 0.05)',
+                        tension: 0.3,
+                        fill: true,
+                        pointBackgroundColor: '#ffffff',
+                        pointBorderColor: '#4e73df',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            callbacks: {
+                                label: function (context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(context.parsed.y);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                borderDash: [2, 2],
+                                drawBorder: false
+                            },
+                            ticks: {
+                                callback: function (value, index, values) {
+                                    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumSignificantDigits: 3 }).format(value);
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Status Chart
+            const ctxStatus = document.getElementById('statusChart').getContext('2d');
+            const occupiedRooms = /*[[${nqtOccupiedRooms}]]*/ 0;
+            const vacantRooms = /*[[${nqtVacantRooms}]]*/ 0;
+
+            new Chart(ctxStatus, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Đã đặt', 'Trống'],
+                    datasets: [{
+                        data: [occupiedRooms, vacantRooms],
+                        backgroundColor: ['#4e73df', '#1cc88a'],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

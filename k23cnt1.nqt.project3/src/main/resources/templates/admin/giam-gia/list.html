@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{admin/layout :: layout(nqtTitle='Quản lý Mã Giảm Giá')}">
+
+<body>
+    <div th:fragment="content">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-semibold text-gray-800 flex items-center">
+                <i class="bi bi-ticket-perforated mr-2"></i> Quản lý Mã Giảm Giá
+            </h2>
+            <a th:href="@{/admin/giam-gia/create}"
+                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors flex items-center">
+                <i class="bi bi-plus-circle mr-2"></i> Thêm mới
+            </a>
+        </div>
+
+        <!-- Quick Filters -->
+        <div class="mb-4 flex space-x-4">
+            <select
+                class="nqt-filter-dropdown px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-700"
+                data-filter-column="6">
+                <option value="">-- Tất cả Trạng thái --</option>
+                <option value="Hoạt động">Hoạt động</option>
+                <option value="Không hoạt động">Không hoạt động</option>
+            </select>
+            <select
+                class="nqt-filter-dropdown px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-700"
+                data-filter-column="7">
+                <option value="">-- Tất cả Loại --</option>
+                <option value="Phần trăm">Phần trăm</option>
+                <option value="Số tiền">Số tiền</option>
+            </select>
+        </div>
+
+        <div class="bg-white shadow-md rounded-lg overflow-hidden">
+            <div class="overflow-x-auto">
+                <table id="nqtDataTable" class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                ID</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Mã giảm giá</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Mô tả</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Loại</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Giá trị</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Phạm vi</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Trạng thái</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Đã dùng</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr th:each="item : ${nqtList}" class="hover:bg-gray-50 transition-colors">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${item.nqtId}"></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+                                th:text="${item.nqtMaGiamGia}"></td>
+                            <td class="px-6 py-4 text-sm text-gray-500" th:text="${item.nqtMoTa}"></td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span th:if="${item.nqtLoaiGiam == 0}"
+                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Phần
+                                    trăm</span>
+                                <span th:if="${item.nqtLoaiGiam == 1}"
+                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800">Số
+                                    tiền</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <span th:if="${item.nqtLoaiGiam == 0}"
+                                    th:text="${#numbers.formatDecimal(item.nqtGiaTriGiam, 1, 'POINT', 1, 'POINT')} + '%'"></span>
+                                <span th:if="${item.nqtLoaiGiam == 1}"
+                                    th:text="${#numbers.formatDecimal(item.nqtGiaTriGiam, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <span th:if="${item.nqtNguoiDungTen == null}"
+                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Chung
+                                    cho VIP</span>
+                                <span th:if="${item.nqtNguoiDungTen != null}"
+                                    th:text="'Riêng: ' + ${item.nqtNguoiDungTen}"
+                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800"></span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span th:if="${item.nqtStatus}"
+                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Hoạt
+                                    động</span>
+                                <span th:unless="${item.nqtStatus}"
+                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">Không
+                                    hoạt động</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <span th:text="${item.nqtSoLuongDaDung} + '/' + (${item.nqtSoLuongToiDa} != null ? ${item.nqtSoLuongToiDa} : '∞')"></span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <a th:href="@{/admin/giam-gia/edit/{id}(id=${item.nqtId})}"
+                                    class="text-yellow-600 hover:text-yellow-900 mr-3" title="Sửa">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a th:href="@{/admin/giam-gia/delete/{id}(id=${item.nqtId})}"
+                                    class="text-red-600 hover:text-red-900 btn-delete" title="Xóa"
+                                    onclick="return confirm('Bạn có chắc chắn muốn xóa?');">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+

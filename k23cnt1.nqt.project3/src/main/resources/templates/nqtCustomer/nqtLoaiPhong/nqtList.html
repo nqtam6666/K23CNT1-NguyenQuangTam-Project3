@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="'Loại phòng - ' + ${nqtWebsiteName ?: 'Hotel NQT'}">Loại phòng - Hotel NQT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link th:with="fontName=${#strings.replace(nqtWebsiteFont ?: 'Inter', ' ', '+')}" 
+          th:href="@{'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=' + ${fontName} + ':wght@300;400;500;600;700&display=swap'}" 
+          rel="stylesheet">
+    <style th:inline="css">
+        .font-serif { font-family: 'Playfair Display', serif; }
+        * {
+            font-family: /*[[${nqtWebsiteFont ?: 'Inter'}]]*/ 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+        }
+        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3); transition: all 0.4s; }
+        .glass-card:hover { transform: translateY(-8px) scale(1.01); box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15); }
+        .gold-accent { 
+            color: /*[[${nqtWebsiteColor ?: '#d97706'}]]*/ #d97706;
+        }
+        .nav-glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); }
+        :root {
+            --color-primary: /*[[${nqtWebsiteColor ?: '#d97706'}]]*/ #d97706;
+        }
+        .btn-primary {
+            background: linear-gradient(to right, var(--color-primary), var(--color-primary)cc);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-white">
+    <nav class="nav-glass fixed top-0 left-0 right-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <a href="/nqtTrangChu" class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-lg flex items-center justify-center shadow-lg overflow-hidden"
+                        th:style="'background: linear-gradient(to bottom right, ' + ${nqtWebsiteColor ?: '#d97706'} + ', ' + ${#strings.replace(nqtWebsiteColor ?: '#d97706', '#', '')} + 'cc);'">
+                        <img th:src="${nqtWebsiteLogo}" alt="Logo" class="w-full h-full object-cover"
+                            th:if="${nqtWebsiteLogo != null and nqtWebsiteLogo != ''}">
+                        <span class="text-white font-serif font-bold" 
+                            th:unless="${nqtWebsiteLogo != null and nqtWebsiteLogo != ''}"
+                            th:text="${#strings.substring(nqtWebsiteName ?: 'Hotel NQT', 0, 1)}">H</span>
+                    </div>
+                    <span class="text-xl font-serif font-bold text-gray-900" th:text="${nqtWebsiteName ?: 'Hotel NQT'}">Hotel NQT</span>
+                </a>
+                <a href="/nqtTrangChu" class="text-gray-700 transition-colors"
+                   th:style="'color: ' + ${nqtWebsiteColor ?: '#d97706'} + ';'"
+                   style="color: #d97706;">← Trang chủ</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="pt-20 pb-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h1 class="font-serif text-4xl md:text-5xl font-bold text-gray-900 mb-4">Loại phòng <span class="gold-accent">cao cấp</span></h1>
+                <p class="text-xl text-gray-600">Khám phá các loại phòng nghỉ đa dạng của chúng tôi</p>
+            </div>
+
+            <div th:if="${roomTypes != null and !roomTypes.isEmpty()}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div th:each="type : ${roomTypes}" class="glass-card rounded-2xl overflow-hidden group cursor-pointer">
+                    <div class="h-64 flex items-center justify-center relative room-type-bg"
+                        th:style="'background: linear-gradient(to bottom right, ' + ${nqtWebsiteColor ?: '#d97706'} + ', ' + ${#strings.replace(nqtWebsiteColor ?: '#d97706', '#', '')} + 'cc);'"
+                        style="background: linear-gradient(to bottom right, #d97706, #d97706cc);">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <span class="text-white text-5xl font-serif font-bold z-10" th:text="${type.nqtTenLoaiPhong}">Deluxe</span>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center gap-2 mb-4">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
+                                th:style="'color: ' + ${nqtWebsiteColor ?: '#d97706'} + ';'"
+                                style="color: #d97706;">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                            </svg>
+                            <span class="text-sm text-gray-600" th:text="${type.nqtSoNguoi} + ' người'">2 người</span>
+                        </div>
+                        <div class="flex items-center justify-between pt-4 border-t border-gray-200">
+                            <div>
+                                <p class="text-sm text-gray-500">Từ</p>
+                                <p class="text-2xl font-bold gold-accent" th:text="${#numbers.formatDecimal(type.nqtGia, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">1,000,000 VNĐ</p>
+                            </div>
+                            <a th:href="@{/nqtLoaiPhong/{id}(id=${type.nqtId})}"
+                                class="text-white px-6 py-2.5 rounded-lg font-semibold hover:shadow-lg transition-all hover:scale-105 btn-primary"
+                                th:style="'background: linear-gradient(to right, ' + ${nqtWebsiteColor ?: '#d97706'} + ', ' + ${#strings.replace(nqtWebsiteColor ?: '#d97706', '#', '')} + 'cc);'"
+                                style="background: linear-gradient(to right, #d97706, #d97706cc);">
+                                Xem chi tiết
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const primaryColor = /*[[${nqtWebsiteColor ?: '#d97706'}]]*/ '#d97706';
+            const primaryColorDark = primaryColor + 'cc';
+            
+            // Apply color to buttons and backgrounds
+            const buttons = document.querySelectorAll('.btn-primary');
+            buttons.forEach(function(btn) {
+                btn.style.background = 'linear-gradient(to right, ' + primaryColor + ', ' + primaryColorDark + ')';
+            });
+            
+            const roomTypeBgs = document.querySelectorAll('.room-type-bg');
+            roomTypeBgs.forEach(function(bg) {
+                bg.style.background = 'linear-gradient(to bottom right, ' + primaryColor + ', ' + primaryColorDark + ')';
+            });
+        });
+    </script>
+</body>
+</html>
+

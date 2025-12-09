@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${book.id != null ? 'Sửa sách' : 'Thêm mới Sách'}">Book Form</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <h2 th:text="${book.id != null ? 'Sửa sách' : 'Thêm mới Sách'}">Book Form</h2>
+                
+                <form th:action="@{/books/save}" th:object="${book}" method="post" enctype="multipart/form-data">
+                    <input type="hidden" th:field="*{id}">
+                    
+                    <div class="mb-3">
+                        <label for="code" class="form-label">Mã sách</label>
+                        <input type="text" class="form-control" id="code" th:field="*{code}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Tên sách</label>
+                        <input type="text" class="form-control" id="name" th:field="*{name}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Mô tả</label>
+                        <textarea class="form-control" id="description" th:field="*{description}" rows="3"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="imageFile" class="form-label">Hình ảnh</label>
+                        <input type="file" class="form-control" id="imageFile" name="imageFile" accept="image/*">
+                        <small class="form-text text-muted">Chọn ảnh từ máy tính (JPG, PNG, GIF)</small>
+                        <div th:if="${book.imgUrl != null && !book.imgUrl.isEmpty()}" class="mt-2">
+                            <label class="form-label">Ảnh hiện tại:</label>
+                            <div>
+                                <img th:src="${book.imgUrl}" alt="Current image" style="max-width: 200px; max-height: 200px; border: 1px solid #ddd; border-radius: 4px;">
+                            </div>
+                            <small class="form-text text-muted">Chọn ảnh mới để thay thế</small>
+                        </div>
+                        <input type="hidden" th:field="*{imgUrl}">
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="quantity" class="form-label">Số lượng</label>
+                            <input type="number" class="form-control" id="quantity" th:field="*{quantity}" min="0">
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="price" class="form-label">Giá</label>
+                            <input type="number" class="form-control" id="price" th:field="*{price}" min="0" step="0.01">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Tác giả:</label>
+                        <div class="border p-3" style="max-height: 300px; overflow-y: auto;">
+                            <div th:each="author : ${authors}" class="mb-2 p-2 border rounded">
+                                <div class="d-flex align-items-center">
+                                    <div class="form-check me-3">
+                                        <input class="form-check-input author-checkbox" 
+                                               type="checkbox" 
+                                               name="authorIds" 
+                                               th:id="'author_' + ${author.id}"
+                                               th:value="${author.id}"
+                                               th:checked="${book.authorIds != null && book.authorIds.contains(author.id)}"
+                                               th:data-author-id="${author.id}">
+                                        <label class="form-check-label" th:for="'author_' + ${author.id}" th:text="${author.name}"></label>
+                                    </div>
+                                    <div class="form-check editor-radio" 
+                                         th:style="${book.authorIds != null && book.authorIds.contains(author.id) ? '' : 'display: none;'}">
+                                        <input class="form-check-input" 
+                                               type="radio" 
+                                               name="editorId" 
+                                               th:id="'editor_' + ${author.id}"
+                                               th:value="${author.id}"
+                                               th:checked="${book.editorId != null && book.editorId == author.id}">
+                                        <label class="form-check-label" th:for="'editor_' + ${author.id}">Chủ biên</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="isActive" th:field="*{isActive}">
+                        <label class="form-check-label" for="isActive">Còn bán</label>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary" th:text="${book.id != null ? 'Cập nhật' : 'Thêm mới'}">Save</button>
+                        <a href="/books" class="btn btn-secondary">Quay về danh sách</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Xử lý hiển thị/ẩn radio button "Chủ biên" khi checkbox tác giả thay đổi
+        document.addEventListener('DOMContentLoaded', function() {
+            const checkboxes = document.querySelectorAll('.author-checkbox');
+            
+            checkboxes.forEach(function(checkbox) {
+                // Tìm container cha (div với class mb-2) và sau đó tìm editor-radio bên trong
+                const authorContainer = checkbox.closest('.mb-2');
+                const editorRadioContainer = authorContainer ? authorContainer.querySelector('.editor-radio') : null;
+                const editorRadio = editorRadioContainer ? editorRadioContainer.querySelector('input[type="radio"]') : null;
+                
+                // Xử lý khi checkbox thay đổi
+                checkbox.addEventListener('change', function() {
+                    if (this.checked) {
+                        // Hiển thị radio button khi tác giả được chọn
+                        if (editorRadioContainer) {
+                            editorRadioContainer.style.display = 'block';
+                        }
+                    } else {
+                        // Ẩn radio button và bỏ chọn nếu có
+                        if (editorRadioContainer) {
+                            editorRadioContainer.style.display = 'none';
+                        }
+                        if (editorRadio && editorRadio.checked) {
+                            editorRadio.checked = false;
+                        }
+                    }
+                });
+                
+                // Khởi tạo trạng thái ban đầu
+                if (!checkbox.checked && editorRadioContainer) {
+                    editorRadioContainer.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="'Chi tiết dịch vụ - ' + ${nqtWebsiteName ?: 'Hotel NQT'}">Chi tiết dịch vụ - Hotel NQT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link th:with="fontName=${#strings.replace(nqtWebsiteFont ?: 'Inter', ' ', '+')}" 
+          th:href="@{'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=' + ${fontName} + ':wght@300;400;500;600;700&display=swap'}" 
+          rel="stylesheet">
+    <style th:inline="css">
+        .font-serif { font-family: 'Playfair Display', serif; }
+        * {
+            font-family: /*[[${nqtWebsiteFont ?: 'Inter'}]]*/ 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+        }
+        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3); }
+        .gold-accent { 
+            color: /*[[${nqtWebsiteColor ?: '#d97706'}]]*/ #d97706;
+        }
+        .nav-glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); }
+        :root {
+            --color-primary: /*[[${nqtWebsiteColor ?: '#d97706'}]]*/ #d97706;
+        }
+        .btn-primary {
+            background: linear-gradient(to right, var(--color-primary), var(--color-primary)cc);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-white">
+    <nav class="nav-glass fixed top-0 left-0 right-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <a href="/nqtTrangChu" class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-lg flex items-center justify-center shadow-lg overflow-hidden"
+                        th:style="'background: linear-gradient(to bottom right, ' + ${nqtWebsiteColor ?: '#d97706'} + ', ' + ${#strings.replace(nqtWebsiteColor ?: '#d97706', '#', '')} + 'cc);'">
+                        <img th:src="${nqtWebsiteLogo}" alt="Logo" class="w-full h-full object-cover"
+                            th:if="${nqtWebsiteLogo != null and nqtWebsiteLogo != ''}">
+                        <span class="text-white font-serif font-bold" 
+                            th:unless="${nqtWebsiteLogo != null and nqtWebsiteLogo != ''}"
+                            th:text="${#strings.substring(nqtWebsiteName ?: 'Hotel NQT', 0, 1)}">H</span>
+                    </div>
+                    <span class="text-xl font-serif font-bold text-gray-900" th:text="${nqtWebsiteName ?: 'Hotel NQT'}">Hotel NQT</span>
+                </a>
+                <a href="/nqtDichVu" class="text-gray-700 transition-colors"
+                   th:style="'color: ' + ${nqtWebsiteColor ?: '#d97706'} + ';'"
+                   style="color: #d97706;">← Quay lại</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="pt-20 pb-16">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div th:if="${service}" class="glass-card rounded-2xl p-8 md:p-12">
+                <div class="text-center mb-8">
+                    <div class="w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center service-detail-icon-bg"
+                        th:style="'background: linear-gradient(to bottom right, ' + ${nqtWebsiteColor ?: '#d97706'} + ', ' + ${#strings.replace(nqtWebsiteColor ?: '#d97706', '#', '')} + 'cc);'"
+                        style="background: linear-gradient(to bottom right, #d97706, #d97706cc);">
+                        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+                        </svg>
+                    </div>
+                    <h1 class="font-serif text-4xl font-bold text-gray-900 mb-4" th:text="${service.nqtTen}">Dịch vụ</h1>
+                    <p class="text-2xl font-bold gold-accent" th:text="${service.nqtDonGia != null ? (#numbers.formatDecimal(service.nqtDonGia, 0, 'COMMA', 0, 'POINT') + ' VNĐ') : 'Liên hệ để biết giá'}">Giá</p>
+                </div>
+                <div class="text-center">
+                    <a href="/nqtDatPhong"
+                        class="inline-block text-white px-10 py-4 rounded-lg font-semibold hover:shadow-lg transition-all hover:scale-105 btn-primary"
+                        th:style="'background: linear-gradient(to right, ' + ${nqtWebsiteColor ?: '#d97706'} + ', ' + ${#strings.replace(nqtWebsiteColor ?: '#d97706', '#', '')} + 'cc);'"
+                        style="background: linear-gradient(to right, #d97706, #d97706cc);">
+                        Đặt phòng và sử dụng dịch vụ
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const primaryColor = /*[[${nqtWebsiteColor ?: '#d97706'}]]*/ '#d97706';
+            const primaryColorDark = primaryColor + 'cc';
+            
+            // Apply color to buttons and service icon backgrounds
+            const buttons = document.querySelectorAll('.btn-primary');
+            buttons.forEach(function(btn) {
+                btn.style.background = 'linear-gradient(to right, ' + primaryColor + ', ' + primaryColorDark + ')';
+            });
+            
+            const serviceIcons = document.querySelectorAll('.service-detail-icon-bg');
+            serviceIcons.forEach(function(icon) {
+                icon.style.background = 'linear-gradient(to bottom right, ' + primaryColor + ', ' + primaryColorDark + ')';
+            });
+        });
+    </script>
+</body>
+</html>
+

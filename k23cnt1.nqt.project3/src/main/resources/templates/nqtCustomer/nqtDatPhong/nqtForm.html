@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="'Đặt phòng - ' + ${nqtWebsiteName ?: 'Hotel NQT'}">Đặt phòng - Hotel NQT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link th:with="fontName=${#strings.replace(nqtWebsiteFont ?: 'Inter', ' ', '+')}" 
+          th:href="@{'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=' + ${fontName} + ':wght@300;400;500;600;700&display=swap'}" 
+          rel="stylesheet">
+    <style th:inline="css">
+        .font-serif { font-family: 'Playfair Display', serif; }
+        * {
+            font-family: /*[[${nqtWebsiteFont ?: 'Inter'}]]*/ 'Inter', sans-serif;
+        }
+        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3); }
+        .gold-accent { 
+            color: /*[[${nqtWebsiteColor ?: '#d97706'}]]*/ #d97706;
+        }
+        .nav-glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); }
+        :root {
+            --color-primary: /*[[${nqtWebsiteColor ?: '#d97706'}]]*/ #d97706;
+        }
+        .input-focus:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            --tw-ring-color: var(--color-primary);
+        }
+        .btn-submit {
+            min-height: 48px;
+            display: block;
+            width: 100%;
+        }
+        .btn-submit:focus {
+            outline: 2px solid var(--color-primary);
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-white">
+    <nav class="nav-glass fixed top-0 left-0 right-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <a href="/nqtTrangChu" class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-lg flex items-center justify-center shadow-lg overflow-hidden"
+                        th:style="'background: linear-gradient(to bottom right, ' + ${nqtWebsiteColor ?: '#d97706'} + ', ' + ${#strings.replace(nqtWebsiteColor ?: '#d97706', '#', '')} + 'cc);'">
+                        <img th:src="${nqtWebsiteLogo}" alt="Logo" class="w-full h-full object-cover"
+                            th:if="${nqtWebsiteLogo != null and nqtWebsiteLogo != ''}">
+                        <span class="text-white font-serif font-bold" 
+                            th:unless="${nqtWebsiteLogo != null and nqtWebsiteLogo != ''}"
+                            th:text="${#strings.substring(nqtWebsiteName ?: 'Hotel NQT', 0, 1)}">H</span>
+                    </div>
+                    <span class="text-xl font-serif font-bold text-gray-900" th:text="${nqtWebsiteName ?: 'Hotel NQT'}">Hotel NQT</span>
+                </a>
+                <a href="/nqtTrangChu" class="text-gray-700 hover:text-amber-700 transition-colors"
+                   th:style="'color: ' + ${nqtWebsiteColor ?: '#d97706'} + ';'"
+                   style="color: #d97706;">← Trang chủ</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="pt-20 pb-16">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-8">
+                <h1 class="font-serif text-4xl font-bold text-gray-900 mb-4">Đặt phòng <span class="gold-accent">của bạn</span></h1>
+                <p class="text-gray-600">Hoàn tất thông tin để đặt phòng</p>
+            </div>
+
+            <div class="glass-card rounded-2xl p-8 md:p-12">
+                <form th:action="@{/nqtDatPhong}" method="post" class="space-y-6">
+                    <div>
+                        <label for="nqtPhongId" class="block text-sm font-medium text-gray-700 mb-2">Chọn phòng <span class="text-red-500">*</span></label>
+                        <select id="nqtPhongId" name="nqtPhongId" required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 input-focus">
+                            <option value="">-- Chọn phòng --</option>
+                            <option th:each="room : ${availableRooms}" th:value="${room.nqtId}" 
+                                th:text="${room.nqtTenPhong} + ' - ' + ${room.nqtSoPhong} + ' (' + ${room.nqtLoaiPhong.nqtTenLoaiPhong} + ')'"
+                                th:selected="${selectedPhongId != null and selectedPhongId == room.nqtId}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="nqtNgayDen" class="block text-sm font-medium text-gray-700 mb-2">Ngày đến <span class="text-red-500">*</span></label>
+                            <input type="date" id="nqtNgayDen" name="nqtNgayDen" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 input-focus"
+                                th:value="${selectedNgayDen}">
+                        </div>
+                        <div>
+                            <label for="nqtNgayDi" class="block text-sm font-medium text-gray-700 mb-2">Ngày đi <span class="text-red-500">*</span></label>
+                            <input type="date" id="nqtNgayDi" name="nqtNgayDi" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 input-focus"
+                                th:value="${selectedNgayDi}">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Dịch vụ kèm theo (tùy chọn)</label>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                            <div th:each="service : ${services}" class="flex items-center">
+                                <input type="checkbox" th:id="'service-' + ${service.nqtId}" 
+                                    th:name="nqtDichVuIds" th:value="${service.nqtId}"
+                                    class="w-4 h-4 border-gray-300 rounded service-checkbox"
+                                    th:style="'accent-color: ' + ${nqtWebsiteColor ?: '#d97706'} + ';'"
+                                    style="accent-color: #d97706;">
+                                <label th:for="'service-' + ${service.nqtId}" 
+                                    class="ml-2 text-sm text-gray-700" th:text="${service.nqtTen} + ' (' + ${#numbers.formatDecimal(service.nqtDonGia, 0, 'COMMA', 0, 'POINT')} + ' VNĐ)'">Dịch vụ</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="nqtMaGiamGia" class="block text-sm font-medium text-gray-700 mb-2">Mã giảm giá (tùy chọn)</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="nqtMaGiamGia" name="nqtMaGiamGia"
+                                class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 input-focus"
+                                placeholder="Nhập mã giảm giá (VD: VIP10)">
+                            <button type="button" id="btnCheckCode" 
+                                class="px-6 py-3 rounded-lg font-medium transition-all hover:shadow-md"
+                                th:style="'background: linear-gradient(to right, ' + ${nqtWebsiteColor ?: '#d97706'} + ', ' + ${#strings.replace(nqtWebsiteColor ?: '#d97706', '#', '')} + 'cc); color: white;'"
+                                style="background: linear-gradient(to right, #d97706, #d97706cc); color: white;">
+                                Áp dụng
+                            </button>
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500" id="codeMessage"></p>
+                        <div id="discountInfo" class="mt-2 hidden">
+                            <div class="bg-green-50 border border-green-200 rounded-lg p-3">
+                                <p class="text-sm text-green-800">
+                                    <span id="discountText"></span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="nqtGhiChu" class="block text-sm font-medium text-gray-700 mb-2">Ghi chú</label>
+                        <textarea id="nqtGhiChu" name="nqtGhiChu" rows="4"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 input-focus"
+                            placeholder="Ghi chú đặc biệt (nếu có)..."></textarea>
+                    </div>
+
+                    <button type="submit"
+                        class="w-full text-white py-4 rounded-lg font-semibold hover:shadow-lg transition-all hover:scale-105 btn-submit"
+                        th:style="'background: linear-gradient(to right, ' + ${nqtWebsiteColor ?: '#d97706'} + ', ' + ${#strings.replace(nqtWebsiteColor ?: '#d97706', '#', '')} + 'cc);'"
+                        style="background: linear-gradient(to right, #d97706, #d97706cc);">
+                        Xác nhận đặt phòng
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const primaryColor = /*[[${nqtWebsiteColor ?: '#d97706'}]]*/ '#d97706';
+            const primaryColorDark = primaryColor + 'cc';
+            
+            // Apply color to button
+            const submitButton = document.querySelector('.btn-submit');
+            if (submitButton) {
+                submitButton.style.background = 'linear-gradient(to right, ' + primaryColor + ', ' + primaryColorDark + ')';
+            }
+            
+            // Apply focus color to inputs
+            const inputs = document.querySelectorAll('.input-focus');
+            inputs.forEach(function(input) {
+                input.addEventListener('focus', function() {
+                    this.style.borderColor = primaryColor;
+                    this.style.boxShadow = '0 0 0 2px ' + primaryColor + '40';
+                });
+                input.addEventListener('blur', function() {
+                    this.style.borderColor = '';
+                    this.style.boxShadow = '';
+                });
+            });
+            
+            // Date validation and auto-fill from URL
+            const today = new Date().toISOString().split('T')[0];
+            const checkinInput = document.getElementById('nqtNgayDen');
+            const checkoutInput = document.getElementById('nqtNgayDi');
+            
+            // Get URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const ngayDen = urlParams.get('ngayDen');
+            const ngayDi = urlParams.get('ngayDi');
+            
+            if (checkinInput) {
+                checkinInput.setAttribute('min', today);
+                // Set value from URL if available
+                if (ngayDen) {
+                    checkinInput.value = ngayDen;
+                }
+                checkinInput.addEventListener('change', function() {
+                    if (checkoutInput) {
+                        checkoutInput.setAttribute('min', this.value);
+                    }
+                });
+            }
+            
+            if (checkoutInput) {
+                checkoutInput.setAttribute('min', today);
+                // Set value from URL if available
+                if (ngayDi) {
+                    checkoutInput.value = ngayDi;
+                    // Also update min if checkin is set
+                    if (checkinInput && checkinInput.value) {
+                        checkoutInput.setAttribute('min', checkinInput.value);
+                    }
+                }
+            }
+
+            // Check discount code
+            const btnCheckCode = document.getElementById('btnCheckCode');
+            const codeInput = document.getElementById('nqtMaGiamGia');
+            const codeMessage = document.getElementById('codeMessage');
+            const discountInfo = document.getElementById('discountInfo');
+            const discountText = document.getElementById('discountText');
+
+            if (btnCheckCode && codeInput) {
+                btnCheckCode.addEventListener('click', function() {
+                    const code = codeInput.value.trim();
+                    if (!code) {
+                        codeMessage.textContent = 'Vui lòng nhập mã giảm giá';
+                        codeMessage.className = 'mt-1 text-xs text-red-500';
+                        discountInfo.classList.add('hidden');
+                        return;
+                    }
+
+                    // Get estimated total price (simplified - you can improve this)
+                    const roomSelect = document.getElementById('nqtPhongId');
+                    const checkinDate = document.getElementById('nqtNgayDen').value;
+                    const checkoutDate = document.getElementById('nqtNgayDi').value;
+                    
+                    // For now, just check the code without price validation
+                    fetch('/api/check-discount-code?code=' + encodeURIComponent(code))
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.valid) {
+                                codeMessage.textContent = '✓ Mã giảm giá hợp lệ';
+                                codeMessage.className = 'mt-1 text-xs text-green-600';
+                                discountInfo.classList.remove('hidden');
+                                discountText.textContent = data.message;
+                            } else {
+                                codeMessage.textContent = data.message || 'Mã giảm giá không hợp lệ';
+                                codeMessage.className = 'mt-1 text-xs text-red-500';
+                                discountInfo.classList.add('hidden');
+                            }
+                        })
+                        .catch(error => {
+                            codeMessage.textContent = 'Lỗi kiểm tra mã giảm giá';
+                            codeMessage.className = 'mt-1 text-xs text-red-500';
+                            discountInfo.classList.add('hidden');
+                        });
+                });
+            }
+        });
+    </script>
+</body>
+</html>
+
