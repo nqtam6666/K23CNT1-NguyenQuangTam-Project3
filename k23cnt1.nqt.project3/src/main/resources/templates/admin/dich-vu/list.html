@@ -108,90 +108,123 @@
                 </table>
             </div>
         </div>
+
+        <script th:inline="javascript">
+            // Define functions in global scope immediately (not in DOMContentLoaded)
+            (function() {
+                window.toggleSelectAll = function(checkbox) {
+                    const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+                    rowCheckboxes.forEach(cb => cb.checked = checkbox.checked);
+                    if (window.updateBulkActions) {
+                        window.updateBulkActions();
+                    }
+                };
+
+                window.updateBulkActions = function() {
+                    const selected = document.querySelectorAll('.row-checkbox:checked');
+                    const bulkActions = document.getElementById('bulkActions');
+                    const selectedCount = document.getElementById('selectedCount');
+                    
+                    if (bulkActions && selectedCount) {
+                        if (selected.length > 0) {
+                            bulkActions.classList.remove('hidden');
+                            selectedCount.textContent = selected.length + ' đã chọn';
+                        } else {
+                            bulkActions.classList.add('hidden');
+                        }
+                        
+                        // Update select all checkbox
+                        const allCheckboxes = document.querySelectorAll('.row-checkbox');
+                        const selectAll = document.getElementById('selectAll');
+                        if (allCheckboxes.length > 0 && selectAll) {
+                            selectAll.checked = selected.length === allCheckboxes.length;
+                        }
+                    }
+                };
+
+                window.clearSelection = function() {
+                    document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = false);
+                    const selectAll = document.getElementById('selectAll');
+                    if (selectAll) {
+                        selectAll.checked = false;
+                    }
+                    if (window.updateBulkActions) {
+                        window.updateBulkActions();
+                    }
+                };
+
+                window.executeBulkAction = function(entity) {
+                    const selected = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(cb => cb.value);
+                    const actionSelect = document.getElementById('bulkActionSelect');
+                    const action = actionSelect ? actionSelect.value : '';
+                    
+                    console.log('Selected IDs:', selected);
+                    console.log('Action:', action);
+                    console.log('Entity:', entity);
+                    
+                    if (selected.length === 0) {
+                        alert('Vui lòng chọn ít nhất một mục!');
+                        return;
+                    }
+                    
+                    if (!action) {
+                        alert('Vui lòng chọn hành động!');
+                        return;
+                    }
+                    
+                    let confirmMessage = '';
+                    let actionUrl = '';
+                    
+                    switch(action) {
+                        case 'activate':
+                            confirmMessage = 'Bạn có chắc chắn muốn kích hoạt ' + selected.length + ' mục đã chọn?';
+                            actionUrl = '/admin/' + entity + '/bulk-activate';
+                            break;
+                        case 'deactivate':
+                            confirmMessage = 'Bạn có chắc chắn muốn vô hiệu hóa ' + selected.length + ' mục đã chọn?';
+                            actionUrl = '/admin/' + entity + '/bulk-deactivate';
+                            break;
+                        case 'delete':
+                            confirmMessage = 'Bạn có chắc chắn muốn xóa ' + selected.length + ' mục đã chọn? Hành động này không thể hoàn tác!';
+                            actionUrl = '/admin/' + entity + '/bulk-delete';
+                            break;
+                        default:
+                            alert('Hành động không hợp lệ!');
+                            return;
+                    }
+                    
+                    if (confirm(confirmMessage)) {
+                        console.log('Submitting to:', actionUrl);
+                        
+                        // Create form element
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = actionUrl;
+                        form.style.display = 'none';
+                        
+                        // Add all selected IDs as hidden inputs
+                        selected.forEach(id => {
+                            const input = document.createElement('input');
+                            input.type = 'hidden';
+                            input.name = 'ids';
+                            input.value = id;
+                            form.appendChild(input);
+                            console.log('Added ID:', id);
+                        });
+                        
+                        // Append form to body
+                        document.body.appendChild(form);
+                        
+                        // Submit form
+                        console.log('Submitting form...');
+                        form.submit();
+                    }
+                };
+
+                console.log('Bulk actions functions defined for dich-vu');
+            })();
+        </script>
     </div>
-
-    <script>
-        function toggleSelectAll(checkbox) {
-            const rowCheckboxes = document.querySelectorAll('.row-checkbox');
-            rowCheckboxes.forEach(cb => cb.checked = checkbox.checked);
-            updateBulkActions();
-        }
-
-        function updateBulkActions() {
-            const selected = document.querySelectorAll('.row-checkbox:checked');
-            const bulkActions = document.getElementById('bulkActions');
-            const selectedCount = document.getElementById('selectedCount');
-            
-            if (selected.length > 0) {
-                bulkActions.classList.remove('hidden');
-                selectedCount.textContent = selected.length + ' đã chọn';
-            } else {
-                bulkActions.classList.add('hidden');
-            }
-            
-            const allCheckboxes = document.querySelectorAll('.row-checkbox');
-            const selectAll = document.getElementById('selectAll');
-            if (allCheckboxes.length > 0) {
-                selectAll.checked = selected.length === allCheckboxes.length;
-            }
-        }
-
-        function clearSelection() {
-            document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = false);
-            document.getElementById('selectAll').checked = false;
-            updateBulkActions();
-        }
-
-        function executeBulkAction(entity) {
-            const selected = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(cb => cb.value);
-            const action = document.getElementById('bulkActionSelect').value;
-            
-            if (selected.length === 0) {
-                alert('Vui lòng chọn ít nhất một mục!');
-                return;
-            }
-            
-            if (!action) {
-                alert('Vui lòng chọn hành động!');
-                return;
-            }
-            
-            let confirmMessage = '';
-            let actionUrl = '';
-            
-            switch(action) {
-                case 'activate':
-                    confirmMessage = 'Bạn có chắc chắn muốn kích hoạt ' + selected.length + ' mục đã chọn?';
-                    actionUrl = '/admin/' + entity + '/bulk-activate';
-                    break;
-                case 'deactivate':
-                    confirmMessage = 'Bạn có chắc chắn muốn vô hiệu hóa ' + selected.length + ' mục đã chọn?';
-                    actionUrl = '/admin/' + entity + '/bulk-deactivate';
-                    break;
-                case 'delete':
-                    confirmMessage = 'Bạn có chắc chắn muốn xóa ' + selected.length + ' mục đã chọn? Hành động này không thể hoàn tác!';
-                    actionUrl = '/admin/' + entity + '/bulk-delete';
-                    break;
-            }
-            
-            if (confirm(confirmMessage)) {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = actionUrl;
-                
-                selected.forEach(id => {
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = 'ids';
-                    input.value = id;
-                    form.appendChild(input);
-                });
-                
-                document.body.appendChild(form);
-                form.submit();
-            }
-        }
-    </script>
 </body>
 
 </html>

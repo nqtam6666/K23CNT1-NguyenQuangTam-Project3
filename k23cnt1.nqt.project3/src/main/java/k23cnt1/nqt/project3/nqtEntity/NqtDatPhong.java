@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -47,8 +48,14 @@ public class NqtDatPhong {
     @Column(name = "nqtGhiChu", columnDefinition = "VARCHAR(2000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci")
     private String nqtGhiChu;
 
+    @Column(name = "nqtNoiDungChuyenKhoan", length = 20)
+    private String nqtNoiDungChuyenKhoan; // Mã nội dung chuyển khoản để xác nhận thanh toán tự động
+
     @Column(name = "nqtStatus")
-    private Byte nqtStatus; // 0-Chưa thanh toán, 1-Đã thanh toán, 2-Hoàn tiền
+    private Byte nqtStatus; // 0-Chưa thanh toán, 1-Đã thanh toán, 2-Đã hủy, 3-Hoàn tiền
+
+    @Column(name = "nqtNgayTao")
+    private LocalDateTime nqtNgayTao; // Thời gian tạo đơn đặt phòng
 
     @OneToMany(mappedBy = "nqtDatPhong", cascade = CascadeType.ALL)
     private List<NqtDonGiaDichVu> nqtDonGiaDichVuList;

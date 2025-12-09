@@ -61,13 +61,36 @@
                                 th:field="*{nqtTongTien}">
                         </div>
                         <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Giảm giá (VNĐ)</label>
+                            <input type="number" step="0.01"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                th:field="*{nqtGiamGia}" placeholder="0">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Mã giảm giá</label>
+                            <select
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                th:field="*{nqtGiamGiaId}">
+                                <option value="">-- Không sử dụng mã giảm giá --</option>
+                                <option th:each="gg : ${nqtGiamGiaList}" th:value="${gg.nqtId}"
+                                    th:text="${gg.nqtMaGiamGia} + ' - ' + ${gg.nqtMoTa}"></option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nội dung chuyển khoản</label>
+                            <input type="text" maxlength="20"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                th:field="*{nqtNoiDungChuyenKhoan}" placeholder="Mã tự động hoặc nhập thủ công">
+                        </div>
+                        <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Trạng thái</label>
                             <select
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                                 th:field="*{nqtStatus}">
                                 <option value="0">Chờ thanh toán</option>
                                 <option value="1">Đã thanh toán</option>
-                                <option value="2">Hoàn tiền</option>
+                                <option value="2">Đã hủy</option>
+                                <option value="3">Hoàn tiền</option>
                             </select>
                         </div>
                         <div class="col-span-1 md:col-span-2 mb-4">

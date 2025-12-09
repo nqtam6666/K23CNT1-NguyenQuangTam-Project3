@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{admin/layout :: layout(nqtTitle='Cấu trúc Database')}">
+
+<body>
+    <div th:fragment="content">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-semibold text-gray-800 flex items-center">
+                <i class="bi bi-database mr-2"></i> Cấu trúc Database
+            </h2>
+            <div class="flex items-center space-x-2">
+                <button onclick="downloadJson()" 
+                        class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg shadow-sm transition-colors flex items-center">
+                    <i class="bi bi-download mr-2"></i> Tải JSON
+                </button>
+                <button onclick="copyJson()" 
+                        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors flex items-center">
+                    <i class="bi bi-clipboard mr-2"></i> Copy JSON
+                </button>
+                <button onclick="toggleView()" 
+                        class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg shadow-sm transition-colors flex items-center">
+                    <i class="bi bi-eye mr-2" id="viewIcon"></i> <span id="viewText">Xem dạng bảng</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Loading -->
+        <div id="loading" class="text-center py-12">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <p class="mt-4 text-gray-600">Đang tải cấu trúc database...</p>
+        </div>
+
+        <!-- JSON View -->
+        <div id="jsonView" class="hidden">
+            <div class="bg-white shadow-md rounded-lg overflow-hidden">
+                <div class="bg-gray-50 px-6 py-3 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-800">JSON Schema</h3>
+                </div>
+                <div class="p-6">
+                    <pre id="jsonContent" class="bg-gray-900 text-green-400 p-4 rounded-lg overflow-x-auto text-sm font-mono" style="max-height: 70vh; overflow-y: auto;"></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table View -->
+        <div id="tableView" class="hidden">
+            <div id="tablesContainer"></div>
+        </div>
+
+        <script th:inline="javascript">
+            let schemaData = null;
+            let currentView = 'json'; // 'json' or 'table'
+
+            // Load schema data
+            fetch(/*[[${jsonUrl}]]*/ '/admin/database-schema.json')
+                .then(response => response.json())
+                .then(data => {
+                    schemaData = data;
+                    document.getElementById('loading').classList.add('hidden');
+                    renderJsonView(data);
+                    renderTableView(data);
+                    showView('json');
+                })
+                .catch(error => {
+                    document.getElementById('loading').innerHTML = 
+                        '<div class="bg-red-50 border border-red-200 rounded-lg p-4"><p class="text-red-800">Lỗi: ' + error.message + '</p></div>';
+                });
+
+            function renderJsonView(data) {
+                const jsonContent = document.getElementById('jsonContent');
+                jsonContent.textContent = JSON.stringify(data, null, 2);
+            }
+
+            function renderTableView(data) {
+                const container = document.getElementById('tablesContainer');
+                let html = '';
+
+                if (data.tables && data.tables.length > 0) {
+                    html += '<div class="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">';
+                    html += '<p class="text-sm text-blue-800"><strong>Database:</strong> ' + (data.database || 'N/A') + '</p>';
+                    html += '<p class="text-sm text-blue-800"><strong>Tổng số bảng:</strong> ' + (data.totalTables || 0) + '</p>';
+                    html += '</div>';
+
+                    data.tables.forEach(table => {
+                        html += '<div class="bg-white shadow-md rounded-lg overflow-hidden mb-6">';
+                        html += '<div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">';
+                        html += '<h3 class="text-xl font-bold text-white flex items-center">';
+                        html += '<i class="bi bi-table mr-2"></i>';
+                        html += table.name;
+                        if (table.comment) {
+                            html += '<span class="ml-3 text-sm font-normal text-blue-100">(' + table.comment + ')</span>';
+                        }
+                        html += '</h3>';
+                        html += '</div>';
+
+                        html += '<div class="p-6">';
+                        
+                        // Columns
+                        if (table.columns && table.columns.length > 0) {
+                            html += '<h4 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">';
+                            html += '<i class="bi bi-list-columns mr-2"></i> Các cột (' + table.columns.length + ')';
+                            html += '</h4>';
+                            html += '<div class="overflow-x-auto mb-6">';
+                            html += '<table class="min-w-full divide-y divide-gray-200">';
+                            html += '<thead class="bg-gray-50">';
+                            html += '<tr>';
+                            html += '<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tên cột</th>';
+                            html += '<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kiểu dữ liệu</th>';
+                            html += '<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nullable</th>';
+                            html += '<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Default</th>';
+                            html += '<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Key</th>';
+                            html += '<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Extra</th>';
+                            html += '<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Comment</th>';
+                            html += '</tr>';
+                            html += '</thead>';
+                            html += '<tbody class="bg-white divide-y divide-gray-200">';
+                            
+                            table.columns.forEach(col => {
+                                html += '<tr class="hover:bg-gray-50">';
+                                html += '<td class="px-4 py-3 text-sm font-medium text-gray-900">' + col.name + '</td>';
+                                html += '<td class="px-4 py-3 text-sm text-gray-600 font-mono">' + col.type + '</td>';
+                                html += '<td class="px-4 py-3 text-sm text-gray-600">';
+                                html += col.nullable ? '<span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">YES</span>' : 
+                                        '<span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">NO</span>';
+                                html += '</td>';
+                                html += '<td class="px-4 py-3 text-sm text-gray-600 font-mono">' + (col.default || '-') + '</td>';
+                                html += '<td class="px-4 py-3 text-sm text-gray-600">';
+                                if (col.key === 'PRI') {
+                                    html += '<span class="px-2 py-1 text-xs rounded-full bg-purple-100 text-purple-800">PRIMARY</span>';
+                                } else if (col.key === 'UNI') {
+                                    html += '<span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">UNIQUE</span>';
+                                } else if (col.key === 'MUL') {
+                                    html += '<span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">INDEX</span>';
+                                } else {
+                                    html += '-';
+                                }
+                                html += '</td>';
+                                html += '<td class="px-4 py-3 text-sm text-gray-600">' + (col.extra || '-') + '</td>';
+                                html += '<td class="px-4 py-3 text-sm text-gray-500">' + (col.comment || '-') + '</td>';
+                                html += '</tr>';
+                            });
+                            
+                            html += '</tbody>';
+                            html += '</table>';
+                            html += '</div>';
+                        }
+
+                        // Foreign Keys
+                        if (table.foreignKeys && table.foreignKeys.length > 0) {
+                            html += '<h4 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">';
+                            html += '<i class="bi bi-link-45deg mr-2"></i> Foreign Keys (' + table.foreignKeys.length + ')';
+                            html += '</h4>';
+                            html += '<div class="mb-6 space-y-2">';
+                            table.foreignKeys.forEach(fk => {
+                                html += '<div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3">';
+                                html += '<p class="text-sm"><strong>' + fk.column + '</strong> → <strong>' + fk.referencesTable + '.' + fk.referencesColumn + '</strong></p>';
+                                html += '<p class="text-xs text-gray-500">Constraint: ' + fk.constraint + '</p>';
+                                html += '</div>';
+                            });
+                            html += '</div>';
+                        }
+
+                        // Indexes
+                        if (table.indexes && Object.keys(table.indexes).length > 0) {
+                            html += '<h4 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">';
+                            html += '<i class="bi bi-list-ul mr-2"></i> Indexes (' + Object.keys(table.indexes).length + ')';
+                            html += '</h4>';
+                            html += '<div class="mb-6 space-y-2">';
+                            Object.entries(table.indexes).forEach(([indexName, columns]) => {
+                                html += '<div class="bg-gray-50 border border-gray-200 rounded-lg p-3">';
+                                html += '<p class="text-sm font-medium">' + indexName + '</p>';
+                                html += '<p class="text-xs text-gray-600">Columns: ' + columns.join(', ') + '</p>';
+                                html += '</div>';
+                            });
+                            html += '</div>';
+                        }
+
+                        html += '</div>';
+                        html += '</div>';
+                    });
+                } else {
+                    html = '<div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4"><p class="text-yellow-800">Không có dữ liệu</p></div>';
+                }
+
+                container.innerHTML = html;
+            }
+
+            function showView(view) {
+                currentView = view;
+                if (view === 'json') {
+                    document.getElementById('jsonView').classList.remove('hidden');
+                    document.getElementById('tableView').classList.add('hidden');
+                    document.getElementById('viewIcon').className = 'bi bi-eye mr-2';
+                    document.getElementById('viewText').textContent = 'Xem dạng bảng';
+                } else {
+                    document.getElementById('jsonView').classList.add('hidden');
+                    document.getElementById('tableView').classList.remove('hidden');
+                    document.getElementById('viewIcon').className = 'bi bi-code-square mr-2';
+                    document.getElementById('viewText').textContent = 'Xem dạng JSON';
+                }
+            }
+
+            function toggleView() {
+                showView(currentView === 'json' ? 'table' : 'json');
+            }
+
+            function downloadJson() {
+                if (!schemaData) {
+                    alert('Chưa có dữ liệu để tải!');
+                    return;
+                }
+                const dataStr = JSON.stringify(schemaData, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'database-schema-' + new Date().toISOString().split('T')[0] + '.json';
+                link.click();
+                URL.revokeObjectURL(url);
+            }
+
+            function copyJson() {
+                if (!schemaData) {
+                    alert('Chưa có dữ liệu để copy!');
+                    return;
+                }
+                const jsonStr = JSON.stringify(schemaData, null, 2);
+                navigator.clipboard.writeText(jsonStr).then(() => {
+                    alert('Đã copy JSON vào clipboard!');
+                }).catch(err => {
+                    alert('Lỗi khi copy: ' + err.message);
+                });
+            }
+        </script>
+    </div>
+</body>
+
+</html>
+

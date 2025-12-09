@@ -7,10 +7,29 @@
             <h2 class="text-2xl font-semibold text-gray-800 flex items-center">
                 <i class="bi bi-calendar-check mr-2"></i> Quản lý Đặt Phòng
             </h2>
-            <a th:href="@{/admin/dat-phong/create}"
-                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors flex items-center">
-                <i class="bi bi-plus-circle mr-2"></i> Thêm mới
-            </a>
+            <div class="flex items-center space-x-2">
+                <!-- Bulk Actions -->
+                <div id="bulkActions" class="hidden flex items-center space-x-2">
+                    <span id="selectedCount" class="text-sm text-gray-600 font-medium">0 đã chọn</span>
+                    <select id="bulkActionSelect"
+                        class="px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-700">
+                        <option value="">-- Chọn hành động --</option>
+                        <option value="delete">Xóa</option>
+                    </select>
+                    <button id="bulkActionBtn" onclick="executeBulkAction('dat-phong')"
+                        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors">
+                        Áp dụng
+                    </button>
+                    <button onclick="clearSelection()"
+                        class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white font-medium rounded-lg shadow-sm transition-colors">
+                        Bỏ chọn
+                    </button>
+                </div>
+                <a th:href="@{/admin/dat-phong/create}"
+                    class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors flex items-center">
+                    <i class="bi bi-plus-circle mr-2"></i> Thêm mới
+                </a>
+            </div>
         </div>
 
         <!-- Quick Filters -->
@@ -30,6 +49,11 @@
                 <table id="nqtDataTable" class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
+                            <th scope="col" class="px-6 py-3 text-left">
+                                <input type="checkbox" id="selectAll" 
+                                    class="w-4 h-4 border-gray-300 rounded focus:ring-blue-500"
+                                    onchange="toggleSelectAll(this)">
+                            </th>
                             <th scope="col"
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 ID</th>
@@ -58,6 +82,10 @@
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                         <tr th:each="item : ${nqtList}" class="hover:bg-gray-50 transition-colors">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <input type="checkbox" class="row-checkbox w-4 h-4 border-gray-300 rounded focus:ring-blue-500"
+                                    th:value="${item.nqtId}" onchange="updateBulkActions()">
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${item.nqtId}"></td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
                                 th:text="${item.nqtTenNguoiDung}"></td>
@@ -97,6 +125,89 @@
                 </table>
             </div>
         </div>
+
+        <script th:inline="javascript">
+            (function() {
+                window.toggleSelectAll = function(checkbox) {
+                    const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+                    rowCheckboxes.forEach(cb => cb.checked = checkbox.checked);
+                    if (window.updateBulkActions) window.updateBulkActions();
+                };
+
+                window.updateBulkActions = function() {
+                    const selected = document.querySelectorAll('.row-checkbox:checked');
+                    const bulkActions = document.getElementById('bulkActions');
+                    const selectedCount = document.getElementById('selectedCount');
+                    
+                    if (bulkActions && selectedCount) {
+                        if (selected.length > 0) {
+                            bulkActions.classList.remove('hidden');
+                            selectedCount.textContent = selected.length + ' đã chọn';
+                        } else {
+                            bulkActions.classList.add('hidden');
+                        }
+                        
+                        const allCheckboxes = document.querySelectorAll('.row-checkbox');
+                        const selectAll = document.getElementById('selectAll');
+                        if (allCheckboxes.length > 0 && selectAll) {
+                            selectAll.checked = selected.length === allCheckboxes.length;
+                        }
+                    }
+                };
+
+                window.clearSelection = function() {
+                    document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = false);
+                    const selectAll = document.getElementById('selectAll');
+                    if (selectAll) selectAll.checked = false;
+                    if (window.updateBulkActions) window.updateBulkActions();
+                };
+
+                window.executeBulkAction = function(entity) {
+                    const selected = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(cb => cb.value);
+                    const actionSelect = document.getElementById('bulkActionSelect');
+                    const action = actionSelect ? actionSelect.value : '';
+                    
+                    if (selected.length === 0) {
+                        alert('Vui lòng chọn ít nhất một mục!');
+                        return;
+                    }
+                    
+                    if (!action) {
+                        alert('Vui lòng chọn hành động!');
+                        return;
+                    }
+                    
+                    let confirmMessage = '';
+                    let actionUrl = '';
+                    
+                    if (action === 'delete') {
+                        confirmMessage = 'Bạn có chắc chắn muốn xóa ' + selected.length + ' mục đã chọn? Hành động này không thể hoàn tác!';
+                        actionUrl = '/admin/' + entity + '/bulk-delete';
+                    } else {
+                        alert('Hành động không hợp lệ!');
+                        return;
+                    }
+                    
+                    if (confirm(confirmMessage)) {
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = actionUrl;
+                        form.style.display = 'none';
+                        
+                        selected.forEach(id => {
+                            const input = document.createElement('input');
+                            input.type = 'hidden';
+                            input.name = 'ids';
+                            input.value = id;
+                            form.appendChild(input);
+                        });
+                        
+                        document.body.appendChild(form);
+                        form.submit();
+                    }
+                };
+            })();
+        </script>
     </div>
 </body>
 

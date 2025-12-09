@@ -22,6 +22,9 @@ public class NqtDatPhongRequest {
     private LocalDate nqtNgayDi;
 
     private Float nqtTongTien;
+    private Float nqtGiamGia; // Số tiền đã giảm
+    private Integer nqtGiamGiaId; // FK: Mã giảm giá đã sử dụng
     private String nqtGhiChu;
+    private String nqtNoiDungChuyenKhoan; // Mã nội dung chuyển khoản
     private Byte nqtStatus;
 }

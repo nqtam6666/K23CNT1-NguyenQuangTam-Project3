@@ -16,8 +16,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 
 @Controller
 public class NqtKhachDatPhongController {
@@ -45,6 +48,9 @@ public class NqtKhachDatPhongController {
 
     @Autowired
     private k23cnt1.nqt.project3.nqtService.NqtNganHangService nqtNganHangService;
+
+    @Autowired
+    private k23cnt1.nqt.project3.nqtService.NqtPaymentCheckService nqtPaymentCheckService;
 
     // Booking Form
     @GetMapping("/nqtDatPhong")
@@ -130,6 +136,9 @@ public class NqtKhachDatPhongController {
         float roomPrice = room.getNqtLoaiPhong().getNqtGia() * numberOfDays;
         float totalPrice = roomPrice;
 
+        // Tạo mã nội dung chuyển khoản ngẫu nhiên 10 ký tự (chữ in hoa + số)
+        String noiDungChuyenKhoan = generateRandomCode(10);
+
         // Create booking
         NqtDatPhong booking = new NqtDatPhong();
         booking.setNqtNguoiDung(nqtCustomerUser);
@@ -137,7 +146,9 @@ public class NqtKhachDatPhongController {
         booking.setNqtNgayDen(nqtNgayDen);
         booking.setNqtNgayDi(nqtNgayDi);
         booking.setNqtGhiChu(nqtGhiChu);
+        booking.setNqtNoiDungChuyenKhoan(noiDungChuyenKhoan); // Lưu mã nội dung chuyển khoản
         booking.setNqtStatus((byte) 0); // Pending payment
+        booking.setNqtNgayTao(java.time.LocalDateTime.now()); // Lưu thời gian tạo đơn
 
         // Save booking first to get ID
         NqtDatPhong savedBooking = nqtDatPhongRepository.save(booking);
@@ -253,7 +264,15 @@ public class NqtKhachDatPhongController {
         
         // Tạo Map chứa QR URL cho mỗi ngân hàng
         java.util.Map<Integer, String> qrUrlMap = new java.util.HashMap<>();
-        String noiDung = "DP" + booking.getNqtId() + " " + nqtCustomerUser.getNqtHoVaTen();
+        
+        // Lấy mã nội dung chuyển khoản từ booking đã lưu trong database
+        String noiDung = booking.getNqtNoiDungChuyenKhoan();
+        if (noiDung == null || noiDung.isEmpty()) {
+            // Nếu chưa có, tạo mới và cập nhật lại (trường hợp cũ chưa có field này)
+            noiDung = generateRandomCode(10);
+            booking.setNqtNoiDungChuyenKhoan(noiDung);
+            nqtDatPhongRepository.save(booking);
+        }
         
         for (k23cnt1.nqt.project3.nqtDto.NqtNganHangResponse nganHang : nganHangList) {
             String qrUrl = nqtNganHangService.generateVietQrUrl(
@@ -268,7 +287,50 @@ public class NqtKhachDatPhongController {
         model.addAttribute("booking", booking);
         model.addAttribute("nganHangList", nganHangList);
         model.addAttribute("qrUrlMap", qrUrlMap);
+        model.addAttribute("noiDung", noiDung);
+        model.addAttribute("isPaid", booking.getNqtStatus() != null && booking.getNqtStatus() == 1);
         return "nqtCustomer/nqtDatPhong/nqtConfirmation";
+    }
+
+    /**
+     * API endpoint để kiểm tra trạng thái thanh toán
+     */
+    @GetMapping("/nqtDatPhong/check-payment/{id}")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> checkPaymentStatus(@PathVariable("id") Integer id, HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            NqtNguoiDung nqtCustomerUser = (NqtNguoiDung) session.getAttribute("nqtCustomerUser");
+            
+            if (nqtCustomerUser == null) {
+                response.put("success", false);
+                response.put("message", "Chưa đăng nhập");
+                return ResponseEntity.ok(response);
+            }
+
+            Optional<NqtDatPhong> bookingOptional = nqtDatPhongRepository.findById(id);
+            
+            if (bookingOptional.isEmpty() || 
+                !bookingOptional.get().getNqtNguoiDung().getNqtId().equals(nqtCustomerUser.getNqtId())) {
+                response.put("success", false);
+                response.put("message", "Không tìm thấy đơn đặt phòng");
+                return ResponseEntity.ok(response);
+            }
+
+            // Kiểm tra thanh toán
+            boolean isPaid = nqtPaymentCheckService.checkPaymentStatus(id);
+            
+            response.put("success", true);
+            response.put("isPaid", isPaid);
+            response.put("message", isPaid ? "Đã thanh toán thành công" : "Chưa thanh toán");
+            
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Lỗi: " + e.getMessage());
+        }
+        
+        return ResponseEntity.ok(response);
     }
 
     // My Bookings
@@ -310,8 +372,47 @@ public class NqtKhachDatPhongController {
         List<NqtDanhGia> existingReviews = nqtDanhGiaRepository.findByNqtDatPhong(booking);
         boolean hasReview = !existingReviews.isEmpty();
         
+        // Lấy thông tin ngân hàng và QR code nếu chưa thanh toán
+        boolean isPaid = booking.getNqtStatus() != null && booking.getNqtStatus() == 1;
+        if (!isPaid) {
+            List<k23cnt1.nqt.project3.nqtDto.NqtNganHangResponse> nganHangList = nqtNganHangService.nqtGetActive();
+            java.util.Map<Integer, String> qrUrlMap = new java.util.HashMap<>();
+            
+            // Lấy mã nội dung chuyển khoản
+            String noiDung = booking.getNqtNoiDungChuyenKhoan();
+            if (noiDung == null || noiDung.isEmpty()) {
+                noiDung = generateRandomCode(10);
+                booking.setNqtNoiDungChuyenKhoan(noiDung);
+                nqtDatPhongRepository.save(booking);
+            }
+            
+            // Tạo QR URL cho mỗi ngân hàng
+            for (k23cnt1.nqt.project3.nqtDto.NqtNganHangResponse nganHang : nganHangList) {
+                String qrUrl = nqtNganHangService.generateVietQrUrl(
+                    nganHang.getNqtMaNganHang(),
+                    nganHang.getNqtSoTaiKhoan(),
+                    booking.getNqtTongTien() != null ? booking.getNqtTongTien() : 0f,
+                    noiDung
+                );
+                qrUrlMap.put(nganHang.getNqtId(), qrUrl);
+            }
+            
+            model.addAttribute("nganHangList", nganHangList);
+            model.addAttribute("qrUrlMap", qrUrlMap);
+            model.addAttribute("noiDung", noiDung);
+        }
+        
+        // Kiểm tra xem có thể hủy đặt phòng không
+        // Chỉ cho phép hủy nếu: chưa thanh toán (status = 0) và ngày đến chưa đến
+        boolean canCancel = false;
+        if (booking.getNqtStatus() != null && booking.getNqtStatus() == 0) {
+            canCancel = booking.getNqtNgayDen().isAfter(LocalDate.now());
+        }
+        
         model.addAttribute("booking", booking);
         model.addAttribute("hasReview", hasReview);
+        model.addAttribute("isPaid", isPaid);
+        model.addAttribute("canCancel", canCancel);
         if (hasReview) {
             model.addAttribute("review", existingReviews.get(0));
         }
@@ -337,7 +438,7 @@ public class NqtKhachDatPhongController {
 
             // Only allow cancellation if not yet checked in
             if (booking.getNqtNgayDen().isAfter(LocalDate.now())) {
-                booking.setNqtStatus((byte) 2); // Cancelled/Refunded
+                booking.setNqtStatus((byte) 2); // Đã hủy
                 nqtDatPhongRepository.save(booking);
 
                 // Make room available again
@@ -415,5 +516,23 @@ public class NqtKhachDatPhongController {
         }
 
         return ResponseEntity.ok().body("{\"valid\": true, \"message\": \"" + discountText + "\", \"discountAmount\": " + discountAmount + "}");
+    }
+
+    /**
+     * Tạo mã ngẫu nhiên gồm chữ in hoa và số
+     * @param length Độ dài mã cần tạo
+     * @return Chuỗi ngẫu nhiên
+     */
+    private String generateRandomCode(int length) {
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        Random random = new Random();
+        StringBuilder code = new StringBuilder();
+        
+        for (int i = 0; i < length; i++) {
+            int index = random.nextInt(chars.length());
+            code.append(chars.charAt(index));
+        }
+        
+        return code.toString();
     }
 }

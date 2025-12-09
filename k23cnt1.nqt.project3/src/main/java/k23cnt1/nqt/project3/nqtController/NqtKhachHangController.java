@@ -8,6 +8,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -131,7 +132,8 @@ public class NqtKhachHangController {
 
             // Check if email is verified
             if (nqtNguoiDung.getNqtEmailVerified() == null || !nqtNguoiDung.getNqtEmailVerified()) {
-                model.addAttribute("nqtError", "Email chưa được xác thực! Vui lòng kiểm tra email và click vào link xác thực. <a href='/nqtGuiLaiEmailXacThuc?email=" + nqtNguoiDung.getNqtEmail() + "'>Gửi lại email xác thực</a>");
+                model.addAttribute("nqtEmailNotVerified", true);
+                model.addAttribute("nqtEmailNotVerifiedEmail", nqtNguoiDung.getNqtEmail());
                 return "nqtCustomer/nqtAuth/nqtLogin";
             }
 
@@ -294,9 +296,24 @@ public class NqtKhachHangController {
 
     // Customer Logout
     @GetMapping("/nqtDangXuat")
-    public String nqtDangXuat(HttpSession session) {
+    public String nqtDangXuat(HttpSession session, HttpServletResponse response) {
+        // Clear SecurityContext (JWT authentication)
+        SecurityContextHolder.clearContext();
+        
+        // Clear JWT cookie
+        Cookie jwtCookie = new Cookie("jwt", null);
+        jwtCookie.setHttpOnly(true);
+        jwtCookie.setPath("/");
+        jwtCookie.setMaxAge(0); // Delete cookie
+        response.addCookie(jwtCookie);
+        
+        // Clear all session attributes (both customer and admin if exists)
         session.removeAttribute("nqtCustomerSession");
         session.removeAttribute("nqtCustomerUser");
+        session.removeAttribute("nqtAdminSession");
+        session.removeAttribute("nqtAdminUser");
+        session.removeAttribute("nqtPending2FAUserId");
+        
         return "redirect:/nqtTrangChu";
     }
 
@@ -369,14 +386,10 @@ public class NqtKhachHangController {
                                              (nqtMatKhauMoi != null && !nqtMatKhauMoi.trim().isEmpty()) ||
                                              (nqtMatKhauMoiXacNhan != null && !nqtMatKhauMoiXacNhan.trim().isEmpty());
             
+            // Check if user is OAuth user (no password set)
+            boolean isOAuthUser = nqtNguoiDung.getNqtMatKhau() == null || nqtNguoiDung.getNqtMatKhau().trim().isEmpty();
+            
             if (passwordChangeRequested) {
-                // All password fields must be provided
-                if (nqtMatKhauCu == null || nqtMatKhauCu.trim().isEmpty()) {
-                    model.addAttribute("nqtError", "Vui lòng nhập mật khẩu cũ!");
-                    model.addAttribute("nqtCustomerUser", nqtNguoiDung);
-                    return "nqtCustomer/nqtTaiKhoan/nqtDashboard";
-                }
-
                 if (nqtMatKhauMoi == null || nqtMatKhauMoi.trim().isEmpty()) {
                     model.addAttribute("nqtError", "Vui lòng nhập mật khẩu mới!");
                     model.addAttribute("nqtCustomerUser", nqtNguoiDung);
@@ -384,22 +397,34 @@ public class NqtKhachHangController {
                 }
 
                 // Trim passwords
-                nqtMatKhauCu = nqtMatKhauCu.trim();
                 nqtMatKhauMoi = nqtMatKhauMoi.trim();
                 nqtMatKhauMoiXacNhan = nqtMatKhauMoiXacNhan != null ? nqtMatKhauMoiXacNhan.trim() : "";
 
-                // Verify old password
-                boolean isMatch = passwordEncoder.matches(nqtMatKhauCu, nqtNguoiDung.getNqtMatKhau());
-                
-                // Support plain text passwords (lazy migration)
-                if (!isMatch && nqtNguoiDung.getNqtMatKhau() != null && nqtNguoiDung.getNqtMatKhau().equals(nqtMatKhauCu)) {
-                    isMatch = true;
-                }
-                
-                if (!isMatch) {
-                    model.addAttribute("nqtError", "Mật khẩu cũ không đúng!");
-                    model.addAttribute("nqtCustomerUser", nqtNguoiDung);
-                    return "nqtCustomer/nqtTaiKhoan/nqtDashboard";
+                // For OAuth users, skip old password verification
+                // For regular users, require old password
+                if (!isOAuthUser) {
+                    if (nqtMatKhauCu == null || nqtMatKhauCu.trim().isEmpty()) {
+                        model.addAttribute("nqtError", "Vui lòng nhập mật khẩu cũ!");
+                        model.addAttribute("nqtCustomerUser", nqtNguoiDung);
+                        return "nqtCustomer/nqtTaiKhoan/nqtDashboard";
+                    }
+                    
+                    // Trim old password
+                    nqtMatKhauCu = nqtMatKhauCu.trim();
+                    
+                    // Verify old password
+                    boolean isMatch = passwordEncoder.matches(nqtMatKhauCu, nqtNguoiDung.getNqtMatKhau());
+                    
+                    // Support plain text passwords (lazy migration)
+                    if (!isMatch && nqtNguoiDung.getNqtMatKhau() != null && nqtNguoiDung.getNqtMatKhau().equals(nqtMatKhauCu)) {
+                        isMatch = true;
+                    }
+                    
+                    if (!isMatch) {
+                        model.addAttribute("nqtError", "Mật khẩu cũ không đúng!");
+                        model.addAttribute("nqtCustomerUser", nqtNguoiDung);
+                        return "nqtCustomer/nqtTaiKhoan/nqtDashboard";
+                    }
                 }
 
                 // Verify new passwords match
@@ -416,15 +441,17 @@ public class NqtKhachHangController {
                     return "nqtCustomer/nqtTaiKhoan/nqtDashboard";
                 }
                 
-                // Check if new password is different from current password
-                boolean newPasswordMatchesCurrent = passwordEncoder.matches(nqtMatKhauMoi, nqtNguoiDung.getNqtMatKhau());
-                if (!newPasswordMatchesCurrent && nqtNguoiDung.getNqtMatKhau() != null && nqtNguoiDung.getNqtMatKhau().equals(nqtMatKhauMoi)) {
-                    newPasswordMatchesCurrent = true;
-                }
-                if (newPasswordMatchesCurrent) {
-                    model.addAttribute("nqtError", "Mật khẩu mới phải khác với mật khẩu hiện tại!");
-                    model.addAttribute("nqtCustomerUser", nqtNguoiDung);
-                    return "nqtCustomer/nqtTaiKhoan/nqtDashboard";
+                // Check if new password is different from current password (only for non-OAuth users)
+                if (!isOAuthUser) {
+                    boolean newPasswordMatchesCurrent = passwordEncoder.matches(nqtMatKhauMoi, nqtNguoiDung.getNqtMatKhau());
+                    if (!newPasswordMatchesCurrent && nqtNguoiDung.getNqtMatKhau() != null && nqtNguoiDung.getNqtMatKhau().equals(nqtMatKhauMoi)) {
+                        newPasswordMatchesCurrent = true;
+                    }
+                    if (newPasswordMatchesCurrent) {
+                        model.addAttribute("nqtError", "Mật khẩu mới phải khác với mật khẩu hiện tại!");
+                        model.addAttribute("nqtCustomerUser", nqtNguoiDung);
+                        return "nqtCustomer/nqtTaiKhoan/nqtDashboard";
+                    }
                 }
 
                 // Update password directly on entity (more reliable than @Modifying query)
@@ -510,16 +537,6 @@ public class NqtKhachHangController {
             return "nqtCustomer/nqtTaiKhoan/nqtDashboard";
         }
 
-        // If user wants to change password, all fields must be provided
-        if (nqtMatKhauCu == null || nqtMatKhauCu.trim().isEmpty()) {
-            model.addAttribute("nqtError", "Vui lòng nhập mật khẩu cũ!");
-            Optional<NqtNguoiDung> nqtNguoiDungOptional = nqtNguoiDungRepository.findById(nqtCustomerUser.getNqtId());
-            if (nqtNguoiDungOptional.isPresent()) {
-                model.addAttribute("nqtCustomerUser", nqtNguoiDungOptional.get());
-            }
-            return "nqtCustomer/nqtTaiKhoan/nqtDashboard";
-        }
-
         if (nqtMatKhauMoi == null || nqtMatKhauMoi.trim().isEmpty()) {
             model.addAttribute("nqtError", "Vui lòng nhập mật khẩu mới!");
             Optional<NqtNguoiDung> nqtNguoiDungOptional = nqtNguoiDungRepository.findById(nqtCustomerUser.getNqtId());
@@ -533,25 +550,38 @@ public class NqtKhachHangController {
         Optional<NqtNguoiDung> nqtNguoiDungOptional = nqtNguoiDungRepository.findById(nqtCustomerUser.getNqtId());
         if (nqtNguoiDungOptional.isPresent()) {
             NqtNguoiDung nqtNguoiDung = nqtNguoiDungOptional.get();
-
-            // Trim old password input
-            nqtMatKhauCu = nqtMatKhauCu != null ? nqtMatKhauCu.trim() : "";
-
-            // Verify old password
-            boolean isMatch = passwordEncoder.matches(nqtMatKhauCu, nqtNguoiDung.getNqtMatKhau());
             
-            // Support plain text passwords (lazy migration)
-            if (!isMatch && nqtNguoiDung.getNqtMatKhau() != null && nqtNguoiDung.getNqtMatKhau().equals(nqtMatKhauCu)) {
-                isMatch = true;
-            }
+            // Check if user is OAuth user (no password set)
+            boolean isOAuthUser = nqtNguoiDung.getNqtMatKhau() == null || nqtNguoiDung.getNqtMatKhau().trim().isEmpty();
             
-            if (!isMatch) {
-                System.out.println("🔐 Old password verification FAILED");
-                System.out.println("🔐 Input password: [" + nqtMatKhauCu + "]");
-                System.out.println("🔐 Stored password hash: " + (nqtNguoiDung.getNqtMatKhau() != null ? nqtNguoiDung.getNqtMatKhau().substring(0, Math.min(20, nqtNguoiDung.getNqtMatKhau().length())) + "..." : "NULL"));
-                model.addAttribute("nqtError", "Mật khẩu cũ không đúng!");
-                model.addAttribute("nqtCustomerUser", nqtNguoiDung);
-                return "nqtCustomer/nqtTaiKhoan/nqtDashboard";
+            // For OAuth users, skip old password verification
+            // For regular users, require old password
+            if (!isOAuthUser) {
+                if (nqtMatKhauCu == null || nqtMatKhauCu.trim().isEmpty()) {
+                    model.addAttribute("nqtError", "Vui lòng nhập mật khẩu cũ!");
+                    model.addAttribute("nqtCustomerUser", nqtNguoiDung);
+                    return "nqtCustomer/nqtTaiKhoan/nqtDashboard";
+                }
+                
+                // Trim old password input
+                nqtMatKhauCu = nqtMatKhauCu != null ? nqtMatKhauCu.trim() : "";
+
+                // Verify old password
+                boolean isMatch = passwordEncoder.matches(nqtMatKhauCu, nqtNguoiDung.getNqtMatKhau());
+                
+                // Support plain text passwords (lazy migration)
+                if (!isMatch && nqtNguoiDung.getNqtMatKhau() != null && nqtNguoiDung.getNqtMatKhau().equals(nqtMatKhauCu)) {
+                    isMatch = true;
+                }
+                
+                if (!isMatch) {
+                    System.out.println("🔐 Old password verification FAILED");
+                    System.out.println("🔐 Input password: [" + nqtMatKhauCu + "]");
+                    System.out.println("🔐 Stored password hash: " + (nqtNguoiDung.getNqtMatKhau() != null ? nqtNguoiDung.getNqtMatKhau().substring(0, Math.min(20, nqtNguoiDung.getNqtMatKhau().length())) + "..." : "NULL"));
+                    model.addAttribute("nqtError", "Mật khẩu cũ không đúng!");
+                    model.addAttribute("nqtCustomerUser", nqtNguoiDung);
+                    return "nqtCustomer/nqtTaiKhoan/nqtDashboard";
+                }
             }
 
             // Trim password to remove any leading/trailing whitespace
@@ -572,16 +602,18 @@ public class NqtKhachHangController {
                 return "nqtCustomer/nqtTaiKhoan/nqtDashboard";
             }
             
-            // Check if new password is different from current password
-            boolean newPasswordMatchesCurrent = passwordEncoder.matches(nqtMatKhauMoi, nqtNguoiDung.getNqtMatKhau());
-            // Also check plain text comparison for backward compatibility
-            if (!newPasswordMatchesCurrent && nqtNguoiDung.getNqtMatKhau() != null && nqtNguoiDung.getNqtMatKhau().equals(nqtMatKhauMoi)) {
-                newPasswordMatchesCurrent = true;
-            }
-            if (newPasswordMatchesCurrent) {
-                model.addAttribute("nqtError", "Mật khẩu mới phải khác với mật khẩu hiện tại!");
-                model.addAttribute("nqtCustomerUser", nqtNguoiDung);
-                return "nqtCustomer/nqtTaiKhoan/nqtDashboard";
+            // Check if new password is different from current password (only for non-OAuth users)
+            if (!isOAuthUser) {
+                boolean newPasswordMatchesCurrent = passwordEncoder.matches(nqtMatKhauMoi, nqtNguoiDung.getNqtMatKhau());
+                // Also check plain text comparison for backward compatibility
+                if (!newPasswordMatchesCurrent && nqtNguoiDung.getNqtMatKhau() != null && nqtNguoiDung.getNqtMatKhau().equals(nqtMatKhauMoi)) {
+                    newPasswordMatchesCurrent = true;
+                }
+                if (newPasswordMatchesCurrent) {
+                    model.addAttribute("nqtError", "Mật khẩu mới phải khác với mật khẩu hiện tại!");
+                    model.addAttribute("nqtCustomerUser", nqtNguoiDung);
+                    return "nqtCustomer/nqtTaiKhoan/nqtDashboard";
+                }
             }
 
             // Encode new password

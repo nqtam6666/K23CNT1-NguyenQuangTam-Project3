@@ -5,12 +5,15 @@ import k23cnt1.nqt.project3.nqtDto.NqtDatPhongResponse;
 import k23cnt1.nqt.project3.nqtEntity.NqtDatPhong;
 import k23cnt1.nqt.project3.nqtEntity.NqtNguoiDung;
 import k23cnt1.nqt.project3.nqtEntity.NqtPhong;
+import k23cnt1.nqt.project3.nqtEntity.NqtGiamGia;
 import k23cnt1.nqt.project3.nqtRepository.NqtDatPhongRepository;
 import k23cnt1.nqt.project3.nqtRepository.NqtNguoiDungRepository;
 import k23cnt1.nqt.project3.nqtRepository.NqtPhongRepository;
+import k23cnt1.nqt.project3.nqtRepository.NqtGiamGiaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,6 +28,9 @@ public class NqtDatPhongService {
 
     @Autowired
     private NqtPhongRepository nqtPhongRepository;
+
+    @Autowired
+    private NqtGiamGiaRepository nqtGiamGiaRepository;
 
     public List<NqtDatPhongResponse> nqtGetAll() {
         return nqtDatPhongRepository.findAll().stream()
@@ -58,8 +64,18 @@ public class NqtDatPhongService {
         nqtDatPhong.setNqtNgayDen(nqtRequest.getNqtNgayDen());
         nqtDatPhong.setNqtNgayDi(nqtRequest.getNqtNgayDi());
         nqtDatPhong.setNqtTongTien(nqtRequest.getNqtTongTien());
+        nqtDatPhong.setNqtGiamGia(nqtRequest.getNqtGiamGia());
         nqtDatPhong.setNqtGhiChu(nqtRequest.getNqtGhiChu());
+        nqtDatPhong.setNqtNoiDungChuyenKhoan(nqtRequest.getNqtNoiDungChuyenKhoan());
         nqtDatPhong.setNqtStatus(nqtRequest.getNqtStatus() != null ? nqtRequest.getNqtStatus() : (byte) 0);
+        nqtDatPhong.setNqtNgayTao(LocalDateTime.now());
+
+        // Set mã giảm giá nếu có
+        if (nqtRequest.getNqtGiamGiaId() != null) {
+            NqtGiamGia nqtGiamGia = nqtGiamGiaRepository.findById(nqtRequest.getNqtGiamGiaId())
+                    .orElse(null);
+            nqtDatPhong.setNqtGiamGiaEntity(nqtGiamGia);
+        }
 
         NqtDatPhong nqtSaved = nqtDatPhongRepository.save(nqtDatPhong);
         updateRoomStatus(nqtSaved);
@@ -93,11 +109,26 @@ public class NqtDatPhongService {
         if (nqtRequest.getNqtTongTien() != null) {
             nqtDatPhong.setNqtTongTien(nqtRequest.getNqtTongTien());
         }
+        if (nqtRequest.getNqtGiamGia() != null) {
+            nqtDatPhong.setNqtGiamGia(nqtRequest.getNqtGiamGia());
+        }
         if (nqtRequest.getNqtGhiChu() != null) {
             nqtDatPhong.setNqtGhiChu(nqtRequest.getNqtGhiChu());
         }
+        if (nqtRequest.getNqtNoiDungChuyenKhoan() != null) {
+            nqtDatPhong.setNqtNoiDungChuyenKhoan(nqtRequest.getNqtNoiDungChuyenKhoan());
+        }
         if (nqtRequest.getNqtStatus() != null) {
             nqtDatPhong.setNqtStatus(nqtRequest.getNqtStatus());
+        }
+        
+        // Set mã giảm giá nếu có
+        if (nqtRequest.getNqtGiamGiaId() != null) {
+            NqtGiamGia nqtGiamGia = nqtGiamGiaRepository.findById(nqtRequest.getNqtGiamGiaId())
+                    .orElse(null);
+            nqtDatPhong.setNqtGiamGiaEntity(nqtGiamGia);
+        } else {
+            nqtDatPhong.setNqtGiamGiaEntity(null);
         }
 
         NqtDatPhong nqtUpdated = nqtDatPhongRepository.save(nqtDatPhong);
@@ -126,8 +157,15 @@ public class NqtDatPhongService {
         nqtResponse.setNqtNgayDen(nqtDatPhong.getNqtNgayDen());
         nqtResponse.setNqtNgayDi(nqtDatPhong.getNqtNgayDi());
         nqtResponse.setNqtTongTien(nqtDatPhong.getNqtTongTien());
+        nqtResponse.setNqtGiamGia(nqtDatPhong.getNqtGiamGia());
+        if (nqtDatPhong.getNqtGiamGiaEntity() != null) {
+            nqtResponse.setNqtGiamGiaId(nqtDatPhong.getNqtGiamGiaEntity().getNqtId());
+            nqtResponse.setNqtMaGiamGia(nqtDatPhong.getNqtGiamGiaEntity().getNqtMaGiamGia());
+        }
         nqtResponse.setNqtGhiChu(nqtDatPhong.getNqtGhiChu());
+        nqtResponse.setNqtNoiDungChuyenKhoan(nqtDatPhong.getNqtNoiDungChuyenKhoan());
         nqtResponse.setNqtStatus(nqtDatPhong.getNqtStatus());
+        nqtResponse.setNqtNgayTao(nqtDatPhong.getNqtNgayTao());
         return nqtResponse;
     }
 

@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" th:fragment="layout(title, description)">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title ?: (nqtWebsiteName ?: 'Hotel NQT')} + ' - ' + ${nqtWebsiteName ?: 'Trải nghiệm sang trọng đẳng cấp'}">
+        Hotel NQT - Trải nghiệm sang trọng đẳng cấp
+    </title>
+    <meta name="description" th:content="${description ?: 'Khách sạn cao cấp với dịch vụ tinh tế, phòng nghỉ sang trọng và trải nghiệm độc quyền'}">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link th:with="fontName=${#strings.replace(nqtWebsiteFont ?: 'Inter', ' ', '+')}" 
+          th:href="@{'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=' + ${fontName} + ':wght@300;400;500;600;700&display=swap'}" 
+          rel="stylesheet">
+
+    <style th:inline="css">
+        :root {
+            --color-charcoal: #1a1a1a;
+            --color-stone: #2d2d2d;
+            --color-beige: #f5f3f0;
+            --color-gold: #d4af37;
+            --color-copper: #b87333;
+            --color-primary: /*[[${nqtWebsiteColor ?: '#d97706'}]]*/ #d97706;
+        }
+
+        * {
+            font-family: /*[[${nqtWebsiteFont ?: 'Inter'}]]*/ 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+            text-rendering: optimizeLegibility !important;
+            -webkit-font-smoothing: antialiased !important;
+            -moz-osx-font-smoothing: grayscale !important;
+        }
+
+        body {
+            font-family: /*[[${nqtWebsiteFont ?: 'Inter'}]]*/ 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+            text-rendering: optimizeLegibility !important;
+            -webkit-font-smoothing: antialiased !important;
+            -moz-osx-font-smoothing: grayscale !important;
+        }
+
+        .font-serif {
+            font-family: 'Playfair Display', Georgia, 'Times New Roman', serif !important;
+        }
+
+        /* Glassmorphism Effect */
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+
+        .glass-dark {
+            background: rgba(26, 26, 26, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(229, 231, 235, 0.5) !important;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-8px) scale(1.01);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15) !important;
+            border-color: rgba(217, 119, 6, 0.3) !important;
+        }
+
+        /* Button Primary */
+        .btn-primary {
+            background: linear-gradient(to right, var(--color-primary), rgba(217, 119, 6, 0.8)) !important;
+            color: white !important;
+            border: none !important;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            opacity: 0.9;
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        /* Ensure buttons with inline styles override default */
+        button.btn-primary, a.btn-primary {
+            background: linear-gradient(to right, var(--color-primary), rgba(217, 119, 6, 0.8)) !important;
+            color: white !important;
+        }
+
+        /* Navigation */
+        .nav-glass {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        /* Input Focus */
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px var(--color-gold);
+            border-color: var(--color-gold);
+        }
+
+        /* GTranslate Customizing */
+        .gtranslate_wrapper select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem !important;
+            padding-left: 1rem !important;
+            padding-top: 0.5rem !important;
+            padding-bottom: 0.5rem !important;
+            border: 1px solid #e5e7eb !important;
+            border-radius: 0.5rem !important;
+            font-size: 0.875rem !important;
+            line-height: 1.25rem !important;
+            color: #374151 !important;
+            outline: none !important;
+            transition: all 0.2s;
+            cursor: pointer;
+            background-color: white;
+            height: auto !important;
+        }
+
+        .gtranslate_wrapper select:hover {
+            border-color: #d1d5db !important;
+        }
+
+        .gtranslate_wrapper select:focus {
+            border-color: var(--color-primary) !important;
+            box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.1) !important;
+        }
+
+        /* Gold Accent */
+        .gold-accent {
+            color: var(--color-primary) !important;
+        }
+
+        .gold-border {
+            border-color: var(--color-primary);
+        }
+
+        /* Smooth Scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Ensure content is below fixed navbar */
+        body {
+            padding-top: 0 !important;
+            margin-top: 0 !important;
+        }
+
+        /* Content wrapper - ensure it's below navbar */
+        .content-wrapper {
+            padding-top: 140px !important;
+            margin-top: 0 !important;
+            min-height: calc(100vh - 140px);
+            position: relative;
+            z-index: 1;
+            display: block !important;
+        }
+
+        /* Ensure all content fragments start below navbar - but don't override their own padding */
+        .content-wrapper > *:first-child {
+            margin-top: 0 !important;
+        }
+
+        /* Override any negative margins that might pull content up */
+        .content-wrapper > div {
+            margin-top: 0 !important;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--color-beige);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--color-gold);
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body class="bg-white antialiased">
+    <!-- Navigation -->
+    <nav class="nav-glass fixed top-0 left-0 right-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo -->
+                <a href="/nqtTrangChu" class="flex items-center space-x-3 group">
+                    <div class="w-12 h-12 rounded-lg flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all overflow-hidden"
+                        th:style="'background: linear-gradient(to bottom right, ' + ${nqtWebsiteColor ?: '#d97706'} + ', ' + ${#strings.replace(nqtWebsiteColor ?: '#d97706', '#', '')} + 'cc);'">
+                        <img th:src="${nqtWebsiteLogo}" alt="Logo" class="w-full h-full object-cover"
+                            th:if="${nqtWebsiteLogo != null and nqtWebsiteLogo != ''}">
+                        <span class="text-white font-serif font-bold text-xl" 
+                            th:unless="${nqtWebsiteLogo != null and nqtWebsiteLogo != ''}"
+                            th:text="${#strings.substring(nqtWebsiteName ?: 'Hotel NQT', 0, 1)}">H</span>
+                    </div>
+                    <span class="text-2xl font-serif font-bold text-gray-900" th:text="${nqtWebsiteName ?: 'Hotel NQT'}">Hotel NQT</span>
+                </a>
+
+                <!-- Desktop Menu -->
+                <div class="hidden lg:flex items-center space-x-8">
+                    <a href="/nqtPhong" class="text-gray-700 hover:text-amber-700 font-medium transition-colors">Phòng</a>
+                    <a href="/nqtLoaiPhong" class="text-gray-700 hover:text-amber-700 font-medium transition-colors">Loại phòng</a>
+                    <a href="/nqtDichVu" class="text-gray-700 hover:text-amber-700 font-medium transition-colors">Dịch vụ</a>
+                    <a href="/nqtTinTuc" class="text-gray-700 hover:text-amber-700 font-medium transition-colors">Tin tức</a>
+                    <a href="/nqtLienHe" class="text-gray-700 hover:text-amber-700 font-medium transition-colors">Liên hệ</a>
+                </div>
+
+                <!-- User Actions -->
+                <div class="flex items-center space-x-4">
+                    <div class="gtranslate_wrapper"></div>
+                    <th:block th:if="${session.nqtCustomerUser == null}">
+                        <a href="/nqtDangNhap" class="text-gray-700 hover:text-amber-700 font-medium transition-colors">Đăng nhập</a>
+                        <a href="/nqtDangKy" class="bg-gradient-to-r from-amber-600 to-amber-800 text-white px-6 py-2.5 rounded-lg font-medium hover:shadow-lg transition-all hover:scale-105">
+                            Đăng ký
+                        </a>
+                    </th:block>
+                    <th:block th:if="${session.nqtCustomerUser != null}">
+                        <!-- Admin Button -->
+                        <a th:if="${session.nqtCustomerUser != null and session.nqtCustomerUser.nqtVaiTro != null and session.nqtCustomerUser.nqtVaiTro == 99}" 
+                           href="/admin" 
+                           class="flex items-center space-x-2 px-4 py-2.5 rounded-lg font-medium transition-all hover:shadow-md text-gray-700 bg-gray-100 hover:bg-gray-200 border border-gray-300">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                            <span class="hidden md:block text-sm">Admin</span>
+                        </a>
+                        <!-- User Menu -->
+                        <div class="relative group">
+                            <button class="flex items-center space-x-2 text-gray-700 hover:text-amber-700 transition-colors">
+                                <div class="w-9 h-9 rounded-full flex items-center justify-center user-avatar-bg"
+                                    th:style="'background: linear-gradient(to right bottom, ' + ${nqtWebsiteColor ?: '#d97706'} + ', ' + ${#strings.replace(nqtWebsiteColor ?: '#d97706', '#', '')} + 'cc);'">
+                                    <span class="text-white font-semibold text-sm" th:text="${#strings.substring(session.nqtCustomerUser.nqtHoVaTen, 0, 1)}">U</span>
+                                </div>
+                                <span class="font-medium hidden md:block" th:text="${session.nqtCustomerUser.nqtHoVaTen}">User</span>
+                            </button>
+                            <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 border border-gray-100">
+                                <a href="/nqtTaiKhoan" class="block px-4 py-2.5 text-gray-700 hover:bg-amber-50 rounded-t-lg transition-colors">Tài khoản</a>
+                                <a href="/nqtDatPhongCuaToi" class="block px-4 py-2.5 text-gray-700 hover:bg-amber-50 transition-colors">Đặt phòng của tôi</a>
+                                <a href="/nqtDangXuat" class="block px-4 py-2.5 text-red-600 hover:bg-red-50 rounded-b-lg transition-colors">Đăng xuất</a>
+                            </div>
+                        </div>
+                    </th:block>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Content -->
+    <div class="content-wrapper" th:replace="~{::content}">
+        <!-- Content will be inserted here by pages using this layout -->
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+                <div class="md:col-span-1">
+                    <div class="flex items-center space-x-4 mb-6">
+                        <div class="w-14 h-14 rounded-xl flex items-center justify-center overflow-hidden shadow-lg transition-transform hover:scale-105"
+                            th:style="'background: linear-gradient(135deg, ' + ${nqtWebsiteColor ?: '#d97706'} + ', ' + ${#strings.replace(nqtWebsiteColor ?: '#d97706', '#', '')} + 'dd);'">
+                            <img th:src="${nqtWebsiteLogo}" alt="Logo" class="w-full h-full object-cover"
+                                th:if="${nqtWebsiteLogo != null and nqtWebsiteLogo != ''}">
+                            <span class="text-white font-serif font-bold text-2xl" 
+                                th:unless="${nqtWebsiteLogo != null and nqtWebsiteLogo != ''}"
+                                th:text="${#strings.substring(nqtWebsiteName ?: 'Hotel NQT', 0, 1)}">H</span>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-serif font-bold leading-tight" th:text="${nqtWebsiteName ?: 'Hotel NQT'}">Hotel NQT</h2>
+                        </div>
+                    </div>
+                    <p class="text-gray-300 text-sm leading-relaxed mb-6 max-w-xs">Khách sạn cao cấp với dịch vụ tinh tế và trải nghiệm độc quyền.</p>
+                    <div class="flex items-center space-x-3">
+                        <a th:href="${nqtWebsiteFacebook ?: '#'}" target="_blank" 
+                            class="w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-300 group bg-white hover:bg-blue-600 hover:scale-110 hover:shadow-xl overflow-hidden"
+                            th:if="${nqtWebsiteFacebook != null and nqtWebsiteFacebook != '' and nqtWebsiteFacebook != '#'}"
+                            title="Facebook">
+                            <img src="/img/facebook.png" alt="Facebook" class="w-6 h-6 object-contain group-hover:brightness-0 group-hover:invert transition-all">
+                        </a>
+                        <a th:href="${nqtWebsiteZalo ?: '#'}" target="_blank" 
+                            class="w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-300 group bg-white hover:bg-blue-500 hover:scale-110 hover:shadow-xl overflow-hidden"
+                            th:if="${nqtWebsiteZalo != null and nqtWebsiteZalo != '' and nqtWebsiteZalo != '#'}"
+                            title="Zalo">
+                            <img src="/img/Logo-Zalo-App-Rec.webp" alt="Zalo" class="w-6 h-6 object-contain group-hover:brightness-0 group-hover:invert transition-all">
+                        </a>
+                        <a th:href="${nqtWebsiteLink ?: '#'}" target="_blank" 
+                            class="w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-300 group bg-white hover:bg-indigo-600 hover:scale-110 hover:shadow-xl overflow-hidden"
+                            th:if="${nqtWebsiteLink != null and nqtWebsiteLink != '' and nqtWebsiteLink != '#'}"
+                            title="Website">
+                            <img src="/img/world-wide-web.png" alt="Website" class="w-6 h-6 object-contain group-hover:brightness-0 group-hover:invert transition-all">
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-lg mb-4">Về chúng tôi</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="/nqtGioiThieu" class="hover:text-amber-500 transition-colors">Giới thiệu</a></li>
+                        <li><a href="/nqtLienHe" class="hover:text-amber-500 transition-colors">Liên hệ</a></li>
+                        <li><a href="/nqtTinTuc" class="hover:text-amber-500 transition-colors">Tin tức</a></li>
+                        <li><a href="#" class="hover:text-amber-500 transition-colors">Tuyển dụng</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-lg mb-4">Dịch vụ</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="/nqtPhong" class="hover:text-amber-500 transition-colors">Phòng nghỉ</a></li>
+                        <li><a href="/nqtDichVu" class="hover:text-amber-500 transition-colors">Dịch vụ</a></li>
+                        <li><a href="/nqtDatPhong" class="hover:text-amber-500 transition-colors">Đặt phòng</a></li>
+                        <li><a href="#" class="hover:text-amber-500 transition-colors">Spa & Wellness</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-lg mb-4">Hỗ trợ</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li th:if="${nqtWebsiteFAQ != null and nqtWebsiteFAQ != '' and nqtWebsiteFAQ != '#'}">
+                            <a th:href="${nqtWebsiteFAQ}" class="hover:text-amber-500 transition-colors">Câu hỏi thường gặp</a>
+                        </li>
+                        <li th:each="link : ${nqtWebsiteSupportLinksList}">
+                            <a th:href="${link[1]}" th:text="${link[0]}" class="hover:text-amber-500 transition-colors">Link</a>
+                        </li>
+                        <li th:if="${nqtWebsiteSupportLinksList == null or nqtWebsiteSupportLinksList.isEmpty()}">
+                            <a href="#" class="hover:text-amber-500 transition-colors">Câu hỏi thường gặp</a>
+                        </li>
+                        <li th:if="${nqtWebsiteSupportLinksList == null or nqtWebsiteSupportLinksList.isEmpty()}">
+                            <a href="#" class="hover:text-amber-500 transition-colors">Chính sách hủy</a>
+                        </li>
+                        <li th:if="${nqtWebsiteSupportLinksList == null or nqtWebsiteSupportLinksList.isEmpty()}">
+                            <a href="#" class="hover:text-amber-500 transition-colors">Điều khoản sử dụng</a>
+                        </li>
+                        <li th:if="${nqtWebsiteSupportLinksList == null or nqtWebsiteSupportLinksList.isEmpty()}">
+                            <a href="#" class="hover:text-amber-500 transition-colors">Bảo mật</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 pt-8 text-center text-gray-400">
+                <p>&copy; <span th:text="${#dates.year(#dates.createNow())}">2024</span> <span th:text="${nqtWebsiteName ?: 'Hotel NQT'}">Hotel NQT</span>. All rights reserved. Developed by Nguyễn Quang Tâm - K23CNT1</p>
+                <p class="mt-2"><span th:text="${nqtWebsiteAddress ?: '123 Đường ABC, Quận XYZ, Hà Nội, Việt Nam'}">123 Đường ABC, Quận XYZ, Hà Nội, Việt Nam</span> | Tel: <span th:text="${nqtWebsitePhone ?: '(84) 123-456-789'}">(84) 123-456-789</span> | Email: <span th:text="${nqtWebsiteEmail ?: 'contact@hotelnqt.com'}">contact@hotelnqt.com</span></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- GTranslate Scripts -->
+    <script>
+        window.gtranslateSettings = {
+            "default_language": "vi",
+            "detect_browser_language": true,
+            "languages": ["vi", "en", "zh-CN", "it", "es", "de", "ar", "tr", "ru", "uk", "km", "th", "fr"],
+            "wrapper_selector": ".gtranslate_wrapper",
+            "native_language_names": true,
+            "flag_style": "3d",
+            "flag_size": 24,
+            "switcher_text_color": "#374151",
+            "switcher_hover_text_color": "#d97706"
+        };
+    </script>
+    <script src="https://cdn.gtranslate.net/widgets/latest/dropdown.js" defer></script>
+    <script>
+        // Việt hóa GTranslate
+        function vietnamizeGTranslate() {
+            const gtranslateSelect = document.querySelector('.gtranslate_wrapper select');
+            if (gtranslateSelect) {
+                // Thay đổi option đầu tiên (Select Language) thành tiếng Việt
+                const firstOption = gtranslateSelect.querySelector('option[value=""]');
+                if (firstOption && firstOption.textContent !== 'Chọn ngôn ngữ') {
+                    firstOption.textContent = 'Chọn ngôn ngữ';
+                }
+                
+                // Thay đổi tên các ngôn ngữ sang tiếng Việt
+                const languageNames = {
+                    'vi': 'Tiếng Việt',
+                    'en': 'Tiếng Anh',
+                    'zh-CN': 'Tiếng Trung',
+                    'it': 'Tiếng Ý',
+                    'es': 'Tiếng Tây Ban Nha',
+                    'de': 'Tiếng Đức',
+                    'ar': 'Tiếng Ả Rập',
+                    'tr': 'Tiếng Thổ Nhĩ Kỳ',
+                    'ru': 'Tiếng Nga',
+                    'uk': 'Tiếng Ukraina',
+                    'km': 'Tiếng Khmer',
+                    'th': 'Tiếng Thái',
+                    'fr': 'Tiếng Pháp'
+                };
+                
+                gtranslateSelect.querySelectorAll('option').forEach(function(option) {
+                    const langCode = option.value;
+                    if (langCode && languageNames[langCode] && option.textContent !== languageNames[langCode]) {
+                        option.textContent = languageNames[langCode];
+                    }
+                });
+            }
+        }
+        
+        // Chạy sau khi DOM load và GTranslate render
+        document.addEventListener('DOMContentLoaded', function() {
+            // Chạy ngay lập tức
+            setTimeout(vietnamizeGTranslate, 300);
+            // Chạy lại sau 1 giây để đảm bảo GTranslate đã render
+            setTimeout(vietnamizeGTranslate, 1000);
+            // Chạy lại sau 2 giây
+            setTimeout(vietnamizeGTranslate, 2000);
+        });
+        
+        // Theo dõi thay đổi của GTranslate
+        const observer = new MutationObserver(function(mutations) {
+            vietnamizeGTranslate();
+        });
+        
+        // Bắt đầu quan sát sau khi DOM load
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                const gtranslateWrapper = document.querySelector('.gtranslate_wrapper');
+                if (gtranslateWrapper) {
+                    observer.observe(gtranslateWrapper, {
+                        childList: true,
+                        subtree: true
+                    });
+                }
+            }, 500);
+        });
+    </script>
+</body>
+</html>
+

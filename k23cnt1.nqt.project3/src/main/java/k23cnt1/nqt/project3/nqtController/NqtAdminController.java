@@ -433,6 +433,84 @@ public class NqtAdminController {
         return "redirect:/admin/loai-phong";
     }
 
+    // Bulk Actions for Loại phòng
+    @PostMapping("/admin/loai-phong/bulk-activate")
+    public String nqtLoaiPhongBulkActivate(@RequestParam("ids") List<Integer> ids, RedirectAttributes redirectAttributes) {
+        try {
+            int count = 0;
+            for (Integer id : ids) {
+                try {
+                    NqtLoaiPhongResponse loaiPhong = nqtLoaiPhongService.nqtGetById(id);
+                    NqtLoaiPhongRequest request = new NqtLoaiPhongRequest();
+                    request.setNqtTenLoaiPhong(loaiPhong.getNqtTenLoaiPhong());
+                    request.setNqtGia(loaiPhong.getNqtGia());
+                    request.setNqtSoNguoi(loaiPhong.getNqtSoNguoi());
+                    request.setNqtHinhAnh(loaiPhong.getNqtHinhAnh());
+                    request.setNqtStatus(true);
+                    request.setNqtMetaTitle(loaiPhong.getNqtMetaTitle());
+                    request.setNqtMetaKeyword(loaiPhong.getNqtMetaKeyword());
+                    request.setNqtMetaDescription(loaiPhong.getNqtMetaDescription());
+                    nqtLoaiPhongService.nqtUpdate(id, request);
+                    count++;
+                } catch (Exception e) {
+                    // Skip if error
+                }
+            }
+            redirectAttributes.addFlashAttribute("nqtSuccess", "Đã kích hoạt " + count + " loại phòng!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
+        }
+        return "redirect:/admin/loai-phong";
+    }
+
+    @PostMapping("/admin/loai-phong/bulk-deactivate")
+    public String nqtLoaiPhongBulkDeactivate(@RequestParam("ids") List<Integer> ids, RedirectAttributes redirectAttributes) {
+        try {
+            int count = 0;
+            for (Integer id : ids) {
+                try {
+                    NqtLoaiPhongResponse loaiPhong = nqtLoaiPhongService.nqtGetById(id);
+                    NqtLoaiPhongRequest request = new NqtLoaiPhongRequest();
+                    request.setNqtTenLoaiPhong(loaiPhong.getNqtTenLoaiPhong());
+                    request.setNqtGia(loaiPhong.getNqtGia());
+                    request.setNqtSoNguoi(loaiPhong.getNqtSoNguoi());
+                    request.setNqtHinhAnh(loaiPhong.getNqtHinhAnh());
+                    request.setNqtStatus(false);
+                    request.setNqtMetaTitle(loaiPhong.getNqtMetaTitle());
+                    request.setNqtMetaKeyword(loaiPhong.getNqtMetaKeyword());
+                    request.setNqtMetaDescription(loaiPhong.getNqtMetaDescription());
+                    nqtLoaiPhongService.nqtUpdate(id, request);
+                    count++;
+                } catch (Exception e) {
+                    // Skip if error
+                }
+            }
+            redirectAttributes.addFlashAttribute("nqtSuccess", "Đã vô hiệu hóa " + count + " loại phòng!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
+        }
+        return "redirect:/admin/loai-phong";
+    }
+
+    @PostMapping("/admin/loai-phong/bulk-delete")
+    public String nqtLoaiPhongBulkDelete(@RequestParam("ids") List<Integer> ids, RedirectAttributes redirectAttributes) {
+        try {
+            int count = 0;
+            for (Integer id : ids) {
+                try {
+                    nqtLoaiPhongService.nqtDelete(id);
+                    count++;
+                } catch (Exception e) {
+                    // Skip if error
+                }
+            }
+            redirectAttributes.addFlashAttribute("nqtSuccess", "Đã xóa " + count + " loại phòng!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
+        }
+        return "redirect:/admin/loai-phong";
+    }
+
     // ========== PHÒNG ==========
     @GetMapping("/admin/phong")
     public String nqtPhongList(Model model) {
@@ -582,9 +660,11 @@ public class NqtAdminController {
     public String nqtDatPhongCreateForm(Model model) {
         List<NqtNguoiDungResponse> nqtNguoiDungList = nqtNguoiDungService.nqtGetAll();
         List<NqtPhongResponse> nqtPhongList = nqtPhongService.nqtGetAll();
+        List<NqtGiamGiaResponse> nqtGiamGiaList = nqtGiamGiaService.nqtGetAll();
         model.addAttribute("nqtRequest", new NqtDatPhongRequest());
         model.addAttribute("nqtNguoiDungList", nqtNguoiDungList);
         model.addAttribute("nqtPhongList", nqtPhongList);
+        model.addAttribute("nqtGiamGiaList", nqtGiamGiaList);
         return "admin/dat-phong/form";
     }
 
@@ -605,17 +685,22 @@ public class NqtAdminController {
         NqtDatPhongResponse nqtResponse = nqtDatPhongService.nqtGetById(nqtId);
         List<NqtNguoiDungResponse> nqtNguoiDungList = nqtNguoiDungService.nqtGetAll();
         List<NqtPhongResponse> nqtPhongList = nqtPhongService.nqtGetAll();
+        List<NqtGiamGiaResponse> nqtGiamGiaList = nqtGiamGiaService.nqtGetAll();
         NqtDatPhongRequest nqtRequest = new NqtDatPhongRequest();
         nqtRequest.setNqtNguoiDungId(nqtResponse.getNqtNguoiDungId());
         nqtRequest.setNqtPhongId(nqtResponse.getNqtPhongId());
         nqtRequest.setNqtNgayDen(nqtResponse.getNqtNgayDen());
         nqtRequest.setNqtNgayDi(nqtResponse.getNqtNgayDi());
         nqtRequest.setNqtTongTien(nqtResponse.getNqtTongTien());
+        nqtRequest.setNqtGiamGia(nqtResponse.getNqtGiamGia());
+        nqtRequest.setNqtGiamGiaId(nqtResponse.getNqtGiamGiaId());
         nqtRequest.setNqtGhiChu(nqtResponse.getNqtGhiChu());
+        nqtRequest.setNqtNoiDungChuyenKhoan(nqtResponse.getNqtNoiDungChuyenKhoan());
         nqtRequest.setNqtStatus(nqtResponse.getNqtStatus());
         model.addAttribute("nqtRequest", nqtRequest);
         model.addAttribute("nqtNguoiDungList", nqtNguoiDungList);
         model.addAttribute("nqtPhongList", nqtPhongList);
+        model.addAttribute("nqtGiamGiaList", nqtGiamGiaList);
         model.addAttribute("nqtId", nqtId);
         return "admin/dat-phong/form";
     }
@@ -637,6 +722,26 @@ public class NqtAdminController {
         try {
             nqtDatPhongService.nqtDelete(nqtId);
             redirectAttributes.addFlashAttribute("nqtSuccess", "Xóa thành công!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
+        }
+        return "redirect:/admin/dat-phong";
+    }
+
+    // Bulk Actions for Đặt phòng
+    @PostMapping("/admin/dat-phong/bulk-delete")
+    public String nqtDatPhongBulkDelete(@RequestParam("ids") List<Integer> ids, RedirectAttributes redirectAttributes) {
+        try {
+            int count = 0;
+            for (Integer id : ids) {
+                try {
+                    nqtDatPhongService.nqtDelete(id);
+                    count++;
+                } catch (Exception e) {
+                    // Skip if error
+                }
+            }
+            redirectAttributes.addFlashAttribute("nqtSuccess", "Đã xóa " + count + " đặt phòng!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
@@ -850,6 +955,26 @@ public class NqtAdminController {
         return "redirect:/admin/don-gia-dich-vu";
     }
 
+    // Bulk Actions for Đơn giá dịch vụ
+    @PostMapping("/admin/don-gia-dich-vu/bulk-delete")
+    public String nqtDonGiaDichVuBulkDelete(@RequestParam("ids") List<Integer> ids, RedirectAttributes redirectAttributes) {
+        try {
+            int count = 0;
+            for (Integer id : ids) {
+                try {
+                    nqtDonGiaDichVuService.nqtDelete(id);
+                    count++;
+                } catch (Exception e) {
+                    // Skip if error
+                }
+            }
+            redirectAttributes.addFlashAttribute("nqtSuccess", "Đã xóa " + count + " đơn giá dịch vụ!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
+        }
+        return "redirect:/admin/don-gia-dich-vu";
+    }
+
     // ========== ĐÁNH GIÁ ==========
     @GetMapping("/admin/danh-gia")
     public String nqtDanhGiaList(Model model) {
@@ -909,6 +1034,74 @@ public class NqtAdminController {
         try {
             nqtDanhGiaService.nqtDelete(nqtId);
             redirectAttributes.addFlashAttribute("nqtSuccess", "Xóa thành công!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
+        }
+        return "redirect:/admin/danh-gia";
+    }
+
+    // Bulk Actions for Đánh giá
+    @PostMapping("/admin/danh-gia/bulk-activate")
+    public String nqtDanhGiaBulkActivate(@RequestParam("ids") List<Integer> ids, RedirectAttributes redirectAttributes) {
+        try {
+            int count = 0;
+            for (Integer id : ids) {
+                try {
+                    NqtDanhGiaResponse danhGia = nqtDanhGiaService.nqtGetById(id);
+                    NqtDanhGiaRequest request = new NqtDanhGiaRequest();
+                    request.setNqtDatPhongId(danhGia.getNqtDatPhongId());
+                    request.setNqtNoiDungDanhGia(danhGia.getNqtNoiDungDanhGia());
+                    request.setNqtStatus(true);
+                    nqtDanhGiaService.nqtUpdate(id, request);
+                    count++;
+                } catch (Exception e) {
+                    // Skip if error
+                }
+            }
+            redirectAttributes.addFlashAttribute("nqtSuccess", "Đã hiển thị " + count + " đánh giá!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
+        }
+        return "redirect:/admin/danh-gia";
+    }
+
+    @PostMapping("/admin/danh-gia/bulk-deactivate")
+    public String nqtDanhGiaBulkDeactivate(@RequestParam("ids") List<Integer> ids, RedirectAttributes redirectAttributes) {
+        try {
+            int count = 0;
+            for (Integer id : ids) {
+                try {
+                    NqtDanhGiaResponse danhGia = nqtDanhGiaService.nqtGetById(id);
+                    NqtDanhGiaRequest request = new NqtDanhGiaRequest();
+                    request.setNqtDatPhongId(danhGia.getNqtDatPhongId());
+                    request.setNqtNoiDungDanhGia(danhGia.getNqtNoiDungDanhGia());
+                    request.setNqtStatus(false);
+                    nqtDanhGiaService.nqtUpdate(id, request);
+                    count++;
+                } catch (Exception e) {
+                    // Skip if error
+                }
+            }
+            redirectAttributes.addFlashAttribute("nqtSuccess", "Đã ẩn " + count + " đánh giá!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
+        }
+        return "redirect:/admin/danh-gia";
+    }
+
+    @PostMapping("/admin/danh-gia/bulk-delete")
+    public String nqtDanhGiaBulkDelete(@RequestParam("ids") List<Integer> ids, RedirectAttributes redirectAttributes) {
+        try {
+            int count = 0;
+            for (Integer id : ids) {
+                try {
+                    nqtDanhGiaService.nqtDelete(id);
+                    count++;
+                } catch (Exception e) {
+                    // Skip if error
+                }
+            }
+            redirectAttributes.addFlashAttribute("nqtSuccess", "Đã xóa " + count + " đánh giá!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
@@ -982,6 +1175,82 @@ public class NqtAdminController {
         try {
             nqtBlogService.nqtDelete(nqtId);
             redirectAttributes.addFlashAttribute("nqtSuccess", "Xóa thành công!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
+        }
+        return "redirect:/admin/blog";
+    }
+
+    // Bulk Actions for Blog
+    @PostMapping("/admin/blog/bulk-activate")
+    public String nqtBlogBulkActivate(@RequestParam("ids") List<Integer> ids, RedirectAttributes redirectAttributes) {
+        try {
+            int count = 0;
+            for (Integer id : ids) {
+                try {
+                    NqtBlogResponse blog = nqtBlogService.nqtGetById(id);
+                    NqtBlogRequest request = new NqtBlogRequest();
+                    request.setNqtTieuDe(blog.getNqtTieuDe());
+                    request.setNqtNoiDung(blog.getNqtNoiDung());
+                    request.setNqtHinhAnh(blog.getNqtHinhAnh());
+                    request.setNqtStatus(true);
+                    request.setNqtMetaTitle(blog.getNqtMetaTitle());
+                    request.setNqtMetaKeyword(blog.getNqtMetaKeyword());
+                    request.setNqtMetaDescription(blog.getNqtMetaDescription());
+                    nqtBlogService.nqtUpdate(id, request);
+                    count++;
+                } catch (Exception e) {
+                    // Skip if error
+                }
+            }
+            redirectAttributes.addFlashAttribute("nqtSuccess", "Đã hiển thị " + count + " blog!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
+        }
+        return "redirect:/admin/blog";
+    }
+
+    @PostMapping("/admin/blog/bulk-deactivate")
+    public String nqtBlogBulkDeactivate(@RequestParam("ids") List<Integer> ids, RedirectAttributes redirectAttributes) {
+        try {
+            int count = 0;
+            for (Integer id : ids) {
+                try {
+                    NqtBlogResponse blog = nqtBlogService.nqtGetById(id);
+                    NqtBlogRequest request = new NqtBlogRequest();
+                    request.setNqtTieuDe(blog.getNqtTieuDe());
+                    request.setNqtNoiDung(blog.getNqtNoiDung());
+                    request.setNqtHinhAnh(blog.getNqtHinhAnh());
+                    request.setNqtStatus(false);
+                    request.setNqtMetaTitle(blog.getNqtMetaTitle());
+                    request.setNqtMetaKeyword(blog.getNqtMetaKeyword());
+                    request.setNqtMetaDescription(blog.getNqtMetaDescription());
+                    nqtBlogService.nqtUpdate(id, request);
+                    count++;
+                } catch (Exception e) {
+                    // Skip if error
+                }
+            }
+            redirectAttributes.addFlashAttribute("nqtSuccess", "Đã ẩn " + count + " blog!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
+        }
+        return "redirect:/admin/blog";
+    }
+
+    @PostMapping("/admin/blog/bulk-delete")
+    public String nqtBlogBulkDelete(@RequestParam("ids") List<Integer> ids, RedirectAttributes redirectAttributes) {
+        try {
+            int count = 0;
+            for (Integer id : ids) {
+                try {
+                    nqtBlogService.nqtDelete(id);
+                    count++;
+                } catch (Exception e) {
+                    // Skip if error
+                }
+            }
+            redirectAttributes.addFlashAttribute("nqtSuccess", "Đã xóa " + count + " blog!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
@@ -1228,6 +1497,90 @@ public class NqtAdminController {
         return "redirect:/admin/giam-gia";
     }
 
+    // Bulk Actions for Mã giảm giá
+    @PostMapping("/admin/giam-gia/bulk-activate")
+    public String nqtGiamGiaBulkActivate(@RequestParam("ids") List<Integer> ids, RedirectAttributes redirectAttributes) {
+        try {
+            int count = 0;
+            for (Integer id : ids) {
+                try {
+                    NqtGiamGiaResponse giamGia = nqtGiamGiaService.nqtGetById(id);
+                    NqtGiamGiaRequest request = new NqtGiamGiaRequest();
+                    request.setNqtMaGiamGia(giamGia.getNqtMaGiamGia());
+                    request.setNqtMoTa(giamGia.getNqtMoTa());
+                    request.setNqtLoaiGiam(giamGia.getNqtLoaiGiam());
+                    request.setNqtGiaTriGiam(giamGia.getNqtGiaTriGiam());
+                    request.setNqtGiaTriToiThieu(giamGia.getNqtGiaTriToiThieu());
+                    request.setNqtGiaTriGiamToiDa(giamGia.getNqtGiaTriGiamToiDa());
+                    request.setNqtNgayBatDau(giamGia.getNqtNgayBatDau());
+                    request.setNqtNgayKetThuc(giamGia.getNqtNgayKetThuc());
+                    request.setNqtSoLuongToiDa(giamGia.getNqtSoLuongToiDa());
+                    request.setNqtStatus(true);
+                    request.setNqtNguoiDungId(giamGia.getNqtNguoiDungId());
+                    nqtGiamGiaService.nqtUpdate(id, request);
+                    count++;
+                } catch (Exception e) {
+                    // Skip if error
+                }
+            }
+            redirectAttributes.addFlashAttribute("nqtSuccess", "Đã kích hoạt " + count + " mã giảm giá!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
+        }
+        return "redirect:/admin/giam-gia";
+    }
+
+    @PostMapping("/admin/giam-gia/bulk-deactivate")
+    public String nqtGiamGiaBulkDeactivate(@RequestParam("ids") List<Integer> ids, RedirectAttributes redirectAttributes) {
+        try {
+            int count = 0;
+            for (Integer id : ids) {
+                try {
+                    NqtGiamGiaResponse giamGia = nqtGiamGiaService.nqtGetById(id);
+                    NqtGiamGiaRequest request = new NqtGiamGiaRequest();
+                    request.setNqtMaGiamGia(giamGia.getNqtMaGiamGia());
+                    request.setNqtMoTa(giamGia.getNqtMoTa());
+                    request.setNqtLoaiGiam(giamGia.getNqtLoaiGiam());
+                    request.setNqtGiaTriGiam(giamGia.getNqtGiaTriGiam());
+                    request.setNqtGiaTriToiThieu(giamGia.getNqtGiaTriToiThieu());
+                    request.setNqtGiaTriGiamToiDa(giamGia.getNqtGiaTriGiamToiDa());
+                    request.setNqtNgayBatDau(giamGia.getNqtNgayBatDau());
+                    request.setNqtNgayKetThuc(giamGia.getNqtNgayKetThuc());
+                    request.setNqtSoLuongToiDa(giamGia.getNqtSoLuongToiDa());
+                    request.setNqtStatus(false);
+                    request.setNqtNguoiDungId(giamGia.getNqtNguoiDungId());
+                    nqtGiamGiaService.nqtUpdate(id, request);
+                    count++;
+                } catch (Exception e) {
+                    // Skip if error
+                }
+            }
+            redirectAttributes.addFlashAttribute("nqtSuccess", "Đã vô hiệu hóa " + count + " mã giảm giá!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
+        }
+        return "redirect:/admin/giam-gia";
+    }
+
+    @PostMapping("/admin/giam-gia/bulk-delete")
+    public String nqtGiamGiaBulkDelete(@RequestParam("ids") List<Integer> ids, RedirectAttributes redirectAttributes) {
+        try {
+            int count = 0;
+            for (Integer id : ids) {
+                try {
+                    nqtGiamGiaService.nqtDelete(id);
+                    count++;
+                } catch (Exception e) {
+                    // Skip if error
+                }
+            }
+            redirectAttributes.addFlashAttribute("nqtSuccess", "Đã xóa " + count + " mã giảm giá!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
+        }
+        return "redirect:/admin/giam-gia";
+    }
+
     // ========== CRON LOG ==========
     @GetMapping("/admin/cron-log")
     public String nqtCronLogList(
@@ -1360,6 +1713,84 @@ public class NqtAdminController {
         try {
             nqtNganHangService.nqtDelete(nqtId);
             redirectAttributes.addFlashAttribute("nqtSuccess", "Xóa thành công!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
+        }
+        return "redirect:/admin/ngan-hang";
+    }
+
+    // Bulk Actions for Ngân hàng
+    @PostMapping("/admin/ngan-hang/bulk-activate")
+    public String nqtNganHangBulkActivate(@RequestParam("ids") List<Integer> ids, RedirectAttributes redirectAttributes) {
+        try {
+            int count = 0;
+            for (Integer id : ids) {
+                try {
+                    k23cnt1.nqt.project3.nqtDto.NqtNganHangResponse nganHang = nqtNganHangService.nqtGetById(id);
+                    k23cnt1.nqt.project3.nqtDto.NqtNganHangRequest request = new k23cnt1.nqt.project3.nqtDto.NqtNganHangRequest();
+                    request.setNqtTenNganHang(nganHang.getNqtTenNganHang());
+                    request.setNqtMaNganHang(nganHang.getNqtMaNganHang());
+                    request.setNqtSoTaiKhoan(nganHang.getNqtSoTaiKhoan());
+                    request.setNqtTenChuTaiKhoan(nganHang.getNqtTenChuTaiKhoan());
+                    request.setNqtChiNhanh(nganHang.getNqtChiNhanh());
+                    request.setNqtGhiChu(nganHang.getNqtGhiChu());
+                    request.setNqtStatus(true);
+                    request.setNqtThuTu(nganHang.getNqtThuTu());
+                    nqtNganHangService.nqtUpdate(id, request);
+                    count++;
+                } catch (Exception e) {
+                    // Skip if error
+                }
+            }
+            redirectAttributes.addFlashAttribute("nqtSuccess", "Đã kích hoạt " + count + " ngân hàng!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
+        }
+        return "redirect:/admin/ngan-hang";
+    }
+
+    @PostMapping("/admin/ngan-hang/bulk-deactivate")
+    public String nqtNganHangBulkDeactivate(@RequestParam("ids") List<Integer> ids, RedirectAttributes redirectAttributes) {
+        try {
+            int count = 0;
+            for (Integer id : ids) {
+                try {
+                    k23cnt1.nqt.project3.nqtDto.NqtNganHangResponse nganHang = nqtNganHangService.nqtGetById(id);
+                    k23cnt1.nqt.project3.nqtDto.NqtNganHangRequest request = new k23cnt1.nqt.project3.nqtDto.NqtNganHangRequest();
+                    request.setNqtTenNganHang(nganHang.getNqtTenNganHang());
+                    request.setNqtMaNganHang(nganHang.getNqtMaNganHang());
+                    request.setNqtSoTaiKhoan(nganHang.getNqtSoTaiKhoan());
+                    request.setNqtTenChuTaiKhoan(nganHang.getNqtTenChuTaiKhoan());
+                    request.setNqtChiNhanh(nganHang.getNqtChiNhanh());
+                    request.setNqtGhiChu(nganHang.getNqtGhiChu());
+                    request.setNqtStatus(false);
+                    request.setNqtThuTu(nganHang.getNqtThuTu());
+                    nqtNganHangService.nqtUpdate(id, request);
+                    count++;
+                } catch (Exception e) {
+                    // Skip if error
+                }
+            }
+            redirectAttributes.addFlashAttribute("nqtSuccess", "Đã vô hiệu hóa " + count + " ngân hàng!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
+        }
+        return "redirect:/admin/ngan-hang";
+    }
+
+    @PostMapping("/admin/ngan-hang/bulk-delete")
+    public String nqtNganHangBulkDelete(@RequestParam("ids") List<Integer> ids, RedirectAttributes redirectAttributes) {
+        try {
+            int count = 0;
+            for (Integer id : ids) {
+                try {
+                    nqtNganHangService.nqtDelete(id);
+                    count++;
+                } catch (Exception e) {
+                    // Skip if error
+                }
+            }
+            redirectAttributes.addFlashAttribute("nqtSuccess", "Đã xóa " + count + " ngân hàng!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }

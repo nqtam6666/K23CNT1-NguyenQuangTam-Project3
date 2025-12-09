@@ -55,6 +55,12 @@ public class NqtOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandl
 
             if (userOptional.isPresent()) {
                 user = userOptional.get();
+                // Update email verification status for existing OAuth users
+                // Google has already verified the email, so we can trust it
+                if (user.getNqtEmailVerified() == null || !user.getNqtEmailVerified()) {
+                    user.setNqtEmailVerified(true);
+                    user = nqtNguoiDungRepository.save(user);
+                }
             } else {
                 // Create new user from OAuth2
                 user = new NqtNguoiDung();
@@ -65,6 +71,7 @@ public class NqtOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandl
                 user.setNqtStatus(true);
                 user.setNqtCapBac("KhachThuong");
                 user.setNqtMatKhau(""); // OAuth users don't need password
+                user.setNqtEmailVerified(true); // OAuth emails are already verified by Google
                 user = nqtNguoiDungRepository.save(user);
             }
 

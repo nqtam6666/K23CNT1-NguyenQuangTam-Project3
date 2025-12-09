@@ -8,6 +8,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -203,8 +204,20 @@ public class NqtLoginController {
     }
 
     @GetMapping("/admin/logout")
-    public String nqtLogout(HttpSession session) {
+    public String nqtLogout(HttpSession session, HttpServletResponse response) {
+        // Clear SecurityContext (JWT authentication)
+        SecurityContextHolder.clearContext();
+        
+        // Clear JWT cookie
+        Cookie jwtCookie = new Cookie("jwt", null);
+        jwtCookie.setHttpOnly(true);
+        jwtCookie.setPath("/");
+        jwtCookie.setMaxAge(0); // Delete cookie
+        response.addCookie(jwtCookie);
+        
+        // Invalidate session (clears all session attributes)
         session.invalidate();
+        
         return "redirect:/admin/login";
     }
 }
