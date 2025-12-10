@@ -32,7 +32,7 @@
     </style>
 </head>
 <body>
-    <div th:fragment="content" class="min-h-screen flex items-center justify-center py-12 px-4">
+    <div th:fragment="content" class="flex-1 flex items-center justify-center py-12 px-4" style="margin-top: 100px;">
         <div class="max-w-md w-full">
             <div class="text-center mb-8">
                 <a href="/nqtTrangChu" class="inline-block mb-6">
@@ -107,10 +107,9 @@
                             placeholder="Nhập lại mật khẩu">
                     </div>
 
-                    <button type="submit"
+                    <button type="submit" id="btn-register-submit"
                         class="w-full text-white py-3 rounded-lg font-semibold hover:shadow-lg transition-all transform hover:scale-105 btn-register"
-                        th:style="'background: linear-gradient(to right, ' + ${nqtWebsiteColor ?: '#d97706'} + ', ' + ${#strings.replace(nqtWebsiteColor ?: '#d97706', '#', '')} + 'cc);'"
-                        style="background: linear-gradient(to right, #d97706, #d97706cc);">
+                        style="background: linear-gradient(to right, #d97706, rgba(217, 119, 6, 0.8)) !important; background-color: #d97706 !important; color: white !important; cursor: pointer !important; border: none !important;">
                         Đăng ký
                     </button>
                 </form>
@@ -131,13 +130,45 @@
         </div>
     </div>
     <script>
+        // Helper function to convert hex to RGB
+        function hexToRgb(hex) {
+            // Remove # if present
+            hex = hex.replace('#', '');
+            
+            // Parse hex to RGB
+            const r = parseInt(hex.substring(0, 2), 16);
+            const g = parseInt(hex.substring(2, 4), 16);
+            const b = parseInt(hex.substring(4, 6), 16);
+            
+            return r + ', ' + g + ', ' + b;
+        }
+        
+        // Function to apply register button color
+        function applyRegisterButtonColor() {
+            const primaryColor = /*[[${nqtWebsiteColor ?: '#d97706'}]]*/ '#d97706';
+            const primaryColorRgb = hexToRgb(primaryColor);
+            const primaryColorDark = 'rgba(' + primaryColorRgb + ', 0.8)';
+            const gradient = 'linear-gradient(to right, ' + primaryColor + ', ' + primaryColorDark + ')';
+            
+            const registerButton = document.getElementById('btn-register-submit');
+            if (registerButton) {
+                registerButton.style.setProperty('background', gradient, 'important');
+                registerButton.style.setProperty('background-color', primaryColor, 'important');
+                registerButton.style.setProperty('color', 'white', 'important');
+                registerButton.style.setProperty('cursor', 'pointer', 'important');
+                registerButton.style.setProperty('border', 'none', 'important');
+            }
+        }
+        
         document.addEventListener('DOMContentLoaded', function() {
             const primaryColor = /*[[${nqtWebsiteColor ?: '#d97706'}]]*/ '#d97706';
-            const primaryColorDark = primaryColor + 'cc';
-            const registerButton = document.querySelector('.btn-register');
-            if (registerButton) {
-                registerButton.style.background = 'linear-gradient(to right, ' + primaryColor + ', ' + primaryColorDark + ')';
-            }
+            
+            // Apply button color
+            applyRegisterButtonColor();
+            
+            // Re-apply after a short delay to ensure it sticks
+            setTimeout(applyRegisterButtonColor, 50);
+            setTimeout(applyRegisterButtonColor, 200);
             
             // Apply focus color to inputs
             const inputs = document.querySelectorAll('.input-focus');

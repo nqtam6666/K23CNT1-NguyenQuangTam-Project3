@@ -18,7 +18,7 @@ public class NqtPaymentCheckService {
 
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private final String PAYMENT_API_URL = "https://clonemmo.com/cron/auto_bank_v2/response.json";
+    private final String PAYMENT_API_URL = "https://nqtam.id.vn/apiACB_Project3.php";
 
     /**
      * Kiểm tra xem đơn đặt phòng đã được thanh toán chưa

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org"
-    th:replace="~{nqtCustomer/layout :: layout(title='Tài khoản của tôi - ' + (nqtWebsiteName ?: 'Hotel NQT'), description='Quản lý thông tin cá nhân - ' + (nqtWebsiteName ?: 'Hotel NQT'))}">
+    th:replace="~{nqtCustomer/layout :: layout(title=${'Tài khoản của tôi - ' + (nqtWebsiteName != null ? nqtWebsiteName : 'Hotel NQT')}, description=${'Quản lý thông tin cá nhân - ' + (nqtWebsiteName != null ? nqtWebsiteName : 'Hotel NQT')})}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,131 +18,313 @@
     </style>
 </head>
 <body>
-    <div th:fragment="content" class="pb-16" style="margin-top: 100px;">
+    <div th:fragment="content" class="pb-16">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-12">
+            <div class="text-center mb-8">
                 <h1 class="font-serif text-4xl font-bold text-gray-900 mb-4">Tài khoản <span class="gold-accent">của tôi</span></h1>
                 <p class="text-gray-600">Quản lý thông tin cá nhân của bạn</p>
             </div>
 
+            <!-- Navigation Tabs -->
+            <div class="bg-gray-700 rounded-lg p-2 mb-6" style="display: block !important; visibility: visible !important;">
+                <div class="flex flex-wrap gap-2">
+                    <button type="button" onclick="window.showTab('profile')" id="tab-profile"
+                        class="px-4 py-2 rounded-md font-medium transition-all bg-white text-gray-800 shadow-sm"
+                        style="cursor: pointer !important; display: inline-block !important;">
+                        THÔNG TIN CÁ NHÂN
+                    </button>
+                    <button type="button" onclick="window.showTab('password')" id="tab-password"
+                        class="px-4 py-2 rounded-md font-medium transition-all text-white hover:bg-gray-600"
+                        style="cursor: pointer !important; display: inline-block !important;">
+                        ĐỔI MẬT KHẨU
+                    </button>
+                    <button type="button" onclick="window.showTab('security')" id="tab-security"
+                        class="px-4 py-2 rounded-md font-medium transition-all text-white hover:bg-gray-600"
+                        style="cursor: pointer !important; display: inline-block !important;">
+                        BẢO MẬT
+                    </button>
+                </div>
+            </div>
+
+            <!-- Success/Error Messages -->
+            <div th:if="${nqtError}" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
+                <span th:text="${nqtError}">Error message</span>
+            </div>
+            <div th:if="${nqtSuccess}" class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-4">
+                <span th:text="${nqtSuccess}">Success message</span>
+            </div>
+
             <div th:if="${nqtCustomerUser}" class="glass-card rounded-2xl p-8 md:p-12">
-                <form th:action="@{/nqtTaiKhoan/cap-nhat}" method="post" class="space-y-6">
-                    <div>
-                        <label for="nqtHoVaTen" class="block text-sm font-medium text-gray-700 mb-2">Họ và tên <span class="text-red-500">*</span></label>
-                        <input type="text" id="nqtHoVaTen" name="nqtHoVaTen" th:value="${nqtCustomerUser.nqtHoVaTen}" required
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
-                    </div>
-
-                    <div>
-                        <label for="nqtEmail" class="block text-sm font-medium text-gray-700 mb-2">Email <span class="text-red-500">*</span></label>
-                        <input type="email" id="nqtEmail" name="nqtEmail" th:value="${nqtCustomerUser.nqtEmail}" required
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
-                    </div>
-
-                    <div>
-                        <label for="nqtSoDienThoai" class="block text-sm font-medium text-gray-700 mb-2">Số điện thoại</label>
-                        <input type="tel" id="nqtSoDienThoai" name="nqtSoDienThoai" th:value="${nqtCustomerUser.nqtSoDienThoai}"
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
-                    </div>
-
-                    <div>
-                        <label for="nqtDiaChi" class="block text-sm font-medium text-gray-700 mb-2">Địa chỉ</label>
-                        <input type="text" id="nqtDiaChi" name="nqtDiaChi" th:value="${nqtCustomerUser.nqtDiaChi}"
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Cấp bậc</label>
-                        <div class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 flex items-center">
-                            <span th:if="${nqtCustomerUser.nqtCapBac == 'KhachVip'}"
-                                class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                <i class="bi bi-star-fill mr-1"></i> Khách VIP
-                            </span>
-                            <span th:if="${nqtCustomerUser.nqtCapBac == null or nqtCustomerUser.nqtCapBac == 'KhachThuong'}"
-                                class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-                                Khách thường
-                            </span>
+                <!-- Tab: THÔNG TIN CÁ NHÂN -->
+                <form th:action="@{/nqtTaiKhoan/cap-nhat}" method="post" id="form-profile" class="tab-content">
+                    <div class="space-y-6">
+                        <div>
+                            <label for="nqtHoVaTen" class="block text-sm font-medium text-gray-700 mb-2">Họ và tên <span class="text-red-500">*</span></label>
+                            <input type="text" id="nqtHoVaTen" name="nqtHoVaTen" th:value="${nqtCustomerUser.nqtHoVaTen}" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
                         </div>
-                        <p class="mt-1 text-xs text-gray-500">Cấp bậc được quản lý bởi hệ thống, không thể thay đổi tại đây.</p>
-                    </div>
 
-                    <!-- 2FA Section -->
-                    <div class="border-t border-gray-200 pt-6">
-                        <h3 class="font-semibold text-gray-900 mb-4">Bảo mật tài khoản</h3>
-                        <div class="bg-gray-50 rounded-lg p-4 mb-4">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="font-medium text-gray-900">Xác thực 2 yếu tố (2FA)</p>
-                                    <p class="text-sm text-gray-600 mt-1">
-                                        <span th:if="${nqtCustomerUser.nqt2faEnabled != null and nqtCustomerUser.nqt2faEnabled}">
+                        <div>
+                            <label for="nqtEmail" class="block text-sm font-medium text-gray-700 mb-2">Email <span class="text-red-500">*</span></label>
+                            <input type="email" id="nqtEmail" name="nqtEmail" th:value="${nqtCustomerUser.nqtEmail}" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+                        </div>
+
+                        <div>
+                            <label for="nqtSoDienThoai" class="block text-sm font-medium text-gray-700 mb-2">Số điện thoại</label>
+                            <input type="tel" id="nqtSoDienThoai" name="nqtSoDienThoai" th:value="${nqtCustomerUser.nqtSoDienThoai}"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+                        </div>
+
+                        <div>
+                            <label for="nqtDiaChi" class="block text-sm font-medium text-gray-700 mb-2">Địa chỉ</label>
+                            <input type="text" id="nqtDiaChi" name="nqtDiaChi" th:value="${nqtCustomerUser.nqtDiaChi}"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Cấp bậc</label>
+                            <div class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 flex items-center">
+                                <span th:if="${nqtCustomerUser.nqtCapBac == 'KhachVip'}"
+                                    class="px-3 py-1 inline-flex items-center text-sm leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                                    </svg>
+                                    Khách VIP
+                                </span>
+                                <span th:if="${nqtCustomerUser.nqtCapBac == null or nqtCustomerUser.nqtCapBac == 'KhachThuong'}"
+                                    class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                    Khách thường
+                                </span>
+                            </div>
+                            <!-- <p class="mt-1 text-xs text-gray-500">Cấp bậc được quản lý bởi hệ thống, không thể thay đổi tại đây.</p> -->
+                        </div>
+
+                        <div class="pt-4 border-t" style="display: block !important; visibility: visible !important;">
+                            <button type="submit" id="btn-update-profile"
+                                class="w-full text-white py-3 rounded-lg font-semibold hover:shadow-lg transition-all hover:scale-105 btn-primary"
+                                style="background: linear-gradient(to right, #d97706, rgba(217, 119, 6, 0.8)) !important; background-color: #d97706 !important; cursor: pointer !important; position: relative !important; z-index: 10 !important; display: block !important; visibility: visible !important; opacity: 1 !important; color: white !important; border: none !important;">
+                                Cập nhật thông tin
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Tab: ĐỔI MẬT KHẨU -->
+                <form th:action="@{/nqtTaiKhoan/cap-nhat}" method="post" id="form-password" class="tab-content hidden">
+                    <div class="space-y-6">
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                            <p class="text-sm text-blue-800 flex items-start">
+                                <svg class="w-5 h-5 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                                </svg>
+                                <span th:if="${nqtCustomerUser.nqtMatKhau == null or nqtCustomerUser.nqtMatKhau.isEmpty()}">
+                                    Tài khoản của bạn được đăng ký qua Google/Facebook. Bạn có thể đặt mật khẩu mới để đăng nhập bằng tài khoản và mật khẩu.
+                                </span>
+                                <span th:unless="${nqtCustomerUser.nqtMatKhau == null or nqtCustomerUser.nqtMatKhau.isEmpty()}">
+                                    Nhập mật khẩu cũ và mật khẩu mới để thay đổi. Để trống nếu không muốn đổi.
+                                </span>
+                            </p>
+                        </div>
+
+                        <div th:if="${nqtCustomerUser.nqtMatKhau != null and !nqtCustomerUser.nqtMatKhau.isEmpty()}">
+                            <label for="nqtMatKhauCu2" class="block text-sm font-medium text-gray-700 mb-2">Mật khẩu hiện tại <span class="text-red-500">*</span></label>
+                            <input type="password" id="nqtMatKhauCu2" name="nqtMatKhauCu"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+                        </div>
+
+                        <div>
+                            <label for="nqtMatKhauMoi2" class="block text-sm font-medium text-gray-700 mb-2">Mật khẩu mới <span class="text-red-500">*</span></label>
+                            <input type="password" id="nqtMatKhauMoi2" name="nqtMatKhauMoi"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+                            <p class="mt-1 text-xs text-gray-500">Mật khẩu phải có ít nhất 6 ký tự</p>
+                        </div>
+
+                        <div>
+                            <label for="nqtMatKhauMoiXacNhan2" class="block text-sm font-medium text-gray-700 mb-2">Xác nhận mật khẩu mới <span class="text-red-500">*</span></label>
+                            <input type="password" id="nqtMatKhauMoiXacNhan2" name="nqtMatKhauMoiXacNhan"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+                        </div>
+
+                        <!-- Hidden fields for profile update -->
+                        <input type="hidden" name="nqtHoVaTen" th:value="${nqtCustomerUser.nqtHoVaTen}">
+                        <input type="hidden" name="nqtEmail" th:value="${nqtCustomerUser.nqtEmail}">
+                        <input type="hidden" name="nqtSoDienThoai" th:value="${nqtCustomerUser.nqtSoDienThoai}">
+                        <input type="hidden" name="nqtDiaChi" th:value="${nqtCustomerUser.nqtDiaChi}">
+
+                        <div class="pt-4 border-t" style="display: block !important; visibility: visible !important;">
+                            <button type="submit" id="btn-change-password"
+                                class="w-full text-white py-3 rounded-lg font-semibold hover:shadow-lg transition-all hover:scale-105 btn-primary"
+                                style="background: linear-gradient(to right, #d97706, rgba(217, 119, 6, 0.8)) !important; background-color: #d97706 !important; cursor: pointer !important; position: relative !important; z-index: 10 !important; display: block !important; visibility: visible !important; opacity: 1 !important; color: white !important; border: none !important;">
+                                Đổi mật khẩu
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Tab: BẢO MẬT -->
+                <div id="content-security" class="tab-content hidden">
+                    <div class="space-y-6">
+                        <div class="bg-gray-50 rounded-lg p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="flex-1">
+                                    <h3 class="font-semibold text-gray-900 mb-2">Xác thực 2 yếu tố (2FA)</h3>
+                                    <p class="text-sm text-gray-600 flex items-center">
+                                        <span th:if="${nqtCustomerUser.nqt2faEnabled != null and nqtCustomerUser.nqt2faEnabled}" class="flex items-center">
+                                            <svg class="w-5 h-5 text-green-600 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                                <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                            </svg>
                                             Đã bật - Tài khoản của bạn được bảo vệ bằng 2FA
                                         </span>
-                                        <span th:unless="${nqtCustomerUser.nqt2faEnabled != null and nqtCustomerUser.nqt2faEnabled}">
+                                        <span th:unless="${nqtCustomerUser.nqt2faEnabled != null and nqtCustomerUser.nqt2faEnabled}" class="flex items-center">
+                                            <svg class="w-5 h-5 text-gray-400 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                            </svg>
                                             Chưa bật - Bảo vệ tài khoản bằng mã xác thực từ ứng dụng
                                         </span>
                                     </p>
                                 </div>
                                 <a th:href="@{/nqtTaiKhoan/setup-2fa}"
-                                    class="px-4 py-2 rounded-lg font-medium transition-colors"
-                                    th:class="${nqtCustomerUser.nqt2faEnabled != null and nqtCustomerUser.nqt2faEnabled} ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200' : 'bg-blue-600 text-white hover:bg-blue-700'"
-                                    th:text="${nqtCustomerUser.nqt2faEnabled != null and nqtCustomerUser.nqt2faEnabled} ? 'Quản lý' : 'Bật 2FA'">
-                                    Bật 2FA
+                                    class="px-6 py-3 rounded-xl font-bold text-base transition-all duration-300 whitespace-nowrap flex items-center space-x-2 shadow-lg hover:shadow-2xl transform hover:scale-105 active:scale-95 border-2"
+                                    th:class="${nqtCustomerUser.nqt2faEnabled != null and nqtCustomerUser.nqt2faEnabled} ? 
+                                        'bg-gradient-to-r from-amber-500 to-orange-600 text-white hover:from-amber-600 hover:to-orange-700 border-amber-600' : 
+                                        'bg-gradient-to-r from-blue-600 to-indigo-700 text-white hover:from-blue-700 hover:to-indigo-800 border-blue-700'">
+                                    <svg th:if="${nqtCustomerUser.nqt2faEnabled != null and nqtCustomerUser.nqt2faEnabled}" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    <svg th:unless="${nqtCustomerUser.nqt2faEnabled != null and nqtCustomerUser.nqt2faEnabled}" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                                    </svg>
+                                    <span th:text="${nqtCustomerUser.nqt2faEnabled != null and nqtCustomerUser.nqt2faEnabled} ? 'Quản lý 2FA' : 'Bật 2FA'">Bật 2FA</span>
                                 </a>
                             </div>
-                        </div>
-                    </div>
-
-                    <div class="border-t border-gray-200 pt-6">
-                        <h3 class="font-semibold text-gray-900 mb-4">Đổi mật khẩu (để trống nếu không muốn đổi)</h3>
-                        <div class="space-y-4">
-                            <div>
-                                <label for="nqtMatKhauCu" class="block text-sm font-medium text-gray-700 mb-2">Mật khẩu hiện tại</label>
-                                <input type="password" id="nqtMatKhauCu" name="nqtMatKhauCu"
-                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
-                            </div>
-                            <div>
-                                <label for="nqtMatKhauMoi" class="block text-sm font-medium text-gray-700 mb-2">Mật khẩu mới</label>
-                                <input type="password" id="nqtMatKhauMoi" name="nqtMatKhauMoi"
-                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
-                            </div>
-                            <div>
-                                <label for="nqtMatKhauMoiXacNhan" class="block text-sm font-medium text-gray-700 mb-2">Xác nhận mật khẩu mới</label>
-                                <input type="password" id="nqtMatKhauMoiXacNhan" name="nqtMatKhauMoiXacNhan"
-                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+                            <div class="mt-4 pt-4 border-t border-gray-200">
+                                <p class="text-xs text-gray-500">
+                                    <strong>2FA là gì?</strong> Xác thực 2 yếu tố giúp bảo vệ tài khoản của bạn bằng cách yêu cầu mã xác thực từ ứng dụng trên điện thoại khi đăng nhập.
+                                </p>
                             </div>
                         </div>
                     </div>
-
-                    <div th:if="${nqtError}" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-                        <span th:text="${nqtError}">Error message</span>
-                    </div>
-
-                    <div th:if="${nqtSuccess}" class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
-                        <span th:text="${nqtSuccess}">Success message</span>
-                    </div>
-
-                    <button type="submit"
-                        class="w-full text-white py-4 rounded-lg font-semibold hover:shadow-lg transition-all hover:scale-105 btn-primary"
-                        th:style="'background: linear-gradient(to right, ' + ${nqtWebsiteColor ?: '#d97706'} + ', ' + ${#strings.replace(nqtWebsiteColor ?: '#d97706', '#', '')} + 'cc);'"
-                        style="background: linear-gradient(to right, #d97706, #d97706cc);">
-                        Cập nhật thông tin
-                    </button>
-                </form>
+                </div>
             </div>
         </div>
-    </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const primaryColor = /*[[${nqtWebsiteColor ?: '#d97706'}]]*/ '#d97706';
-            const primaryColorDark = primaryColor + 'cc';
+        
+        <script>
+            // Function to apply button colors
+            function applyButtonColors() {
+                const primaryColor = /*[[${nqtWebsiteColor ?: '#d97706'}]]*/ '#d97706';
+                const primaryColorRgb = hexToRgb(primaryColor);
+                const primaryColorDark = 'rgba(' + primaryColorRgb + ', 0.8)';
+                const gradient = 'linear-gradient(to right, ' + primaryColor + ', ' + primaryColorDark + ')';
+                
+                // Apply to all buttons with class btn-primary
+                document.querySelectorAll('.btn-primary').forEach(function(btn) {
+                    btn.style.setProperty('background', gradient, 'important');
+                    btn.style.setProperty('background-color', primaryColor, 'important');
+                    btn.style.setProperty('color', 'white', 'important');
+                    btn.style.setProperty('cursor', 'pointer', 'important');
+                    btn.style.setProperty('position', 'relative', 'important');
+                    btn.style.setProperty('z-index', '10', 'important');
+                    btn.style.setProperty('display', 'block', 'important');
+                    btn.style.setProperty('visibility', 'visible', 'important');
+                    btn.style.setProperty('opacity', '1', 'important');
+                    btn.style.setProperty('border', 'none', 'important');
+                });
+            }
             
-            // Apply color to buttons
-            const buttons = document.querySelectorAll('.btn-primary');
-            buttons.forEach(function(btn) {
-                btn.style.background = 'linear-gradient(to right, ' + primaryColor + ', ' + primaryColorDark + ')';
-            });
-        });
-    </script>
+            // Tab navigation - must be in global scope
+            window.showTab = function(tabName) {
+                
+                // Hide all tab contents
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.add('hidden');
+                    content.style.display = 'none';
+                });
+                
+                // Remove active state from all tabs
+                document.querySelectorAll('[id^="tab-"]').forEach(tab => {
+                    tab.classList.remove('bg-white', 'text-gray-800', 'shadow-sm');
+                    tab.classList.add('text-white', 'hover:bg-gray-600');
+                });
+                
+                // Show selected tab content
+                if (tabName === 'profile') {
+                    const formProfile = document.getElementById('form-profile');
+                    if (formProfile) {
+                        formProfile.classList.remove('hidden');
+                        formProfile.style.display = 'block';
+                    }
+                } else if (tabName === 'password') {
+                    const formPassword = document.getElementById('form-password');
+                    if (formPassword) {
+                        formPassword.classList.remove('hidden');
+                        formPassword.style.display = 'block';
+                    }
+                } else if (tabName === 'security') {
+                    const contentSecurity = document.getElementById('content-security');
+                    if (contentSecurity) {
+                        contentSecurity.classList.remove('hidden');
+                        contentSecurity.style.display = 'block';
+                    }
+                }
+                
+                // Add active state to selected tab
+                const activeTab = document.getElementById('tab-' + tabName);
+                if (activeTab) {
+                    activeTab.classList.remove('text-white', 'hover:bg-gray-600');
+                    activeTab.classList.add('bg-white', 'text-gray-800', 'shadow-sm');
+                }
+                
+                // Re-apply button colors after tab switch
+                setTimeout(applyButtonColors, 50);
+            };
+            
+            // Helper function to convert hex to RGB
+            function hexToRgb(hex) {
+                // Remove # if present
+                hex = hex.replace('#', '');
+                
+                // Parse hex to RGB
+                const r = parseInt(hex.substring(0, 2), 16);
+                const g = parseInt(hex.substring(2, 4), 16);
+                const b = parseInt(hex.substring(4, 6), 16);
+                
+                return r + ', ' + g + ', ' + b;
+            }
+            
+            // Initialize: show profile tab by default
+            function initTabs() {
+                
+                // Ensure showTab is available
+                if (typeof window.showTab === 'function') {
+                    window.showTab('profile');
+                } else {
+                    console.error('showTab function not found!');
+                }
+                
+                // Apply button colors
+                applyButtonColors();
+                
+                // Ensure tab navigation is visible
+                const tabNav = document.querySelector('.bg-gray-700.rounded-lg');
+                if (tabNav) {
+                    tabNav.style.display = 'block';
+                    tabNav.style.visibility = 'visible';
+                }
+                
+                // Re-apply colors after a short delay to ensure DOM is ready
+                setTimeout(applyButtonColors, 100);
+                setTimeout(applyButtonColors, 500);
+            }
+            
+            // Run on DOM ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initTabs);
+            } else {
+                initTabs();
+            }
+        </script>
+    </div>
 </body>
 </html>
 

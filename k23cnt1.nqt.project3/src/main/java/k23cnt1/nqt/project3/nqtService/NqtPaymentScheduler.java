@@ -35,8 +35,9 @@ public class NqtPaymentScheduler {
     private NqtPhongRepository nqtPhongRepository;
 
     /**
-     * Kiểm tra thanh toán tự động mỗi 2 phút
+     * Kiểm tra thanh toán tự động mỗi 30 giây
      * Chỉ kiểm tra các đơn đặt phòng chưa thanh toán (status = 0)
+     * CHỈ GỌI API KHI CÓ HÓA ĐƠN CHƯA THANH TOÁN CẦN XỬ LÝ
      */
     @Scheduled(fixedRate = 30000) // 30 seconds = 30000 milliseconds
     public void checkPendingPayments() {
@@ -52,6 +53,13 @@ public class NqtPaymentScheduler {
 
             logger.info("Tìm thấy {} đơn đặt phòng chưa thanh toán", pendingBookings.size());
 
+            // NẾU KHÔNG CÓ HÓA ĐƠN CHƯA THANH TOÁN, KHÔNG GỌI API
+            if (pendingBookings.isEmpty()) {
+                logger.info("Không có hóa đơn chưa thanh toán cần xử lý. Bỏ qua việc gọi API.");
+                return;
+            }
+
+            // CHỈ KHI CÓ HÓA ĐƠN CHƯA THANH TOÁN MỚI XỬ LÝ
             List<NqtDatPhong> paidBookings = new ArrayList<>();
             int successCount = 0;
             for (NqtDatPhong booking : pendingBookings) {

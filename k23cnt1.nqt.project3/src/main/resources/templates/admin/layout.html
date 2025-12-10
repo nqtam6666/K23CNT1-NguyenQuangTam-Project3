@@ -7,7 +7,6 @@
     <title th:text="${nqtTitle} ?: (${nqtTieuDe} ?: (${nqtWebsiteName} ?: 'Admin - Quản lý Khách sạn'))">Admin</title>
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <link
         th:href="@{'https://fonts.googleapis.com/css?family=' + ${#strings.replace(nqtWebsiteFont ?: 'Nunito', ' ', '+')} + ':200,300,400,600,700,800,900&display=swap'}"
         rel="stylesheet">
@@ -182,16 +181,18 @@
                     <img th:src="${nqtWebsiteLogo}" alt="Logo" class="w-8 h-8 rounded-full object-cover"
                         :class="sidebarCollapsed ? '' : 'mr-2'"
                         th:if="${nqtWebsiteLogo != null and nqtWebsiteLogo != ''}">
-                    <i class="bi bi-building text-primary" :class="sidebarCollapsed ? '' : 'mr-2'"
-                        th:unless="${nqtWebsiteLogo != null and nqtWebsiteLogo != ''}"></i>
+                    <svg class="w-6 h-6 text-primary" :class="sidebarCollapsed ? '' : 'mr-2'" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" th:unless="${nqtWebsiteLogo != null and nqtWebsiteLogo != ''}">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                    </svg>
                     <span x-show="!sidebarCollapsed" x-transition th:text="${nqtWebsiteName} ?: 'Admin Panel'"></span>
                 </a>
 
                 <!-- Toggle Button -->
                 <button @click="toggleCollapse()"
                     class="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-white text-sidebar rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center hidden lg:flex">
-                    <i class="bi text-xs transition-transform duration-200"
-                        :class="sidebarCollapsed ? 'bi-chevron-right' : 'bi-chevron-left'"></i>
+                    <svg class="w-3 h-3 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" :class="sidebarCollapsed ? '' : 'rotate-180'">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
                 </button>
             </div>
 
@@ -203,22 +204,31 @@
                             class="flex items-center justify-between w-full px-4 py-3 text-gray-300 hover:bg-sidebarActive hover:text-white rounded-lg transition-colors group"
                             :class="[open ? 'bg-sidebarActive text-white' : '', sidebarCollapsed ? 'justify-center' : '']">
                             <div class="flex items-center" :class="sidebarCollapsed ? 'mx-auto' : ''">
-                                <i class="bi bi-houses text-lg" :class="sidebarCollapsed ? '' : 'mr-3'"></i>
+                                <svg class="w-5 h-5 text-lg" :class="sidebarCollapsed ? '' : 'mr-3'" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                                </svg>
                                 <span class="font-medium" x-show="!sidebarCollapsed" x-transition>Phòng & Loại</span>
                             </div>
-                            <i class="bi bi-chevron-down text-xs transition-transform duration-200"
-                                x-show="!sidebarCollapsed" x-transition :class="open ? 'transform rotate-180' : ''"></i>
+                            <svg class="w-3 h-3 transition-transform duration-200" x-show="!sidebarCollapsed" x-transition :class="open ? 'transform rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
                         </button>
                         <div x-show="open && !sidebarCollapsed" x-collapse class="pl-4 mt-1 space-y-1">
                             <a href="/admin/loai-phong"
                                 th:classappend="${#strings.startsWith(nqtCurrentURI, '/admin/loai-phong')} ? 'text-white bg-gray-800' : ''"
                                 class="flex items-center px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-gray-800 rounded-md transition-colors">
-                                <i class="bi bi-door-open mr-2"></i> Loại phòng
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                                Loại phòng
                             </a>
                             <a href="/admin/phong"
                                 th:classappend="${#strings.startsWith(nqtCurrentURI, '/admin/phong')} ? 'text-white bg-gray-800' : ''"
                                 class="flex items-center px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-gray-800 rounded-md transition-colors">
-                                <i class="bi bi-house-door mr-2"></i> Phòng
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                                </svg>
+                                Phòng
                             </a>
                         </div>
                     </div>
@@ -227,7 +237,9 @@
                         th:classappend="${#strings.startsWith(nqtCurrentURI, '/admin/dat-phong')} ? 'bg-sidebarActive text-white' : ''"
                         class="flex items-center px-4 py-3 text-gray-300 hover:bg-sidebarActive hover:text-white rounded-lg transition-colors group"
                         :class="sidebarCollapsed ? 'justify-center' : ''">
-                        <i class="bi bi-calendar-check text-lg" :class="sidebarCollapsed ? '' : 'mr-3'"></i>
+                        <svg class="w-5 h-5 text-lg" :class="sidebarCollapsed ? '' : 'mr-3'" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
                         <span class="font-medium" x-show="!sidebarCollapsed" x-transition>Đặt phòng</span>
                     </a>
 
@@ -241,22 +253,31 @@
                             class="flex items-center justify-between w-full px-4 py-3 text-gray-300 hover:bg-sidebarActive hover:text-white rounded-lg transition-colors group"
                             :class="[open ? 'bg-sidebarActive text-white' : '', sidebarCollapsed ? 'justify-center' : '']">
                             <div class="flex items-center" :class="sidebarCollapsed ? 'mx-auto' : ''">
-                                <i class="bi bi-stars text-lg" :class="sidebarCollapsed ? '' : 'mr-3'"></i>
+                                <svg class="w-5 h-5 text-lg" :class="sidebarCollapsed ? '' : 'mr-3'" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                                </svg>
                                 <span class="font-medium" x-show="!sidebarCollapsed" x-transition>Dịch vụ</span>
                             </div>
-                            <i class="bi bi-chevron-down text-xs transition-transform duration-200"
-                                x-show="!sidebarCollapsed" x-transition :class="open ? 'transform rotate-180' : ''"></i>
+                            <svg class="w-3 h-3 transition-transform duration-200" x-show="!sidebarCollapsed" x-transition :class="open ? 'transform rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
                         </button>
                         <div x-show="open && !sidebarCollapsed" x-collapse class="pl-4 mt-1 space-y-1">
                             <a href="/admin/dich-vu"
                                 th:classappend="${#strings.startsWith(nqtCurrentURI, '/admin/dich-vu')} ? 'text-white bg-gray-800' : ''"
                                 class="flex items-center px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-gray-800 rounded-md transition-colors">
-                                <i class="bi bi-list-task mr-2"></i> DS Dịch vụ
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                                </svg>
+                                DS Dịch vụ
                             </a>
                             <a href="/admin/don-gia-dich-vu"
                                 th:classappend="${#strings.startsWith(nqtCurrentURI, '/admin/don-gia-dich-vu')} ? 'text-white bg-gray-800' : ''"
                                 class="flex items-center px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-gray-800 rounded-md transition-colors">
-                                <i class="bi bi-cash-coin mr-2"></i> Đơn giá DV
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                </svg>
+                                Đơn giá DV
                             </a>
                         </div>
                     </div>
@@ -268,7 +289,9 @@
                         th:classappend="${#strings.startsWith(nqtCurrentURI, '/admin/nguoi-dung')} ? 'bg-sidebarActive text-white' : ''"
                         class="flex items-center px-4 py-3 text-gray-300 hover:bg-sidebarActive hover:text-white rounded-lg transition-colors group"
                         :class="sidebarCollapsed ? 'justify-center' : ''">
-                        <i class="bi bi-people text-lg" :class="sidebarCollapsed ? '' : 'mr-3'"></i>
+                        <svg class="w-5 h-5 text-lg" :class="sidebarCollapsed ? '' : 'mr-3'" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
                         <span class="font-medium" x-show="!sidebarCollapsed" x-transition>Người dùng</span>
                     </a>
 
@@ -276,7 +299,9 @@
                         th:classappend="${#strings.startsWith(nqtCurrentURI, '/admin/giam-gia')} ? 'bg-sidebarActive text-white' : ''"
                         class="flex items-center px-4 py-3 text-gray-300 hover:bg-sidebarActive hover:text-white rounded-lg transition-colors group"
                         :class="sidebarCollapsed ? 'justify-center' : ''">
-                        <i class="bi bi-ticket-perforated text-lg" :class="sidebarCollapsed ? '' : 'mr-3'"></i>
+                        <svg class="w-5 h-5 text-lg" :class="sidebarCollapsed ? '' : 'mr-3'" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path>
+                        </svg>
                         <span class="font-medium" x-show="!sidebarCollapsed" x-transition>Mã giảm giá</span>
                     </a>
 
@@ -284,7 +309,9 @@
                         th:classappend="${#strings.startsWith(nqtCurrentURI, '/admin/cron-log')} ? 'bg-sidebarActive text-white' : ''"
                         class="flex items-center px-4 py-3 text-gray-300 hover:bg-sidebarActive hover:text-white rounded-lg transition-colors group"
                         :class="sidebarCollapsed ? 'justify-center' : ''">
-                        <i class="bi bi-clock-history text-lg" :class="sidebarCollapsed ? '' : 'mr-3'"></i>
+                        <svg class="w-5 h-5 text-lg" :class="sidebarCollapsed ? '' : 'mr-3'" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
                         <span class="font-medium" x-show="!sidebarCollapsed" x-transition>Cron Log</span>
                     </a>
 
@@ -292,7 +319,9 @@
                         th:classappend="${#strings.startsWith(nqtCurrentURI, '/admin/ngan-hang')} ? 'bg-sidebarActive text-white' : ''"
                         class="flex items-center px-4 py-3 text-gray-300 hover:bg-sidebarActive hover:text-white rounded-lg transition-colors group"
                         :class="sidebarCollapsed ? 'justify-center' : ''">
-                        <i class="bi bi-bank text-lg" :class="sidebarCollapsed ? '' : 'mr-3'"></i>
+                        <svg class="w-5 h-5 text-lg" :class="sidebarCollapsed ? '' : 'mr-3'" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                        </svg>
                         <span class="font-medium" x-show="!sidebarCollapsed" x-transition>Ngân Hàng</span>
                     </a>
 
@@ -300,7 +329,9 @@
                         th:classappend="${#strings.startsWith(nqtCurrentURI, '/admin/danh-gia')} ? 'bg-sidebarActive text-white' : ''"
                         class="flex items-center px-4 py-3 text-gray-300 hover:bg-sidebarActive hover:text-white rounded-lg transition-colors group"
                         :class="sidebarCollapsed ? 'justify-center' : ''">
-                        <i class="bi bi-chat-left-quote text-lg" :class="sidebarCollapsed ? '' : 'mr-3'"></i>
+                        <svg class="w-5 h-5 text-lg" :class="sidebarCollapsed ? '' : 'mr-3'" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                        </svg>
                         <span class="font-medium" x-show="!sidebarCollapsed" x-transition>Đánh giá</span>
                     </a>
 
@@ -308,7 +339,9 @@
                         th:classappend="${#strings.startsWith(nqtCurrentURI, '/admin/blog')} ? 'bg-sidebarActive text-white' : ''"
                         class="flex items-center px-4 py-3 text-gray-300 hover:bg-sidebarActive hover:text-white rounded-lg transition-colors group"
                         :class="sidebarCollapsed ? 'justify-center' : ''">
-                        <i class="bi bi-newspaper text-lg" :class="sidebarCollapsed ? '' : 'mr-3'"></i>
+                        <svg class="w-5 h-5 text-lg" :class="sidebarCollapsed ? '' : 'mr-3'" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
+                        </svg>
                         <span class="font-medium" x-show="!sidebarCollapsed" x-transition>Blog</span>
                     </a>
 
@@ -320,14 +353,19 @@
                         th:classappend="${#strings.startsWith(nqtCurrentURI, '/admin/setting')} ? 'bg-sidebarActive text-white' : ''"
                         class="flex items-center px-4 py-3 text-gray-300 hover:bg-sidebarActive hover:text-white rounded-lg transition-colors group"
                         :class="sidebarCollapsed ? 'justify-center' : ''">
-                        <i class="bi bi-gear text-lg" :class="sidebarCollapsed ? '' : 'mr-3'"></i>
+                        <svg class="w-5 h-5 text-lg" :class="sidebarCollapsed ? '' : 'mr-3'" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
                         <span class="font-medium" x-show="!sidebarCollapsed" x-transition>Cấu hình</span>
                     </a>
                     <a th:if="${session.nqtAdminUser != null and session.nqtAdminUser.nqtVaiTro != null and session.nqtAdminUser.nqtVaiTro == 99}"
                         href="/nqtTrangChu"
                         class="flex items-center px-4 py-3 text-gray-300 hover:bg-sidebarActive hover:text-white rounded-lg transition-colors group"
                         :class="sidebarCollapsed ? 'justify-center' : ''">
-                        <i class="bi bi-globe text-lg" :class="sidebarCollapsed ? '' : 'mr-3'"></i>
+                        <svg class="w-5 h-5 text-lg" :class="sidebarCollapsed ? '' : 'mr-3'" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
                         <span class="font-medium" x-show="!sidebarCollapsed" x-transition>Về trang khách</span>
                     </a>
                 </nav>
@@ -338,12 +376,16 @@
             <header
                 class="flex items-center justify-between h-16 bg-white shadow-sm px-4 lg:px-6 z-10 shrink-0 transition-colors duration-200">
                 <button @click="sidebarOpen = !sidebarOpen" class="text-gray-500 focus:outline-none lg:hidden">
-                    <i class="bi bi-list text-2xl"></i>
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
                 </button>
 
                 <!-- Search (Optional) -->
                 <div class="hidden md:flex items-center bg-gray-100 rounded-full px-4 py-2 w-64">
-                    <i class="bi bi-search text-gray-400 mr-2"></i>
+                    <svg class="w-5 h-5 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
                     <input type="text" placeholder="Tìm kiếm..."
                         class="bg-transparent border-none focus:outline-none text-sm text-gray-600 w-full">
                 </div>
@@ -361,9 +403,9 @@
                             </div>
                             <span class="hidden md:block text-sm font-semibold text-gray-700 group-hover:text-gray-900 transition-colors"
                                 th:text="${session.nqtAdminUser != null ? session.nqtAdminUser.nqtHoVaTen : 'Admin'}">Admin</span>
-                            <i class="bi bi-chevron-down text-xs text-gray-500 group-hover:text-gray-700 transition-colors" 
-                               :class="open ? 'rotate-180' : ''" 
-                               style="transition: transform 0.2s ease-in-out;"></i>
+                            <svg class="w-3 h-3 text-gray-500 group-hover:text-gray-700 transition-colors" :class="open ? 'rotate-180' : ''" style="transition: transform 0.2s ease-in-out;" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
                         </button>
 
                         <!-- Dropdown -->
@@ -379,29 +421,40 @@
                             <a th:if="${session.nqtAdminUser != null}"
                                 th:href="@{/admin/nguoi-dung/edit/{id}(id=${session.nqtAdminUser.nqtId})}"
                                 class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors duration-150">
-                                <i class="bi bi-person mr-3 text-gray-400"></i> 
+                                <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                </svg> 
                                 <span class="font-medium">Hồ sơ</span>
                             </a>
-                            <a th:href="@{/admin/setup-2fa}"
+                            <!-- <a th:href="@{/admin/setup-2fa}"
                                 class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors duration-150">
-                                <i class="bi bi-shield-lock mr-3 text-gray-400"></i> 
+                                <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                                </svg> 
                                 <span class="font-medium">Bảo mật 2FA</span>
-                            </a>
+                            </a> -->
                             <a th:href="@{/admin/setting}"
                                 class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors duration-150">
-                                <i class="bi bi-gear mr-3 text-gray-400"></i> 
+                                <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg> 
                                 <span class="font-medium">Cài đặt</span>
                             </a>
                             <a th:if="${session.nqtAdminUser != null and session.nqtAdminUser.nqtVaiTro != null and session.nqtAdminUser.nqtVaiTro == 99}"
                                 href="/nqtTrangChu"
                                 class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors duration-150">
-                                <i class="bi bi-globe mr-3 text-gray-400"></i> 
+                                <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg> 
                                 <span class="font-medium">Về trang khách</span>
                             </a>
                             <div class="border-t border-gray-100 my-1"></div>
                             <a href="/admin/logout" 
                                class="flex items-center px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors duration-150">
-                                <i class="bi bi-box-arrow-right mr-3"></i> 
+                                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                                </svg> 
                                 <span class="font-medium">Đăng xuất</span>
                             </a>
                         </div>
@@ -415,21 +468,31 @@
                     class="mb-4 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded shadow-sm flex items-center justify-between"
                     role="alert">
                     <div class="flex items-center">
-                        <i class="bi bi-check-circle-fill mr-2 text-xl"></i>
+                        <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                        </svg>
                         <span th:text="${nqtSuccess}"></span>
                     </div>
-                    <button onclick="this.parentElement.remove()" class="text-green-700 hover:text-green-900"><i
-                            class="bi bi-x-lg"></i></button>
+                    <button onclick="this.parentElement.remove()" class="text-green-700 hover:text-green-900">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
                 </div>
                 <div th:if="${nqtError}"
                     class="mb-4 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded shadow-sm flex items-center justify-between"
                     role="alert">
                     <div class="flex items-center">
-                        <i class="bi bi-exclamation-triangle-fill mr-2 text-xl"></i>
+                        <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                        </svg>
                         <span th:text="${nqtError}"></span>
                     </div>
-                    <button onclick="this.parentElement.remove()" class="text-red-700 hover:text-red-900"><i
-                            class="bi bi-x-lg"></i></button>
+                    <button onclick="this.parentElement.remove()" class="text-red-700 hover:text-red-900">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
                 </div>
 
                 <div th:replace="~{::content}"></div>

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org"
-    th:replace="~{nqtCustomer/layout :: layout(title='Đăng nhập - ' + (nqtWebsiteName ?: 'Hotel NQT'), description='Đăng nhập vào tài khoản - ' + (nqtWebsiteName ?: 'Hotel NQT'))}">
+    th:replace="~{nqtCustomer/layout :: layout(title=${'Đăng nhập - ' + (nqtWebsiteName != null ? nqtWebsiteName : 'Hotel NQT')}, description=${'Đăng nhập vào tài khoản - ' + (nqtWebsiteName != null ? nqtWebsiteName : 'Hotel NQT')})}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -27,7 +27,7 @@
     </style>
 </head>
 <body>
-    <div th:fragment="content" class="min-h-screen flex items-center justify-center py-12 px-4">
+    <div th:fragment="content" class="flex-1 flex items-center justify-center py-12 px-4" style="margin-top: 100px;">
         <div class="max-w-md w-full">
             <div class="text-center mb-8">
                 <a href="/nqtTrangChu" class="inline-block mb-6">
@@ -149,10 +149,9 @@
                         <input type="hidden" name="nqtTaiKhoan" th:value="${nqtTaiKhoan}">
                     </div>
 
-                    <button type="submit"
+                    <button type="submit" id="btn-login-submit"
                         class="w-full text-white py-3 rounded-lg font-semibold hover:shadow-lg transition-all transform hover:scale-105 btn-login"
-                        th:style="'background: linear-gradient(to right, ' + ${nqtWebsiteColor ?: '#d97706'} + ', ' + ${#strings.replace(nqtWebsiteColor ?: '#d97706', '#', '')} + 'cc);'"
-                        style="background: linear-gradient(to right, #d97706, #d97706cc);">
+                        style="background: linear-gradient(to right, #d97706, rgba(217, 119, 6, 0.8)) !important; background-color: #d97706 !important; color: white !important; cursor: pointer !important; border: none !important;">
                         Đăng nhập
                     </button>
                 </form>
@@ -193,13 +192,43 @@
             return true; // Allow form submission
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
+        // Helper function to convert hex to RGB
+        function hexToRgb(hex) {
+            // Remove # if present
+            hex = hex.replace('#', '');
+            
+            // Parse hex to RGB
+            const r = parseInt(hex.substring(0, 2), 16);
+            const g = parseInt(hex.substring(2, 4), 16);
+            const b = parseInt(hex.substring(4, 6), 16);
+            
+            return r + ', ' + g + ', ' + b;
+        }
+        
+        // Function to apply login button color
+        function applyLoginButtonColor() {
             const primaryColor = /*[[${nqtWebsiteColor ?: '#d97706'}]]*/ '#d97706';
-            const primaryColorDark = primaryColor + 'cc';
+            const primaryColorRgb = hexToRgb(primaryColor);
+            const primaryColorDark = 'rgba(' + primaryColorRgb + ', 0.8)';
+            const gradient = 'linear-gradient(to right, ' + primaryColor + ', ' + primaryColorDark + ')';
+            
             const loginButton = document.querySelector('.btn-login');
             if (loginButton) {
-                loginButton.style.background = 'linear-gradient(to right, ' + primaryColor + ', ' + primaryColorDark + ')';
+                loginButton.style.setProperty('background', gradient, 'important');
+                loginButton.style.setProperty('background-color', primaryColor, 'important');
+                loginButton.style.setProperty('color', 'white', 'important');
+                loginButton.style.setProperty('cursor', 'pointer', 'important');
+                loginButton.style.setProperty('border', 'none', 'important');
             }
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Apply button color
+            applyLoginButtonColor();
+            
+            // Re-apply after a short delay to ensure it sticks
+            setTimeout(applyLoginButtonColor, 50);
+            setTimeout(applyLoginButtonColor, 200);
 
             // Clean input on blur
             const usernameInput = document.getElementById('nqtTaiKhoan');

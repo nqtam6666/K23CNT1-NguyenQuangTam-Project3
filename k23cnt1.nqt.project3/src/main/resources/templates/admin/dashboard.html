@@ -11,7 +11,10 @@
             <div class="flex space-x-2">
                 <a href="/admin/report/excel"
                     class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 shadow-sm transition-colors flex items-center">
-                    <i class="bi bi-file-excel mr-2 text-green-600"></i> Xuất báo cáo Excel
+                    <svg class="w-5 h-5 mr-2 text-green-600" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"></path>
+                    </svg>
+                    Xuất báo cáo Excel
                 </a>
             </div>
         </div>
@@ -30,14 +33,20 @@
                         </div>
                     </div>
                     <div class="p-3 bg-green-100 rounded-full text-green-600">
-                        <i class="bi bi-currency-dollar text-2xl"></i>
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
                     </div>
                 </div>
                 <div class="flex items-center text-sm">
                     <span
                         th:class="${nqtRevenueGrowth >= 0} ? 'text-green-500 font-medium flex items-center' : 'text-red-500 font-medium flex items-center'">
-                        <i
-                            th:class="${nqtRevenueGrowth >= 0} ? 'bi bi-arrow-up-short text-lg mr-1' : 'bi bi-arrow-down-short text-lg mr-1'"></i>
+                        <svg th:if="${nqtRevenueGrowth >= 0}" class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                        </svg>
+                        <svg th:unless="${nqtRevenueGrowth >= 0}" class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
                         <span th:text="${nqtRevenueGrowth} + '%'">0%</span>
                     </span>
                     <span class="text-gray-400 ml-2">so với tháng trước</span>
@@ -55,7 +64,9 @@
                             th:text="${#lists.size(nqtDatPhongList) ?: 0}">0</div>
                     </div>
                     <div class="p-3 bg-blue-100 rounded-full text-blue-600">
-                        <i class="bi bi-calendar-check text-2xl"></i>
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
                     </div>
                 </div>
                 <div class="flex items-center text-sm">
@@ -78,7 +89,9 @@
                         </div>
                     </div>
                     <div class="p-3 bg-indigo-100 rounded-full text-indigo-600">
-                        <i class="bi bi-house-door text-2xl"></i>
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                        </svg>
                     </div>
                 </div>
                 <div class="flex items-center text-sm">
@@ -98,7 +111,9 @@
                             th:text="${#lists.size(nqtNguoiDungList) ?: 0}">0</div>
                     </div>
                     <div class="p-3 bg-orange-100 rounded-full text-orange-600">
-                        <i class="bi bi-people text-2xl"></i>
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
                     </div>
                 </div>
                 <div class="flex items-center text-sm">
@@ -155,7 +170,8 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
-                        <tr th:each="dp, iterStat : ${nqtDatPhongList}" th:if="${iterStat.index < 5}"
+                        <tr th:each="dp, iterStat : ${nqtDatPhongList}" 
+                            th:if="${#lists.size(nqtDatPhongList) <= 5 or iterStat.index >= #lists.size(nqtDatPhongList) - 5}"
                             class="hover:bg-gray-50 transition-colors">
                             <td class="px-6 py-4 text-sm font-medium text-gray-900" th:text="'#' + ${dp.nqtId}"></td>
                             <td class="px-6 py-4 text-sm text-gray-600" th:text="${dp.nqtTenNguoiDung}"></td>

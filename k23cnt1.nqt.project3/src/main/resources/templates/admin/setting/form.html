@@ -7,135 +7,212 @@
             <h1 class="text-2xl font-semibold text-gray-800">Cấu hình Website</h1>
         </div>
 
-        <form th:action="@{/admin/setting}" method="post" enctype="multipart/form-data"
-            class="bg-white shadow-md rounded-lg p-6 max-w-2xl">
-            <div class="mb-4">
-                <label for="nqtWebsiteName" class="block text-sm font-medium text-gray-700 mb-1">Tên Website</label>
-                <input type="text"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                    id="nqtWebsiteName" name="nqtWebsiteName" th:value="${nqtWebsiteName}">
+        <!-- Navigation Tabs -->
+        <div class="bg-gray-700 rounded-lg p-2 mb-6">
+            <div class="flex flex-wrap gap-2">
+                <button type="button" onclick="showTab('general')" id="tab-general"
+                    class="px-4 py-2 rounded-md font-medium transition-all bg-white text-gray-800 shadow-sm">
+                    THÔNG TIN CHUNG
+                </button>
+                <button type="button" onclick="showTab('smtp')" id="tab-smtp"
+                    class="px-4 py-2 rounded-md font-medium transition-all text-white hover:bg-gray-600">
+                    SMTP EMAIL
+                </button>
+                <button type="button" onclick="showTab('vip')" id="tab-vip"
+                    class="px-4 py-2 rounded-md font-medium transition-all text-white hover:bg-gray-600">
+                    CHIẾT KHẤU VIP
+                </button>
+                <button type="button" onclick="showTab('support')" id="tab-support"
+                    class="px-4 py-2 rounded-md font-medium transition-all text-white hover:bg-gray-600">
+                    LINK HỖ TRỢ
+                </button>
             </div>
-            <div class="mb-4">
-                <label for="nqtTieuDe" class="block text-sm font-medium text-gray-700 mb-1">Tiêu đề</label>
-                <input type="text"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                    id="nqtTieuDe" name="nqtTieuDe" th:value="${nqtTieuDe}">
-            </div>
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Logo Website</label>
-                <div class="flex items-center space-x-4">
-                    <div th:if="${nqtWebsiteLogo != null && nqtWebsiteLogo != ''}"
-                        class="w-16 h-16 border rounded p-1 flex items-center justify-center">
-                        <img th:src="${nqtWebsiteLogo}" alt="Logo" class="max-w-full max-h-full object-contain">
+        </div>
+
+        <form th:action="@{/admin/setting}" method="post" enctype="multipart/form-data" autocomplete="off"
+            class="bg-white shadow-md rounded-lg p-6 max-w-4xl">
+            <!-- Hidden fields to prevent browser autocomplete -->
+            <input type="text" style="position: absolute; left: -9999px;" tabindex="-1" autocomplete="chrome-off">
+            <input type="email" style="position: absolute; left: -9999px;" tabindex="-1" autocomplete="chrome-off">
+            <input type="password" style="position: absolute; left: -9999px;" tabindex="-1" autocomplete="new-password">
+            
+            <!-- Tab: THÔNG TIN CHUNG -->
+            <div id="content-general" class="tab-content">
+                <div class="mb-4">
+                    <label for="nqtWebsiteName" class="block text-sm font-medium text-gray-700 mb-1">Tên Website</label>
+                    <input type="text" autocomplete="chrome-off"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                        id="nqtWebsiteName" name="nqtWebsiteName" th:value="${nqtWebsiteName}">
+                </div>
+                <div class="mb-4">
+                    <label for="nqtTieuDe" class="block text-sm font-medium text-gray-700 mb-1">Tiêu đề</label>
+                    <input type="text" autocomplete="chrome-off"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                        id="nqtTieuDe" name="nqtTieuDe" th:value="${nqtTieuDe}">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Logo Website</label>
+                    <div class="flex items-center space-x-4">
+                        <div th:if="${nqtWebsiteLogo != null && nqtWebsiteLogo != ''}"
+                            class="w-16 h-16 border rounded p-1 flex items-center justify-center">
+                            <img th:src="${nqtWebsiteLogo}" alt="Logo" class="max-w-full max-h-full object-contain">
+                        </div>
+                        <input type="file" name="nqtWebsiteLogoFile" accept="image/*" autocomplete="chrome-off"
+                            class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
                     </div>
-                    <input type="file" name="nqtWebsiteLogoFile" accept="image/*"
-                        class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
                 </div>
-            </div>
-            <div class="mb-6">
-                <label for="nqtWebsiteColor" class="block text-sm font-medium text-gray-700 mb-1">Màu chủ đạo</label>
-                <div class="flex items-center space-x-2">
-                    <input type="color" class="h-10 w-20 p-1 border border-gray-300 rounded cursor-pointer"
-                        id="nqtWebsiteColor" name="nqtWebsiteColor" th:value="${nqtWebsiteColor}"
-                        title="Chọn màu chủ đạo">
-                    <span class="text-sm text-gray-500">Chọn màu sắc cho thanh bên và các điểm nhấn</span>
+                <div class="mb-6">
+                    <label for="nqtWebsiteColor" class="block text-sm font-medium text-gray-700 mb-1">Màu chủ đạo</label>
+                    <div class="flex items-center space-x-2">
+                        <input type="color" autocomplete="chrome-off" class="h-10 w-20 p-1 border border-gray-300 rounded cursor-pointer"
+                            id="nqtWebsiteColor" name="nqtWebsiteColor" th:value="${nqtWebsiteColor}"
+                            title="Chọn màu chủ đạo">
+                        <span class="text-sm text-gray-500">Chọn màu sắc cho thanh bên và các điểm nhấn</span>
+                    </div>
                 </div>
-            </div>
-
-
-
-            <div class="mb-6">
-                <label for="nqtWebsiteFont" class="block text-sm font-medium text-gray-700 mb-1">Font chữ</label>
-                <select id="nqtWebsiteFont" name="nqtWebsiteFont"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all">
-                    <option value="Nunito" th:selected="${nqtWebsiteFont == 'Nunito'}">Nunito (Mặc định)</option>
-                    <option value="Roboto" th:selected="${nqtWebsiteFont == 'Roboto'}">Roboto</option>
-                    <option value="Open Sans" th:selected="${nqtWebsiteFont == 'Open Sans'}">Open Sans</option>
-                    <option value="Montserrat" th:selected="${nqtWebsiteFont == 'Montserrat'}">Montserrat</option>
-                    <option value="Inter" th:selected="${nqtWebsiteFont == 'Inter'}">Inter</option>
-                    <option value="Poppins" th:selected="${nqtWebsiteFont == 'Poppins'}">Poppins</option>
-                    <option value="Lato" th:selected="${nqtWebsiteFont == 'Lato'}">Lato</option>
-                    <option value="Raleway" th:selected="${nqtWebsiteFont == 'Raleway'}">Raleway</option>
-                    <option value="Ubuntu" th:selected="${nqtWebsiteFont == 'Ubuntu'}">Ubuntu</option>
-                    <option value="Playfair Display" th:selected="${nqtWebsiteFont == 'Playfair Display'}">Playfair
-                        Display (Serif)</option>
-                    <option value="Lora" th:selected="${nqtWebsiteFont == 'Lora'}">Lora (Serif)</option>
-                    <option value="Merriweather" th:selected="${nqtWebsiteFont == 'Merriweather'}">Merriweather (Serif)
-                    </option>
-                </select>
-            </div>
-
-            <div class="mb-4">
-                <label for="nqtWebsiteAddress" class="block text-sm font-medium text-gray-700 mb-1">Địa chỉ</label>
-                <input type="text"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                    id="nqtWebsiteAddress" name="nqtWebsiteAddress" th:value="${nqtWebsiteAddress}">
-            </div>
-
-            <div class="mb-4">
-                <label for="nqtWebsitePhone" class="block text-sm font-medium text-gray-700 mb-1">Số điện thoại</label>
-                <input type="text"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                    id="nqtWebsitePhone" name="nqtWebsitePhone" th:value="${nqtWebsitePhone}">
-            </div>
-
-            <div class="mb-4">
-                <label for="nqtWebsiteEmail" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                <input type="email"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                    id="nqtWebsiteEmail" name="nqtWebsiteEmail" th:value="${nqtWebsiteEmail}">
-            </div>
-
-            <div class="mb-4">
-                <label for="nqtWebsiteFacebook" class="block text-sm font-medium text-gray-700 mb-1">Link Facebook</label>
-                <input type="url"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                    id="nqtWebsiteFacebook" name="nqtWebsiteFacebook" th:value="${nqtWebsiteFacebook}" placeholder="https://facebook.com/...">
-            </div>
-
-            <div class="mb-4">
-                <label for="nqtWebsiteZalo" class="block text-sm font-medium text-gray-700 mb-1">Link Zalo</label>
-                <input type="url"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                    id="nqtWebsiteZalo" name="nqtWebsiteZalo" th:value="${nqtWebsiteZalo}" placeholder="https://zalo.me/...">
-            </div>
-
-            <div class="mb-4">
-                <label for="nqtWebsiteLink" class="block text-sm font-medium text-gray-700 mb-1">Link Website</label>
-                <input type="url"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                    id="nqtWebsiteLink" name="nqtWebsiteLink" th:value="${nqtWebsiteLink}" placeholder="https://...">
-            </div>
-
-            <div class="mb-4">
-                <label for="nqtWebsiteFAQ" class="block text-sm font-medium text-gray-700 mb-1">Link FAQ</label>
-                <input type="url"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                    id="nqtWebsiteFAQ" name="nqtWebsiteFAQ" th:value="${nqtWebsiteFAQ}" placeholder="https://... hoặc /faq">
-            </div>
-
-            <div class="mb-6">
-                <label for="nqtWebsiteSupportLinks" class="block text-sm font-medium text-gray-700 mb-1">Các link hỗ trợ (mỗi dòng một link, format: Tên|URL|Nội dung HTML)</label>
-                <textarea id="nqtWebsiteSupportLinks" name="nqtWebsiteSupportLinks" rows="8"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all font-mono text-sm"
-                    placeholder="Chính sách hủy|/nqtSupport/chinh-sach-huy|&lt;p&gt;Nội dung HTML ở đây...&lt;/p&gt;&#10;Điều khoản sử dụng|/nqtSupport/dieu-khoan|&lt;p&gt;Nội dung HTML...&lt;/p&gt;"><th:block th:if="${nqtWebsiteSupportLinks != null and nqtWebsiteSupportLinks != ''}" th:inline="text">[[${nqtWebsiteSupportLinks}]]</th:block></textarea>
-                <div class="text-xs text-gray-500 mt-2 space-y-1">
-                    <p><strong>Format:</strong> Tên|URL|Nội dung HTML</p>
-                    <p><strong>Ví dụ:</strong></p>
-                    <pre class="bg-gray-50 p-2 rounded text-xs overflow-x-auto">Chính sách hủy|/nqtSupport/chinh-sach-huy|&lt;h2&gt;Chính sách hủy&lt;/h2&gt;&lt;p&gt;Khách hàng có thể hủy đặt phòng trước 24 giờ...&lt;/p&gt;
-Điều khoản sử dụng|/nqtSupport/dieu-khoan|&lt;h2&gt;Điều khoản&lt;/h2&gt;&lt;p&gt;Nội dung điều khoản...&lt;/p&gt;</pre>
-                    <p class="mt-2"><strong>Lưu ý:</strong> URL sẽ tự động tạo route /nqtSupport/{slug}. Nếu không có nội dung HTML, sẽ hiển thị nội dung mặc định.</p>
+                <div class="mb-6">
+                    <label for="nqtWebsiteFont" class="block text-sm font-medium text-gray-700 mb-1">Font chữ</label>
+                    <select id="nqtWebsiteFont" name="nqtWebsiteFont" autocomplete="chrome-off"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all">
+                        <option value="Nunito" th:selected="${nqtWebsiteFont == 'Nunito'}">Nunito (Mặc định)</option>
+                        <option value="Roboto" th:selected="${nqtWebsiteFont == 'Roboto'}">Roboto</option>
+                        <option value="Open Sans" th:selected="${nqtWebsiteFont == 'Open Sans'}">Open Sans</option>
+                        <option value="Montserrat" th:selected="${nqtWebsiteFont == 'Montserrat'}">Montserrat</option>
+                        <option value="Inter" th:selected="${nqtWebsiteFont == 'Inter'}">Inter</option>
+                        <option value="Poppins" th:selected="${nqtWebsiteFont == 'Poppins'}">Poppins</option>
+                        <option value="Lato" th:selected="${nqtWebsiteFont == 'Lato'}">Lato</option>
+                        <option value="Raleway" th:selected="${nqtWebsiteFont == 'Raleway'}">Raleway</option>
+                        <option value="Ubuntu" th:selected="${nqtWebsiteFont == 'Ubuntu'}">Ubuntu</option>
+                        <option value="Playfair Display" th:selected="${nqtWebsiteFont == 'Playfair Display'}">Playfair
+                            Display (Serif)</option>
+                        <option value="Lora" th:selected="${nqtWebsiteFont == 'Lora'}">Lora (Serif)</option>
+                        <option value="Merriweather" th:selected="${nqtWebsiteFont == 'Merriweather'}">Merriweather (Serif)
+                        </option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="nqtWebsiteAddress" class="block text-sm font-medium text-gray-700 mb-1">Địa chỉ</label>
+                    <input type="text" autocomplete="chrome-off"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                        id="nqtWebsiteAddress" name="nqtWebsiteAddress" th:value="${nqtWebsiteAddress}">
+                </div>
+                <div class="mb-4">
+                    <label for="nqtWebsitePhone" class="block text-sm font-medium text-gray-700 mb-1">Số điện thoại</label>
+                    <input type="text" autocomplete="chrome-off"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                        id="nqtWebsitePhone" name="nqtWebsitePhone" th:value="${nqtWebsitePhone}">
+                </div>
+                <div class="mb-4">
+                    <label for="nqtWebsiteEmail" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input type="email" autocomplete="chrome-off"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                        id="nqtWebsiteEmail" name="nqtWebsiteEmail" th:value="${nqtWebsiteEmail}">
+                </div>
+                <div class="mb-4">
+                    <label for="nqtWebsiteFacebook" class="block text-sm font-medium text-gray-700 mb-1">Link Facebook</label>
+                    <input type="url" autocomplete="chrome-off"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                        id="nqtWebsiteFacebook" name="nqtWebsiteFacebook" th:value="${nqtWebsiteFacebook}" placeholder="https://facebook.com/...">
+                </div>
+                <div class="mb-4">
+                    <label for="nqtWebsiteZalo" class="block text-sm font-medium text-gray-700 mb-1">Link Zalo</label>
+                    <input type="url" autocomplete="chrome-off"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                        id="nqtWebsiteZalo" name="nqtWebsiteZalo" th:value="${nqtWebsiteZalo}" placeholder="https://zalo.me/...">
+                </div>
+                <div class="mb-4">
+                    <label for="nqtWebsiteLink" class="block text-sm font-medium text-gray-700 mb-1">Link Website</label>
+                    <input type="url" autocomplete="chrome-off"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                        id="nqtWebsiteLink" name="nqtWebsiteLink" th:value="${nqtWebsiteLink}" placeholder="https://...">
+                </div>
+                <div class="mb-4">
+                    <label for="nqtWebsiteFAQ" class="block text-sm font-medium text-gray-700 mb-1">Link FAQ</label>
+                    <input type="url" autocomplete="chrome-off"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                        id="nqtWebsiteFAQ" name="nqtWebsiteFAQ" th:value="${nqtWebsiteFAQ}" placeholder="https://... hoặc /faq">
                 </div>
             </div>
 
-            <div class="mb-6 border-t pt-4">
+            <!-- Tab: SMTP EMAIL -->
+            <div id="content-smtp" class="tab-content hidden">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">Cấu hình SMTP Email (Gmail)</h3>
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                    <p class="text-sm text-blue-800 mb-2"><strong>Hướng dẫn cấu hình Gmail:</strong></p>
+                    <ol class="list-decimal list-inside text-sm text-blue-700 space-y-1">
+                        <li>Truy cập <a href="https://myaccount.google.com/apppasswords" target="_blank" class="underline">Google App Passwords</a></li>
+                        <li>Tạo App Password mới (nếu chưa bật 2-Step Verification, cần bật trước)</li>
+                        <li>Sử dụng App Password (16 ký tự) thay vì mật khẩu Gmail thông thường</li>
+                        <li>Điền thông tin bên dưới và nhấn "Lưu cấu hình"</li>
+                    </ol>
+                </div>
+
+                <div class="mb-4">
+                    <label for="nqtSmtpHost" class="block text-sm font-medium text-gray-700 mb-1">SMTP Host</label>
+                    <input type="text" autocomplete="chrome-off"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                        id="nqtSmtpHost" name="nqtSmtpHost" th:value="${nqtSmtpHost ?: 'smtp.gmail.com'}" placeholder="smtp.gmail.com">
+                    <p class="mt-1 text-xs text-gray-500">Gmail: smtp.gmail.com</p>
+                </div>
+
+                <div class="mb-4">
+                    <label for="nqtSmtpPort" class="block text-sm font-medium text-gray-700 mb-1">SMTP Port</label>
+                    <input type="number" autocomplete="chrome-off"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                        id="nqtSmtpPort" name="nqtSmtpPort" th:value="${nqtSmtpPort ?: '587'}" placeholder="587">
+                    <p class="mt-1 text-xs text-gray-500">Gmail: 587 (TLS) hoặc 465 (SSL)</p>
+                </div>
+
+                <div class="mb-4">
+                    <label for="nqtSmtpUsername" class="block text-sm font-medium text-gray-700 mb-1">Email (Username)</label>
+                    <input type="email" autocomplete="chrome-off"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                        id="nqtSmtpUsername" name="nqtSmtpUsername" th:value="${nqtSmtpUsername}" placeholder="your-email@gmail.com">
+                    <p class="mt-1 text-xs text-gray-500">Địa chỉ email Gmail của bạn</p>
+                </div>
+
+                <div class="mb-4">
+                    <label for="nqtSmtpPassword" class="block text-sm font-medium text-gray-700 mb-1">App Password</label>
+                    <input type="password" autocomplete="new-password"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                        id="nqtSmtpPassword" name="nqtSmtpPassword" placeholder="Nhập App Password (16 ký tự)">
+                    <p class="mt-1 text-xs text-gray-500">App Password từ Google (không phải mật khẩu Gmail thông thường). Để trống nếu không muốn thay đổi.</p>
+                </div>
+
+                <div class="mb-4">
+                    <label for="nqtSmtpFromEmail" class="block text-sm font-medium text-gray-700 mb-1">Email gửi đi (From Email)</label>
+                    <input type="email" autocomplete="chrome-off"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                        id="nqtSmtpFromEmail" name="nqtSmtpFromEmail" th:value="${nqtSmtpFromEmail}" placeholder="your-email@gmail.com">
+                    <p class="mt-1 text-xs text-gray-500">Email sẽ hiển thị trong phần "From" của email gửi đi</p>
+                </div>
+
+                <div class="mb-4">
+                    <label for="nqtSmtpFromName" class="block text-sm font-medium text-gray-700 mb-1">Tên người gửi (From Name)</label>
+                    <input type="text" autocomplete="chrome-off"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                        id="nqtSmtpFromName" name="nqtSmtpFromName" th:value="${nqtSmtpFromName}" placeholder="Hotel NQT">
+                    <p class="mt-1 text-xs text-gray-500">Tên sẽ hiển thị trong phần "From" của email gửi đi</p>
+                </div>
+
+                <div class="mb-4">
+                    <button type="button" onclick="testSmtpConnection()"
+                        class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg shadow-sm transition-colors">
+                        <i class="bi bi-envelope-check mr-2"></i> Test kết nối SMTP
+                    </button>
+                    <div id="smtpTestResult" class="mt-2 hidden"></div>
+                </div>
+            </div>
+
+            <!-- Tab: CHIẾT KHẤU VIP -->
+            <div id="content-vip" class="tab-content hidden">
                 <h3 class="text-lg font-semibold text-gray-800 mb-4">Chiết khấu Khách VIP</h3>
                 <div class="mb-4">
                     <label for="nqtVipDiscountPercent" class="block text-sm font-medium text-gray-700 mb-1">
                         Phần trăm chiết khấu mặc định cho khách VIP (%)
                     </label>
                     <div class="flex items-center space-x-2">
-                        <input type="number" 
+                        <input type="number" autocomplete="chrome-off"
                             min="0" 
                             max="100" 
                             step="0.1"
@@ -152,82 +229,106 @@
                 </div>
             </div>
 
-            <div class="mb-6 border-t pt-4">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4">Cấu hình SMTP Email (Gmail)</h3>
-                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-                    <p class="text-sm text-blue-800 mb-2"><strong>Hướng dẫn cấu hình Gmail:</strong></p>
-                    <ol class="list-decimal list-inside text-sm text-blue-700 space-y-1">
-                        <li>Truy cập <a href="https://myaccount.google.com/apppasswords" target="_blank" class="underline">Google App Passwords</a></li>
-                        <li>Tạo App Password mới (nếu chưa bật 2-Step Verification, cần bật trước)</li>
-                        <li>Sử dụng App Password (16 ký tự) thay vì mật khẩu Gmail thông thường</li>
-                        <li>Điền thông tin bên dưới và nhấn "Lưu cấu hình"</li>
-                    </ol>
-                </div>
-
-                <div class="mb-4">
-                    <label for="nqtSmtpHost" class="block text-sm font-medium text-gray-700 mb-1">SMTP Host</label>
-                    <input type="text"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                        id="nqtSmtpHost" name="nqtSmtpHost" th:value="${nqtSmtpHost ?: 'smtp.gmail.com'}" placeholder="smtp.gmail.com">
-                    <p class="mt-1 text-xs text-gray-500">Gmail: smtp.gmail.com</p>
-                </div>
-
-                <div class="mb-4">
-                    <label for="nqtSmtpPort" class="block text-sm font-medium text-gray-700 mb-1">SMTP Port</label>
-                    <input type="number"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                        id="nqtSmtpPort" name="nqtSmtpPort" th:value="${nqtSmtpPort ?: '587'}" placeholder="587">
-                    <p class="mt-1 text-xs text-gray-500">Gmail: 587 (TLS) hoặc 465 (SSL)</p>
-                </div>
-
-                <div class="mb-4">
-                    <label for="nqtSmtpUsername" class="block text-sm font-medium text-gray-700 mb-1">Email (Username)</label>
-                    <input type="email"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                        id="nqtSmtpUsername" name="nqtSmtpUsername" th:value="${nqtSmtpUsername}" placeholder="your-email@gmail.com">
-                    <p class="mt-1 text-xs text-gray-500">Địa chỉ email Gmail của bạn</p>
-                </div>
-
-                <div class="mb-4">
-                    <label for="nqtSmtpPassword" class="block text-sm font-medium text-gray-700 mb-1">App Password</label>
-                    <input type="password"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                        id="nqtSmtpPassword" name="nqtSmtpPassword" placeholder="Nhập App Password (16 ký tự)">
-                    <p class="mt-1 text-xs text-gray-500">App Password từ Google (không phải mật khẩu Gmail thông thường). Để trống nếu không muốn thay đổi.</p>
-                </div>
-
-                <div class="mb-4">
-                    <label for="nqtSmtpFromEmail" class="block text-sm font-medium text-gray-700 mb-1">Email gửi đi (From Email)</label>
-                    <input type="email"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                        id="nqtSmtpFromEmail" name="nqtSmtpFromEmail" th:value="${nqtSmtpFromEmail}" placeholder="your-email@gmail.com">
-                    <p class="mt-1 text-xs text-gray-500">Email sẽ hiển thị trong phần "From" của email gửi đi</p>
-                </div>
-
-                <div class="mb-4">
-                    <label for="nqtSmtpFromName" class="block text-sm font-medium text-gray-700 mb-1">Tên người gửi (From Name)</label>
-                    <input type="text"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                        id="nqtSmtpFromName" name="nqtSmtpFromName" th:value="${nqtSmtpFromName}" placeholder="Hotel NQT">
-                    <p class="mt-1 text-xs text-gray-500">Tên sẽ hiển thị trong phần "From" của email gửi đi</p>
-                </div>
-
-                <div class="mb-4">
-                    <button type="button" onclick="testSmtpConnection()"
-                        class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg shadow-sm transition-colors">
-                        <i class="bi bi-envelope-check mr-2"></i> Test kết nối SMTP
-                    </button>
-                    <div id="smtpTestResult" class="mt-2 hidden"></div>
+            <!-- Tab: LINK HỖ TRỢ -->
+            <div id="content-support" class="tab-content hidden">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">Các link hỗ trợ</h3>
+                <div class="mb-6">
+                    <label for="nqtWebsiteSupportLinks" class="block text-sm font-medium text-gray-700 mb-1">Các link hỗ trợ (mỗi dòng một link, format: Tên|URL|Nội dung HTML)</label>
+                    <textarea id="nqtWebsiteSupportLinks" name="nqtWebsiteSupportLinks" rows="8" autocomplete="chrome-off"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all font-mono text-sm"
+                        placeholder="Chính sách hủy|/nqtSupport/chinh-sach-huy|&lt;p&gt;Nội dung HTML ở đây...&lt;/p&gt;&#10;Điều khoản sử dụng|/nqtSupport/dieu-khoan|&lt;p&gt;Nội dung HTML...&lt;/p&gt;"><th:block th:if="${nqtWebsiteSupportLinks != null and nqtWebsiteSupportLinks != ''}" th:inline="text">[[${nqtWebsiteSupportLinks}]]</th:block></textarea>
+                    <div class="text-xs text-gray-500 mt-2 space-y-1">
+                        <p><strong>Format:</strong> Tên|URL|Nội dung HTML</p>
+                        <p><strong>Ví dụ:</strong></p>
+                        <pre class="bg-gray-50 p-2 rounded text-xs overflow-x-auto">Chính sách hủy|/nqtSupport/chinh-sach-huy|&lt;h2&gt;Chính sách hủy&lt;/h2&gt;&lt;p&gt;Khách hàng có thể hủy đặt phòng trước 24 giờ...&lt;/p&gt;
+Điều khoản sử dụng|/nqtSupport/dieu-khoan|&lt;h2&gt;Điều khoản&lt;/h2&gt;&lt;p&gt;Nội dung điều khoản...&lt;/p&gt;</pre>
+                        <p class="mt-2"><strong>Lưu ý:</strong> URL sẽ tự động tạo route /nqtSupport/{slug}. Nếu không có nội dung HTML, sẽ hiển thị nội dung mặc định.</p>
+                    </div>
                 </div>
             </div>
 
-            <button type="submit"
-                class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors">
-                Lưu cấu hình
-            </button>
+            <div class="mt-6 pt-4 border-t">
+                <button type="submit"
+                    class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors">
+                    Lưu cấu hình
+                </button>
+            </div>
         </form>
 
         <script>
+            // Tab navigation
+            function showTab(tabName) {
+                // Hide all tab contents
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.add('hidden');
+                });
+                
+                // Remove active state from all tabs
+                document.querySelectorAll('[id^="tab-"]').forEach(tab => {
+                    tab.classList.remove('bg-white', 'text-gray-800', 'shadow-sm');
+                    tab.classList.add('text-white', 'hover:bg-gray-600');
+                });
+                
+                // Show selected tab content
+                document.getElementById('content-' + tabName).classList.remove('hidden');
+                
+                // Add active state to selected tab
+                const activeTab = document.getElementById('tab-' + tabName);
+                activeTab.classList.remove('text-white', 'hover:bg-gray-600');
+                activeTab.classList.add('bg-white', 'text-gray-800', 'shadow-sm');
+            }
+            
+            // Initialize: show general tab by default
+            document.addEventListener('DOMContentLoaded', function() {
+                showTab('general');
+                
+                // Disable autocomplete for all form fields - multiple methods
+                const form = document.querySelector('form[method="post"]');
+                if (form) {
+                    // Method 1: Set autocomplete off on form
+                    form.setAttribute('autocomplete', 'off');
+                    
+                    // Method 2: Disable autocomplete for all inputs, selects, and textareas
+                    const allInputs = form.querySelectorAll('input, select, textarea');
+                    allInputs.forEach(function(field) {
+                        // Skip hidden fields
+                        if (field.type === 'hidden' || field.style.position === 'absolute') {
+                            return;
+                        }
+                        
+                        // Set autocomplete attribute
+                        if (field.type === 'password') {
+                            field.setAttribute('autocomplete', 'new-password');
+                        } else if (field.type === 'email') {
+                            field.setAttribute('autocomplete', 'chrome-off');
+                        } else if (!field.getAttribute('autocomplete') || field.getAttribute('autocomplete') === 'off') {
+                            field.setAttribute('autocomplete', 'chrome-off');
+                        }
+                        
+                        // Method 3: Set readonly then remove it to prevent autofill
+                        if (field.type !== 'file' && field.type !== 'color' && field.type !== 'hidden') {
+                            const originalReadonly = field.readOnly;
+                            field.readOnly = true;
+                            setTimeout(function() {
+                                field.readOnly = originalReadonly;
+                            }, 100);
+                        }
+                        
+                        // Method 4: Add data attribute to confuse browser
+                        field.setAttribute('data-lpignore', 'true');
+                        field.setAttribute('data-form-type', 'other');
+                    });
+                }
+                
+                // Method 5: Prevent autofill on focus
+                document.addEventListener('focusin', function(e) {
+                    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+                        if (e.target.type !== 'file' && e.target.type !== 'color') {
+                            e.target.setAttribute('autocomplete', 'chrome-off');
+                        }
+                    }
+                }, true);
+            });
             function testSmtpConnection() {
                 const resultDiv = document.getElementById('smtpTestResult');
                 resultDiv.classList.remove('hidden');
@@ -258,7 +359,6 @@
                 });
             }
         </script>
-        </form>
     </div>
 </body>
 

@@ -40,6 +40,7 @@
                 <option value="">-- Tất cả Trạng thái --</option>
                 <option value="Chưa thanh toán">Chưa thanh toán</option>
                 <option value="Đã thanh toán">Đã thanh toán</option>
+                <option value="Đã hủy">Đã hủy</option>
                 <option value="Hoàn tiền">Hoàn tiền</option>
             </select>
         </div>
@@ -106,7 +107,10 @@
                                     class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Đã
                                     thanh toán</span>
                                 <span th:if="${item.nqtStatus == 2}"
-                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Hoàn
+                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Đã
+                                    hủy</span>
+                                <span th:if="${item.nqtStatus == 3}"
+                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">Hoàn
                                     tiền</span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
