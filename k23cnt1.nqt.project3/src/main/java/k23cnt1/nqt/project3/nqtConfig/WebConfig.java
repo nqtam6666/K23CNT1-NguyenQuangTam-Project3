@@ -1,5 +1,6 @@
 package k23cnt1.nqt.project3.nqtConfig;
 
+import k23cnt1.nqt.project3.nqtService.NqtAdminPathService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -11,12 +12,23 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Autowired
     private AdminLoginInterceptor adminLoginInterceptor;
+    
+    @Autowired
+    private NqtAdminPathService adminPathService;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
+        // Use dynamic admin path
+        String adminPath = adminPathService.getAdminPathWithSlash();
+        String adminLoginPath = adminPath + "/login";
+        String adminCssPattern = adminPath + "/css/**";
+        String adminJsPattern = adminPath + "/js/**";
+        String adminImagesPattern = adminPath + "/images/**";
+        String adminAllPattern = adminPath + "/**";
+        
         registry.addInterceptor(adminLoginInterceptor)
-                .addPathPatterns("/admin/**")
-                .excludePathPatterns("/admin/login", "/admin/css/**", "/admin/js/**", "/admin/images/**");
+                .addPathPatterns(adminAllPattern)
+                .excludePathPatterns(adminLoginPath, adminCssPattern, adminJsPattern, adminImagesPattern);
     }
 
     @Override

@@ -19,6 +19,6 @@ public class NqtSetting {
     @Column(name = "nqtName", columnDefinition = "VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci")
     private String nqtName;
 
-    @Column(name = "nqtValue", columnDefinition = "VARCHAR(5000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci")
+    @Column(name = "nqtValue", columnDefinition = "TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci")
     private String nqtValue;
 }

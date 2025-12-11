@@ -47,6 +47,20 @@
             outline: 2px solid var(--color-primary);
             outline-offset: 2px;
         }
+        .service-card:hover {
+            transform: translateY(-2px);
+        }
+        .service-card input[type="checkbox"]:checked ~ div {
+            border-color: var(--color-primary);
+            background-color: rgba(217, 119, 6, 0.05);
+        }
+        .service-card input[type="checkbox"]:checked {
+            border-color: var(--color-primary);
+        }
+        .service-card.selected {
+            border-color: var(--color-primary) !important;
+            background-color: rgba(217, 119, 6, 0.05) !important;
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-gray-50 to-white">
@@ -76,6 +90,26 @@
             <div class="text-center mb-8">
                 <h1 class="font-serif text-4xl font-bold text-gray-900 mb-4">Đặt phòng <span class="gold-accent">của bạn</span></h1>
                 <p class="text-gray-600">Hoàn tất thông tin để đặt phòng</p>
+            </div>
+
+            <!-- Error Message -->
+            <div th:if="${nqtError}" class="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 text-red-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                    </svg>
+                    <p class="text-red-700 font-medium" th:text="${nqtError}">Lỗi</p>
+                </div>
+            </div>
+
+            <!-- Success Message -->
+            <div th:if="${nqtSuccess}" class="mb-6 bg-green-50 border-l-4 border-green-500 p-4 rounded-lg">
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                    <p class="text-green-700 font-medium" th:text="${nqtSuccess}">Thành công</p>
+                </div>
             </div>
 
             <div class="glass-card rounded-2xl p-8 md:p-12">
@@ -108,18 +142,35 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Dịch vụ kèm theo (tùy chọn)</label>
-                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                            <div th:each="service : ${services}" class="flex items-center">
-                                <input type="checkbox" th:id="'service-' + ${service.nqtId}" 
-                                    th:name="nqtDichVuIds" th:value="${service.nqtId}"
-                                    class="w-4 h-4 border-gray-300 rounded service-checkbox"
-                                    th:style="'accent-color: ' + ${nqtWebsiteColor ?: '#d97706'} + ';'"
-                                    style="accent-color: #d97706;">
-                                <label th:for="'service-' + ${service.nqtId}" 
-                                    class="ml-2 text-sm text-gray-700" th:text="${service.nqtTen} + ' (' + ${#numbers.formatDecimal(service.nqtDonGia, 0, 'COMMA', 0, 'POINT')} + ' VNĐ)'">Dịch vụ</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-3">Dịch vụ kèm theo (tùy chọn)</label>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3" th:if="${services != null and !services.isEmpty()}">
+                            <div th:each="service : ${services}" 
+                                th:id="'service-card-' + ${service.nqtId}"
+                                class="service-card relative border-2 border-gray-200 rounded-lg p-4 hover:border-amber-400 transition-all duration-200 bg-white hover:shadow-md"
+                                th:style="'border-color: ' + ${nqtWebsiteColor ?: '#d97706'} + '40;'">
+                                <div class="flex items-start space-x-3">
+                                    <input type="checkbox" th:id="'service-' + ${service.nqtId}" 
+                                        th:name="nqtDichVuIds" th:value="${service.nqtId}"
+                                        class="mt-1 w-5 h-5 border-gray-300 rounded service-checkbox flex-shrink-0 cursor-pointer"
+                                        th:style="'accent-color: ' + ${nqtWebsiteColor ?: '#d97706'} + '; cursor: pointer;'"
+                                        style="accent-color: #d97706; cursor: pointer;"
+                                        onchange="toggleServiceCard(this);">
+                                    <label th:for="'service-' + ${service.nqtId}" class="flex-1 min-w-0 cursor-pointer">
+                                        <span class="block text-sm font-semibold text-gray-900"
+                                            th:text="${service.nqtTen}">Dịch vụ</span>
+                                        <p class="mt-1 text-sm font-medium"
+                                            th:style="'color: ' + ${nqtWebsiteColor ?: '#d97706'} + ';'"
+                                            style="color: #d97706;"
+                                            th:text="${#numbers.formatDecimal(service.nqtDonGia, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">
+                                            Giá
+                                        </p>
+                                    </label>
+                                </div>
                             </div>
                         </div>
+                        <p class="text-sm text-gray-500 italic" th:if="${services == null or services.isEmpty()}">
+                            Hiện tại không có dịch vụ nào khả dụng.
+                        </p>
                     </div>
 
                     <div>
@@ -223,6 +274,77 @@
                     }
                 }
             }
+            
+            // Form validation before submit
+            const bookingForm = document.querySelector('form[method="post"]');
+            if (bookingForm) {
+                bookingForm.addEventListener('submit', function(e) {
+                    const checkin = checkinInput?.value;
+                    const checkout = checkoutInput?.value;
+                    
+                    if (!checkin || !checkout) {
+                        return; // Let HTML5 validation handle empty fields
+                    }
+                    
+                    const checkinDate = new Date(checkin);
+                    const checkoutDate = new Date(checkout);
+                    
+                    // Check if checkout is before or equal to checkin
+                    if (checkoutDate <= checkinDate) {
+                        e.preventDefault();
+                        alert('Ngày đi phải sau ngày đến! Vui lòng chọn lại.');
+                        if (checkoutInput) {
+                            checkoutInput.focus();
+                            checkoutInput.style.borderColor = '#ef4444';
+                            setTimeout(() => {
+                                checkoutInput.style.borderColor = '';
+                            }, 3000);
+                        }
+                        return false;
+                    }
+                    
+                    // Check if checkin is in the past
+                    const todayDate = new Date();
+                    todayDate.setHours(0, 0, 0, 0);
+                    if (checkinDate < todayDate) {
+                        e.preventDefault();
+                        alert('Ngày đến không hợp lệ! Vui lòng chọn ngày từ hôm nay trở đi.');
+                        if (checkinInput) {
+                            checkinInput.focus();
+                            checkinInput.style.borderColor = '#ef4444';
+                            setTimeout(() => {
+                                checkinInput.style.borderColor = '';
+                            }, 3000);
+                        }
+                        return false;
+                    }
+                });
+            }
+
+            // Toggle service card style when checkbox is checked
+            function toggleServiceCard(checkbox) {
+                const card = checkbox.closest('.service-card');
+                if (!card) return;
+                
+                const primaryColor = /*[[${nqtWebsiteColor ?: '#d97706'}]]*/ '#d97706';
+                
+                if (checkbox.checked) {
+                    card.classList.add('selected');
+                    card.style.borderColor = primaryColor;
+                    card.style.backgroundColor = primaryColor + '0D'; // ~5% opacity
+                } else {
+                    card.classList.remove('selected');
+                    card.style.borderColor = primaryColor + '40'; // ~25% opacity
+                    card.style.backgroundColor = 'white';
+                }
+            }
+            
+            // Initialize service card states on page load
+            document.addEventListener('DOMContentLoaded', function() {
+                document.querySelectorAll('.service-checkbox').forEach(function(checkbox) {
+                    toggleServiceCard(checkbox);
+                });
+            });
 
             // Check discount code
             const btnCheckCode = document.getElementById('btnCheckCode');

@@ -4,7 +4,9 @@ import k23cnt1.nqt.project3.nqtEntity.NqtNguoiDung;
 import k23cnt1.nqt.project3.nqtRepository.NqtNguoiDungRepository;
 import k23cnt1.nqt.project3.nqtService.NqtJwtService;
 import k23cnt1.nqt.project3.nqtService.Nqt2FAService;
+import k23cnt1.nqt.project3.nqtService.NqtRateLimitService;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,13 +39,39 @@ public class NqtKhachHangController {
     @Autowired
     private k23cnt1.nqt.project3.nqtService.NqtEmailVerificationService nqtEmailVerificationService;
 
+    @Autowired
+    private NqtRateLimitService rateLimitService;
+
     // Customer Login
     @GetMapping("/nqtDangNhap")
-    public String nqtDangNhap(HttpSession session, Model model) {
+    public String nqtDangNhap(@RequestParam(value = "error", required = false) String error,
+                              @RequestParam(value = "message", required = false) String message,
+                              HttpSession session, 
+                              Model model) {
         // Redirect if already logged in
         if (session.getAttribute("nqtCustomerSession") != null) {
             return "redirect:/nqtTaiKhoan";
         }
+        
+        // Handle OAuth errors
+        if (error != null) {
+            if ("oauth2_no_email".equals(error)) {
+                model.addAttribute("nqtError", "Không thể lấy thông tin email từ Google. Vui lòng thử lại hoặc đăng nhập bằng tài khoản thường.");
+            } else if ("oauth2_failed".equals(error)) {
+                model.addAttribute("nqtError", "Đăng nhập bằng Google thất bại. Vui lòng thử lại.");
+            } else if ("account_locked".equals(error)) {
+                if (message != null && !message.isEmpty()) {
+                    try {
+                        model.addAttribute("nqtError", java.net.URLDecoder.decode(message, "UTF-8"));
+                    } catch (Exception e) {
+                        model.addAttribute("nqtError", "Tài khoản đã bị khóa tạm thời do quá nhiều lần đăng nhập sai. Vui lòng thử lại sau.");
+                    }
+                } else {
+                    model.addAttribute("nqtError", "Tài khoản đã bị khóa tạm thời do quá nhiều lần đăng nhập sai. Vui lòng thử lại sau.");
+                }
+            }
+        }
+        
         // Set default value for 2FA section
         model.addAttribute("nqtShow2FA", false);
         return "nqtCustomer/nqtAuth/nqtLogin";
@@ -53,22 +81,30 @@ public class NqtKhachHangController {
     public String nqtDangNhapSubmit(@RequestParam(value = "nqtTaiKhoan", required = false) String nqtTaiKhoan,
             @RequestParam(value = "nqtMatKhau", required = false) String nqtMatKhau,
             @RequestParam(value = "nqt2faCode", required = false) String nqt2faCode,
+            HttpServletRequest request,
             HttpSession session,
             HttpServletResponse response,
             Model model) {
         
+        String ipAddress = rateLimitService.getClientIpAddress(request);
+        String userAgent = rateLimitService.getUserAgent(request);
+        
         // Check if this is a 2FA verification (user already verified password)
         Integer pending2FAUserId = (Integer) session.getAttribute("nqtPending2FAUserId");
         if (pending2FAUserId != null && nqt2faCode != null && !nqt2faCode.isEmpty()) {
-            // This is 2FA verification step
+            // This is 2FA verification step - NO rate limiting here, password already verified
             Optional<NqtNguoiDung> userOptional = nqtNguoiDungRepository.findById(pending2FAUserId);
             if (userOptional.isPresent()) {
                 NqtNguoiDung nqtNguoiDung = userOptional.get();
+                String identifier = nqtNguoiDung.getNqtTaiKhoan() != null ? nqtNguoiDung.getNqtTaiKhoan() : nqtNguoiDung.getNqtEmail();
+                
                 String secret = nqtNguoiDung.getNqt2faSecret();
                 if (secret != null && nqt2FAService.verifyCode(secret, nqt2faCode)) {
                     // 2FA verified, complete login
+                    rateLimitService.recordAttempt(identifier, ipAddress, true, null, userAgent, NqtRateLimitService.ACTION_LOGIN);
                     return completeLogin(nqtNguoiDung, session, response);
                 } else {
+                    rateLimitService.recordAttempt(identifier, ipAddress, false, "Invalid 2FA code", userAgent, NqtRateLimitService.ACTION_2FA_VERIFICATION);
                     model.addAttribute("nqtError", "Mã xác thực 2FA không đúng!");
                     model.addAttribute("nqtShow2FA", true);
                     model.addAttribute("nqtTaiKhoan", nqtTaiKhoan != null ? nqtTaiKhoan : nqtNguoiDung.getNqtTaiKhoan());
@@ -99,7 +135,7 @@ public class NqtKhachHangController {
         // Debug logging
         System.out.println("🔍 Searching for user (cleaned): [" + cleanedUsername + "]");
         
-        // Try exact match first
+        // Try exact match first - Find user BEFORE checking rate limit
         Optional<NqtNguoiDung> nqtNguoiDungOptional = nqtNguoiDungRepository.findByNqtTaiKhoanOrNqtEmail(cleanedUsername,
                 cleanedUsername);
         
@@ -129,9 +165,11 @@ public class NqtKhachHangController {
 
         if (nqtNguoiDungOptional.isPresent()) {
             NqtNguoiDung nqtNguoiDung = nqtNguoiDungOptional.get();
+            String identifier = nqtNguoiDung.getNqtTaiKhoan() != null ? nqtNguoiDung.getNqtTaiKhoan() : nqtNguoiDung.getNqtEmail();
 
             // Check if email is verified
             if (nqtNguoiDung.getNqtEmailVerified() == null || !nqtNguoiDung.getNqtEmailVerified()) {
+                rateLimitService.recordAttempt(identifier, ipAddress, false, "Email not verified", userAgent, NqtRateLimitService.ACTION_LOGIN);
                 model.addAttribute("nqtEmailNotVerified", true);
                 model.addAttribute("nqtEmailNotVerifiedEmail", nqtNguoiDung.getNqtEmail());
                 return "nqtCustomer/nqtAuth/nqtLogin";
@@ -139,13 +177,42 @@ public class NqtKhachHangController {
 
             // Check if account is active
             if (nqtNguoiDung.getNqtStatus() == null || !nqtNguoiDung.getNqtStatus()) {
+                rateLimitService.recordAttempt(identifier, ipAddress, false, "Account disabled", userAgent, NqtRateLimitService.ACTION_LOGIN);
                 model.addAttribute("nqtError", "Tài khoản đã bị khóa hoặc chưa kích hoạt!");
                 return "nqtCustomer/nqtAuth/nqtLogin";
             }
 
             // Check if user is OAuth2 user (no password)
             if (nqtNguoiDung.getNqtMatKhau() == null || nqtNguoiDung.getNqtMatKhau().isEmpty()) {
+                rateLimitService.recordAttempt(identifier, ipAddress, false, "OAuth2 account", userAgent, NqtRateLimitService.ACTION_LOGIN);
                 model.addAttribute("nqtError", "Tài khoản này được đăng ký qua Google/Facebook. Vui lòng sử dụng nút đăng nhập với Google/Facebook.");
+                model.addAttribute("nqtShow2FA", false);
+                return "nqtCustomer/nqtAuth/nqtLogin";
+            }
+
+            // Check rate limiting and brute force protection AFTER we know user exists
+            NqtRateLimitService.RateLimitResult identifierRateLimit = rateLimitService.checkRateLimitByIdentifier(identifier);
+            if (identifierRateLimit.isBlocked()) {
+                rateLimitService.recordAttempt(identifier, ipAddress, false, "Rate limit exceeded (identifier)", userAgent, NqtRateLimitService.ACTION_LOGIN);
+                model.addAttribute("nqtError", identifierRateLimit.getMessage());
+                model.addAttribute("nqtShow2FA", false);
+                return "nqtCustomer/nqtAuth/nqtLogin";
+            }
+            
+            // Check brute force protection
+            NqtRateLimitService.RateLimitResult bruteForceCheck = rateLimitService.checkBruteForceProtection(identifier);
+            if (bruteForceCheck.isBlocked()) {
+                rateLimitService.recordAttempt(identifier, ipAddress, false, "Account locked (brute force)", userAgent, NqtRateLimitService.ACTION_LOGIN);
+                model.addAttribute("nqtError", bruteForceCheck.getMessage());
+                model.addAttribute("nqtShow2FA", false);
+                return "nqtCustomer/nqtAuth/nqtLogin";
+            }
+            
+            // Check IP rate limiting
+            NqtRateLimitService.RateLimitResult ipRateLimit = rateLimitService.checkRateLimitByIpAddress(ipAddress);
+            if (ipRateLimit.isBlocked()) {
+                rateLimitService.recordAttempt(identifier, ipAddress, false, "Rate limit exceeded (IP)", userAgent, NqtRateLimitService.ACTION_LOGIN);
+                model.addAttribute("nqtError", ipRateLimit.getMessage());
                 model.addAttribute("nqtShow2FA", false);
                 return "nqtCustomer/nqtAuth/nqtLogin";
             }
@@ -161,6 +228,9 @@ public class NqtKhachHangController {
             }
 
             if (isMatch) {
+                // Password is correct - record successful attempt
+                rateLimitService.recordAttempt(identifier, ipAddress, true, null, userAgent, NqtRateLimitService.ACTION_LOGIN);
+                
                 // Check if 2FA is enabled
                 boolean is2FAEnabled = nqtNguoiDung.getNqt2faEnabled() != null && nqtNguoiDung.getNqt2faEnabled();
                 
@@ -172,6 +242,7 @@ public class NqtKhachHangController {
                             // 2FA verified, complete login
                             return completeLogin(nqtNguoiDung, session, response);
                         } else {
+                            rateLimitService.recordAttempt(identifier, ipAddress, false, "Invalid 2FA code", userAgent, NqtRateLimitService.ACTION_2FA_VERIFICATION);
                             model.addAttribute("nqtError", "Mã xác thực 2FA không đúng!");
                             model.addAttribute("nqtShow2FA", true);
                             model.addAttribute("nqtTaiKhoan", nqtTaiKhoan);
@@ -190,9 +261,22 @@ public class NqtKhachHangController {
                     return completeLogin(nqtNguoiDung, session, response);
                 }
             } else {
+                // Password is wrong - record failed attempt
+                rateLimitService.recordAttempt(identifier, ipAddress, false, "Wrong password", userAgent, NqtRateLimitService.ACTION_LOGIN);
                 model.addAttribute("nqtError", "Sai mật khẩu!");
             }
         } else {
+            // User not found - check if this identifier has been locked (for non-existent users, we still track attempts)
+            // But we should check brute force protection to show lock message if applicable
+            NqtRateLimitService.RateLimitResult bruteForceCheck = rateLimitService.checkBruteForceProtection(cleanedUsername);
+            if (bruteForceCheck.isBlocked()) {
+                rateLimitService.recordAttempt(cleanedUsername, ipAddress, false, "Account locked (brute force)", userAgent, NqtRateLimitService.ACTION_LOGIN);
+                model.addAttribute("nqtError", bruteForceCheck.getMessage());
+                model.addAttribute("nqtShow2FA", false);
+                return "nqtCustomer/nqtAuth/nqtLogin";
+            }
+            
+            rateLimitService.recordAttempt(cleanedUsername, ipAddress, false, "User not found", userAgent, NqtRateLimitService.ACTION_LOGIN);
             model.addAttribute("nqtError", "Tài khoản hoặc Email không tồn tại!");
         }
 
@@ -248,21 +332,53 @@ public class NqtKhachHangController {
             @RequestParam("nqtMatKhauXacNhan") String nqtMatKhauXacNhan,
             @RequestParam(value = "nqtSoDienThoai", required = false) String nqtSoDienThoai,
             @RequestParam(value = "nqtDiaChi", required = false) String nqtDiaChi,
+            HttpServletRequest request,
             Model model) {
+        String ipAddress = rateLimitService.getClientIpAddress(request);
+        String userAgent = rateLimitService.getUserAgent(request);
+        
+        // Check rate limiting for IP
+        NqtRateLimitService.RateLimitResult ipRateLimit = rateLimitService.checkRateLimitByIpAddressAndAction(
+            ipAddress, NqtRateLimitService.ACTION_REGISTER,
+            "Quá nhiều lần đăng ký từ địa chỉ IP này. Vui lòng đợi một chút trước khi thử lại.");
+        if (ipRateLimit.isBlocked()) {
+            rateLimitService.recordAttempt(nqtEmail, ipAddress, false, "Rate limit exceeded (IP)", userAgent,
+                                          NqtRateLimitService.ACTION_REGISTER);
+            model.addAttribute("nqtError", ipRateLimit.getMessage());
+            return "nqtCustomer/nqtAuth/nqtRegister";
+        }
+        
+        // Check rate limiting for email
+        NqtRateLimitService.RateLimitResult emailRateLimit = rateLimitService.checkRateLimitByIdentifierAndAction(
+            nqtEmail, NqtRateLimitService.ACTION_REGISTER,
+            "Quá nhiều lần đăng ký với email này. Vui lòng đợi một chút trước khi thử lại.");
+        if (emailRateLimit.isBlocked()) {
+            rateLimitService.recordAttempt(nqtEmail, ipAddress, false, "Rate limit exceeded (email)", userAgent,
+                                          NqtRateLimitService.ACTION_REGISTER);
+            model.addAttribute("nqtError", emailRateLimit.getMessage());
+            return "nqtCustomer/nqtAuth/nqtRegister";
+        }
+        
         // Validate passwords match
         if (!nqtMatKhau.equals(nqtMatKhauXacNhan)) {
+            rateLimitService.recordAttempt(nqtEmail, ipAddress, false, "Password mismatch", userAgent,
+                                          NqtRateLimitService.ACTION_REGISTER);
             model.addAttribute("nqtError", "Mật khẩu xác nhận không khớp!");
             return "nqtCustomer/nqtAuth/nqtRegister";
         }
 
         // Check if username already exists
         if (nqtNguoiDungRepository.findByNqtTaiKhoan(nqtTaiKhoan).isPresent()) {
+            rateLimitService.recordAttempt(nqtEmail, ipAddress, false, "Username already exists", userAgent,
+                                          NqtRateLimitService.ACTION_REGISTER);
             model.addAttribute("nqtError", "Tài khoản đã tồn tại!");
             return "nqtCustomer/nqtAuth/nqtRegister";
         }
 
         // Check if email already exists
         if (nqtNguoiDungRepository.findByNqtEmail(nqtEmail).isPresent()) {
+            rateLimitService.recordAttempt(nqtEmail, ipAddress, false, "Email already exists", userAgent,
+                                          NqtRateLimitService.ACTION_REGISTER);
             model.addAttribute("nqtError", "Email đã được sử dụng!");
             return "nqtCustomer/nqtAuth/nqtRegister";
         }
@@ -285,9 +401,13 @@ public class NqtKhachHangController {
         // Send verification email
         try {
             nqtEmailVerificationService.sendVerificationEmail(nqtNguoiDung);
+            rateLimitService.recordAttempt(nqtEmail, ipAddress, true, null, userAgent,
+                                          NqtRateLimitService.ACTION_REGISTER);
             model.addAttribute("nqtSuccess", "Đăng ký thành công! Vui lòng kiểm tra email để xác thực tài khoản.");
         } catch (Exception e) {
             // If email sending fails, still allow registration but warn user
+            rateLimitService.recordAttempt(nqtEmail, ipAddress, false, "Email send failed: " + e.getMessage(), userAgent,
+                                          NqtRateLimitService.ACTION_REGISTER);
             model.addAttribute("nqtWarning", "Đăng ký thành công nhưng không thể gửi email xác thực. Vui lòng liên hệ admin để kích hoạt tài khoản.");
         }
         

@@ -39,44 +39,60 @@ public class NqtRoomStatusService {
         try {
             LocalDate today = LocalDate.now();
             
-            // Lấy tất cả các booking đang active (status = 0 hoặc 1)
-            List<NqtDatPhong> activeBookings = nqtDatPhongRepository.findAll();
+            // Lấy tất cả các booking
+            List<NqtDatPhong> allBookings = nqtDatPhongRepository.findAll();
             
-            for (NqtDatPhong booking : activeBookings) {
-            NqtPhong room = booking.getNqtPhong();
-            if (room == null) continue;
-            
-            LocalDate ngayDi = booking.getNqtNgayDi();
-            LocalDate ngayDen = booking.getNqtNgayDen();
-            
-            // Nếu ngày đi đã qua (ngày hiện tại > ngày đi)
-            if (ngayDi != null && today.isAfter(ngayDi)) {
-                // Giải phóng phòng (set về trống)
-                if (!room.getNqtStatus()) { // Chỉ update nếu đang bị đặt
-                    room.setNqtStatus(true);
-                    nqtPhongRepository.save(room);
-                    roomsUpdated++;
+            for (NqtDatPhong booking : allBookings) {
+                NqtPhong room = booking.getNqtPhong();
+                if (room == null) continue;
+                
+                Byte bookingStatus = booking.getNqtStatus();
+                LocalDate ngayDi = booking.getNqtNgayDi();
+                LocalDate ngayDen = booking.getNqtNgayDen();
+                
+                // Nếu booking đã hủy (2) hoặc hoàn tiền (3) -> giải phóng phòng ngay lập tức
+                if (bookingStatus != null && (bookingStatus == 2 || bookingStatus == 3)) {
+                    if (!room.getNqtStatus()) { // Chỉ update nếu đang bị đặt
+                        room.setNqtStatus(true);
+                        nqtPhongRepository.save(room);
+                        roomsUpdated++;
+                    }
+                    continue; // Bỏ qua các xử lý khác cho booking đã hủy/hoàn tiền
                 }
-            }
-            // Nếu ngày hiện tại nằm trong khoảng ngày đến - ngày đi
-            else if (ngayDen != null && ngayDi != null 
-                    && !today.isBefore(ngayDen) && !today.isAfter(ngayDi)) {
-                // Phòng đang được sử dụng (set thành đã đặt)
-                if (booking.getNqtStatus() == 1 && room.getNqtStatus()) { // Chỉ khi đã thanh toán và phòng đang trống
-                    room.setNqtStatus(false);
-                    nqtPhongRepository.save(room);
-                    roomsUpdated++;
+                
+                // Chỉ xử lý booking đã thanh toán (status = 1)
+                if (bookingStatus == null || bookingStatus != 1) {
+                    continue; // Bỏ qua booking chưa thanh toán (0) hoặc status khác
                 }
-            }
-            // Nếu ngày đến chưa đến và booking đã thanh toán
-            else if (ngayDen != null && today.isBefore(ngayDen) && booking.getNqtStatus() == 1) {
-                // Phòng đã được đặt nhưng chưa đến ngày check-in
-                if (room.getNqtStatus()) { // Chỉ update nếu phòng đang trống
-                    room.setNqtStatus(false);
-                    nqtPhongRepository.save(room);
-                    roomsUpdated++;
+                
+                // Nếu ngày đi đã qua (ngày hiện tại > ngày đi)
+                if (ngayDi != null && today.isAfter(ngayDi)) {
+                    // Giải phóng phòng (set về trống)
+                    if (!room.getNqtStatus()) { // Chỉ update nếu đang bị đặt
+                        room.setNqtStatus(true);
+                        nqtPhongRepository.save(room);
+                        roomsUpdated++;
+                    }
                 }
-            }
+                // Nếu ngày hiện tại nằm trong khoảng ngày đến - ngày đi
+                else if (ngayDen != null && ngayDi != null 
+                        && !today.isBefore(ngayDen) && !today.isAfter(ngayDi)) {
+                    // Phòng đang được sử dụng (set thành đã đặt)
+                    if (room.getNqtStatus()) { // Chỉ khi phòng đang trống
+                        room.setNqtStatus(false);
+                        nqtPhongRepository.save(room);
+                        roomsUpdated++;
+                    }
+                }
+                // Nếu ngày đến chưa đến và booking đã thanh toán
+                else if (ngayDen != null && today.isBefore(ngayDen)) {
+                    // Phòng đã được đặt nhưng chưa đến ngày check-in
+                    if (room.getNqtStatus()) { // Chỉ update nếu phòng đang trống
+                        room.setNqtStatus(false);
+                        nqtPhongRepository.save(room);
+                        roomsUpdated++;
+                    }
+                }
             }
             
             long executionTime = System.currentTimeMillis() - startTime;
@@ -124,8 +140,17 @@ public class NqtRoomStatusService {
             return;
         }
         
-        // Nếu booking đã thanh toán và ngày đến chưa đến hoặc đang trong khoảng thời gian
-        if (booking.getNqtStatus() == 1) {
+        Byte bookingStatus = booking.getNqtStatus();
+        
+        // Nếu booking đã hủy (2) hoặc hoàn tiền (3) -> giải phóng phòng
+        if (bookingStatus != null && (bookingStatus == 2 || bookingStatus == 3)) {
+            room.setNqtStatus(true);
+            nqtPhongRepository.save(room);
+            return;
+        }
+        
+        // Chỉ xử lý booking đã thanh toán (status = 1)
+        if (bookingStatus != null && bookingStatus == 1) {
             if (ngayDen != null && (today.isBefore(ngayDen) || 
                 (ngayDi != null && !today.isBefore(ngayDen) && !today.isAfter(ngayDi)))) {
                 room.setNqtStatus(false);
@@ -154,9 +179,15 @@ public class NqtRoomStatusService {
             for (NqtDatPhong booking : bookings) {
                 LocalDate ngayDi = booking.getNqtNgayDi();
                 LocalDate ngayDen = booking.getNqtNgayDen();
+                Byte bookingStatus = booking.getNqtStatus();
                 
-                // Nếu có booking đang active (đã thanh toán và trong khoảng thời gian)
-                if (booking.getNqtStatus() == 1 && ngayDen != null && ngayDi != null) {
+                // Bỏ qua booking đã hủy (2) hoặc hoàn tiền (3)
+                if (bookingStatus != null && (bookingStatus == 2 || bookingStatus == 3)) {
+                    continue;
+                }
+                
+                // Chỉ xử lý booking đã thanh toán (status = 1)
+                if (bookingStatus != null && bookingStatus == 1 && ngayDen != null && ngayDi != null) {
                     if (!today.isBefore(ngayDen) && !today.isAfter(ngayDi)) {
                         // Đang trong thời gian sử dụng
                         shouldBeAvailable = false;

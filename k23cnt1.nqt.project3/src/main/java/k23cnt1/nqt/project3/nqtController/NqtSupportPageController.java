@@ -59,13 +59,17 @@ public class NqtSupportPageController {
                         // Tạo slug từ URL hoặc tên
                         String slug;
                         if (url.startsWith("/nqtSupport/")) {
-                            // Nếu URL đã có format /nqtSupport/{slug}
+                            // Nếu URL đã có format /nqtSupport/{slug}, giữ nguyên slug (có thể có chữ hoa)
                             slug = url.substring("/nqtSupport/".length()).trim();
+                            // Chỉ clean khoảng trắng, giữ nguyên chữ hoa/thường và dấu gạch ngang
+                            slug = slug.replaceAll("\\s+", "-").replaceAll("[^a-zA-Z0-9-]", "");
                         } else if (url.startsWith("/")) {
                             // Nếu URL bắt đầu bằng /, lấy phần sau
                             slug = url.substring(1).replaceAll("/", "-").trim();
+                            // Clean: giữ chữ hoa/thường, số và dấu gạch ngang
+                            slug = slug.replaceAll("\\s+", "-").replaceAll("[^a-zA-Z0-9-]", "");
                         } else {
-                            // Tạo slug từ tên
+                            // Tạo slug từ tên (chuyển thành chữ thường)
                             slug = name.toLowerCase()
                                     .replaceAll("[àáạảãâầấậẩẫăằắặẳẵ]", "a")
                                     .replaceAll("[èéẹẻẽêềếệểễ]", "e")
@@ -77,9 +81,6 @@ public class NqtSupportPageController {
                                     .replaceAll("[^a-z0-9]+", "-")
                                     .replaceAll("^-|-$", "");
                         }
-                        
-                        // Clean slug: loại bỏ khoảng trắng và ký tự đặc biệt
-                        slug = slug.trim().replaceAll("\\s+", "-").replaceAll("[^a-z0-9-]", "");
                         
                         if (slug.isEmpty()) {
                             slug = "support-page";

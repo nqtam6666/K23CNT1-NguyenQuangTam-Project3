@@ -1,5 +1,6 @@
 package k23cnt1.nqt.project3.nqtConfig;
 
+import k23cnt1.nqt.project3.nqtService.NqtAdminPathService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,13 +27,19 @@ public class SecurityConfig {
     @Autowired
     private NqtOAuth2FailureHandler oAuth2FailureHandler;
 
+    @Autowired
+    private NqtAdminPathService adminPathService;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
+    
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        String adminPath = adminPathService.getAdminPathWithSlash();
+        String adminLoginPath = adminPath + "/login";
+        
         http
             .csrf(csrf -> csrf.disable())
             // Use IF_REQUIRED instead of STATELESS to support both JWT and session
@@ -42,10 +49,35 @@ public class SecurityConfig {
             .authorizeHttpRequests(authorize -> authorize
                 // Public endpoints
                 .requestMatchers("/", "/nqt**", "/static/**", "/uploads/**", "/favicon.ico").permitAll()
-                .requestMatchers("/admin/login", "/admin/css/**", "/admin/js/**", "/admin/images/**").permitAll()
+                // Block access to /admin/** if admin path has been changed
+                .requestMatchers(request -> {
+                    String path = request.getRequestURI();
+                    // If admin path is not default and request is to /admin/**, deny access
+                    if (!adminPath.equals("/admin") && path.startsWith("/admin/")) {
+                        // Allow static resources from /admin/ (css, js, images) for backward compatibility
+                        return path.startsWith("/admin/css/") || 
+                               path.startsWith("/admin/js/") || 
+                               path.startsWith("/admin/images/");
+                    }
+                    return false;
+                }).denyAll()
+                // Admin login and static resources - permit all (using dynamic path)
+                .requestMatchers(request -> {
+                    String path = request.getRequestURI();
+                    return path.equals(adminLoginPath) || 
+                           path.startsWith(adminPath + "/css/") ||
+                           path.startsWith(adminPath + "/js/") ||
+                           path.startsWith(adminPath + "/images/");
+                }).permitAll()
                 .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
-                // Admin endpoints - require authentication
-                .requestMatchers("/admin/**").authenticated()
+                // Admin endpoints - require authentication (using dynamic path)
+                .requestMatchers(request -> {
+                    String path = request.getRequestURI();
+                    return path.startsWith(adminPath + "/") && !path.equals(adminLoginPath) &&
+                           !path.startsWith(adminPath + "/css/") &&
+                           !path.startsWith(adminPath + "/js/") &&
+                           !path.startsWith(adminPath + "/images/");
+                }).authenticated()
                 // API endpoints - can be protected later
                 .anyRequest().permitAll()
             )

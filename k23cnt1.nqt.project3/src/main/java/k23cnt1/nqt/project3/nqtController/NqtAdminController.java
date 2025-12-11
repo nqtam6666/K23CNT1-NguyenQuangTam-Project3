@@ -45,6 +45,9 @@ public class NqtAdminController {
 
     @Autowired
     private NqtSettingService nqtSettingService;
+    
+    @Autowired
+    private k23cnt1.nqt.project3.nqtService.NqtAdminPathService adminPathService;
 
     @Autowired
     private NqtReportService nqtReportService;
@@ -1295,6 +1298,18 @@ public class NqtAdminController {
         model.addAttribute("nqtSmtpFromEmail", nqtSettingService.getNqtValue("nqtSmtpFromEmail", ""));
         model.addAttribute("nqtSmtpFromName", nqtSettingService.getNqtValue("nqtSmtpFromName", ""));
         
+        // Rate Limiting Settings
+        model.addAttribute("rate_limit_max_failed_attempts", nqtSettingService.getNqtValue("rate_limit_max_failed_attempts", "5"));
+        model.addAttribute("rate_limit_lockout_duration_minutes", nqtSettingService.getNqtValue("rate_limit_lockout_duration_minutes", "15"));
+        model.addAttribute("rate_limit_max_attempts", nqtSettingService.getNqtValue("rate_limit_max_attempts", "10"));
+        model.addAttribute("rate_limit_window_minutes", nqtSettingService.getNqtValue("rate_limit_window_minutes", "15"));
+        model.addAttribute("rate_limit_ip_max_attempts", nqtSettingService.getNqtValue("rate_limit_ip_max_attempts", "20"));
+        model.addAttribute("rate_limit_ip_window_minutes", nqtSettingService.getNqtValue("rate_limit_ip_window_minutes", "15"));
+        model.addAttribute("rate_limit_cleanup_days", nqtSettingService.getNqtValue("rate_limit_cleanup_days", "30"));
+        
+        // Admin Path Setting - use service to get sanitized path (without leading slash)
+        model.addAttribute("admin_path", adminPathService.getAdminPath());
+        
         return "admin/setting/form";
     }
 
@@ -1322,6 +1337,14 @@ public class NqtAdminController {
             @RequestParam(value = "nqtSmtpPassword", required = false) String nqtSmtpPassword,
             @RequestParam(value = "nqtSmtpFromEmail", required = false) String nqtSmtpFromEmail,
             @RequestParam(value = "nqtSmtpFromName", required = false) String nqtSmtpFromName,
+            @RequestParam(value = "rate_limit_max_failed_attempts", required = false) String rate_limit_max_failed_attempts,
+            @RequestParam(value = "rate_limit_lockout_duration_minutes", required = false) String rate_limit_lockout_duration_minutes,
+            @RequestParam(value = "rate_limit_max_attempts", required = false) String rate_limit_max_attempts,
+            @RequestParam(value = "rate_limit_window_minutes", required = false) String rate_limit_window_minutes,
+            @RequestParam(value = "rate_limit_ip_max_attempts", required = false) String rate_limit_ip_max_attempts,
+            @RequestParam(value = "rate_limit_ip_window_minutes", required = false) String rate_limit_ip_window_minutes,
+            @RequestParam(value = "rate_limit_cleanup_days", required = false) String rate_limit_cleanup_days,
+            @RequestParam(value = "admin_path", required = false) String admin_path,
             RedirectAttributes redirectAttributes) {
         try {
             if (nqtWebsiteLogoFile != null && !nqtWebsiteLogoFile.isEmpty()) {
@@ -1388,11 +1411,47 @@ public class NqtAdminController {
                 nqtEmailService.updateMailSender();
             }
             
+            // Save Rate Limiting Settings
+            if (rate_limit_max_failed_attempts != null && !rate_limit_max_failed_attempts.trim().isEmpty()) {
+                nqtSettingService.saveNqtValue("rate_limit_max_failed_attempts", rate_limit_max_failed_attempts);
+            }
+            if (rate_limit_lockout_duration_minutes != null && !rate_limit_lockout_duration_minutes.trim().isEmpty()) {
+                nqtSettingService.saveNqtValue("rate_limit_lockout_duration_minutes", rate_limit_lockout_duration_minutes);
+            }
+            if (rate_limit_max_attempts != null && !rate_limit_max_attempts.trim().isEmpty()) {
+                nqtSettingService.saveNqtValue("rate_limit_max_attempts", rate_limit_max_attempts);
+            }
+            if (rate_limit_window_minutes != null && !rate_limit_window_minutes.trim().isEmpty()) {
+                nqtSettingService.saveNqtValue("rate_limit_window_minutes", rate_limit_window_minutes);
+            }
+            if (rate_limit_ip_max_attempts != null && !rate_limit_ip_max_attempts.trim().isEmpty()) {
+                nqtSettingService.saveNqtValue("rate_limit_ip_max_attempts", rate_limit_ip_max_attempts);
+            }
+            if (rate_limit_ip_window_minutes != null && !rate_limit_ip_window_minutes.trim().isEmpty()) {
+                nqtSettingService.saveNqtValue("rate_limit_ip_window_minutes", rate_limit_ip_window_minutes);
+            }
+            if (rate_limit_cleanup_days != null && !rate_limit_cleanup_days.trim().isEmpty()) {
+                nqtSettingService.saveNqtValue("rate_limit_cleanup_days", rate_limit_cleanup_days);
+            }
+            
+            // Save Admin Path
+            if (admin_path != null && !admin_path.trim().isEmpty()) {
+                boolean saved = adminPathService.setAdminPath(admin_path.trim());
+                if (!saved) {
+                    redirectAttributes.addFlashAttribute("nqtError", "Đường dẫn admin không hợp lệ! Chỉ cho phép chữ cái, số, dấu gạch dưới (_) và dấu gạch ngang (-).");
+                    // Use current admin path (before change) for redirect
+                    String currentAdminPath = adminPathService.getAdminPathWithSlash();
+                    return "redirect:" + currentAdminPath + "/setting";
+                }
+            }
+            
             redirectAttributes.addFlashAttribute("nqtSuccess", "Cập nhật cấu hình thành công!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/setting";
+        // Use dynamic admin path for redirect
+        String currentAdminPath = adminPathService.getAdminPathWithSlash();
+        return "redirect:" + currentAdminPath + "/setting";
     }
 
     @PostMapping("/admin/setting/test-smtp")

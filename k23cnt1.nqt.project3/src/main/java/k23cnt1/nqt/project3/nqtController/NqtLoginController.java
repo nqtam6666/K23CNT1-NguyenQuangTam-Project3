@@ -4,7 +4,9 @@ import k23cnt1.nqt.project3.nqtEntity.NqtNguoiDung;
 import k23cnt1.nqt.project3.nqtRepository.NqtNguoiDungRepository;
 import k23cnt1.nqt.project3.nqtService.NqtJwtService;
 import k23cnt1.nqt.project3.nqtService.Nqt2FAService;
+import k23cnt1.nqt.project3.nqtService.NqtRateLimitService;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +35,9 @@ public class NqtLoginController {
     @Autowired
     private Nqt2FAService nqt2FAService;
 
+    @Autowired
+    private NqtRateLimitService rateLimitService;
+
     @GetMapping("/admin/login")
     public String nqtLogin(@RequestParam(value = "error", required = false) String error, Model model) {
         if ("noPermission".equals(error)) {
@@ -47,9 +52,13 @@ public class NqtLoginController {
     public String nqtLoginSubmit(@RequestParam(value = "nqtTaiKhoan", required = false) String nqtTaiKhoan,
             @RequestParam(value = "nqtMatKhau", required = false) String nqtMatKhau,
             @RequestParam(value = "nqt2faCode", required = false) String nqt2faCode,
+            HttpServletRequest request,
             HttpSession session,
             HttpServletResponse response,
             Model model) {
+        
+        String ipAddress = rateLimitService.getClientIpAddress(request);
+        String userAgent = rateLimitService.getUserAgent(request);
         
         // Check if this is a 2FA verification (user already verified password)
         Integer pending2FAUserId = (Integer) session.getAttribute("nqtPending2FAUserId");
@@ -58,11 +67,14 @@ public class NqtLoginController {
             Optional<NqtNguoiDung> userOptional = nqtNguoiDungRepository.findById(pending2FAUserId);
             if (userOptional.isPresent()) {
                 NqtNguoiDung nqtNguoiDung = userOptional.get();
+                String identifier = nqtNguoiDung.getNqtTaiKhoan() != null ? nqtNguoiDung.getNqtTaiKhoan() : nqtNguoiDung.getNqtEmail();
                 
+                // NO rate limiting for 2FA verification - password already verified
                 // Check role again
                 if (nqtNguoiDung.getNqtVaiTro() == null || 
                     (nqtNguoiDung.getNqtVaiTro() != 99 && nqtNguoiDung.getNqtVaiTro() != 1)) {
                     session.removeAttribute("nqtPending2FAUserId");
+                    rateLimitService.recordLoginAttempt(identifier, ipAddress, false, "No permission", userAgent);
                     model.addAttribute("nqtError", "Bạn không có quyền truy cập Admin!");
                     model.addAttribute("nqtShow2FA", false);
                     return "admin/login";
@@ -71,8 +83,10 @@ public class NqtLoginController {
                 String secret = nqtNguoiDung.getNqt2faSecret();
                 if (secret != null && nqt2FAService.verifyCode(secret, nqt2faCode)) {
                     // 2FA verified, complete login
+                    rateLimitService.recordAttempt(identifier, ipAddress, true, null, userAgent, NqtRateLimitService.ACTION_LOGIN);
                     return completeAdminLogin(nqtNguoiDung, session, response);
                 } else {
+                    rateLimitService.recordAttempt(identifier, ipAddress, false, "Invalid 2FA code", userAgent, NqtRateLimitService.ACTION_2FA_VERIFICATION);
                     model.addAttribute("nqtError", "Mã xác thực 2FA không đúng!");
                     model.addAttribute("nqtShow2FA", true);
                     model.addAttribute("nqtTaiKhoan", nqtTaiKhoan != null ? nqtTaiKhoan : nqtNguoiDung.getNqtTaiKhoan());
@@ -100,15 +114,18 @@ public class NqtLoginController {
                 .replaceAll("^,", "") // Remove leading comma
                 .replaceAll("\\s+", " "); // Normalize whitespace
         
-        // Tìm kiếm theo Tài khoản hoặc Email
+        // Tìm kiếm theo Tài khoản hoặc Email TRƯỚC KHI check rate limit
+        // Rate limit chỉ áp dụng cho failed attempts, không áp dụng trước khi biết user có tồn tại không
         Optional<NqtNguoiDung> nqtNguoiDungOptional = nqtNguoiDungRepository.findByNqtTaiKhoanOrNqtEmail(cleanedUsername,
                 cleanedUsername);
 
         if (nqtNguoiDungOptional.isPresent()) {
             NqtNguoiDung nqtNguoiDung = nqtNguoiDungOptional.get();
+            String identifier = nqtNguoiDung.getNqtTaiKhoan() != null ? nqtNguoiDung.getNqtTaiKhoan() : nqtNguoiDung.getNqtEmail();
 
             // Kiểm tra trạng thái hoạt động
             if (nqtNguoiDung.getNqtStatus() != null && !nqtNguoiDung.getNqtStatus()) {
+                rateLimitService.recordAttempt(identifier, ipAddress, false, "Account disabled", userAgent, NqtRateLimitService.ACTION_LOGIN);
                 model.addAttribute("nqtError", "Tài khoản đã bị khóa hoặc chưa kích hoạt!");
                 return "admin/login";
             }
@@ -116,7 +133,36 @@ public class NqtLoginController {
             // Kiểm tra quyền trước
             if (nqtNguoiDung.getNqtVaiTro() == null || 
                 (nqtNguoiDung.getNqtVaiTro() != 99 && nqtNguoiDung.getNqtVaiTro() != 1)) {
+                rateLimitService.recordAttempt(identifier, ipAddress, false, "No permission", userAgent, NqtRateLimitService.ACTION_LOGIN);
                 model.addAttribute("nqtError", "Bạn không có quyền truy cập Admin!");
+                return "admin/login";
+            }
+
+            // Check rate limiting and brute force protection AFTER we know user exists
+            // Only check for this specific user, not for the input username (which might be different)
+            NqtRateLimitService.RateLimitResult identifierRateLimit = rateLimitService.checkRateLimitByIdentifier(identifier);
+            if (identifierRateLimit.isBlocked()) {
+                rateLimitService.recordAttempt(identifier, ipAddress, false, "Rate limit exceeded (identifier)", userAgent, NqtRateLimitService.ACTION_LOGIN);
+                model.addAttribute("nqtError", identifierRateLimit.getMessage());
+                model.addAttribute("nqtShow2FA", false);
+                return "admin/login";
+            }
+            
+            // Check brute force protection
+            NqtRateLimitService.RateLimitResult bruteForceCheck = rateLimitService.checkBruteForceProtection(identifier);
+            if (bruteForceCheck.isBlocked()) {
+                rateLimitService.recordAttempt(identifier, ipAddress, false, "Account locked (brute force)", userAgent, NqtRateLimitService.ACTION_LOGIN);
+                model.addAttribute("nqtError", bruteForceCheck.getMessage());
+                model.addAttribute("nqtShow2FA", false);
+                return "admin/login";
+            }
+            
+            // Check IP rate limiting (only for failed attempts, but check before password verification)
+            NqtRateLimitService.RateLimitResult ipRateLimit = rateLimitService.checkRateLimitByIpAddress(ipAddress);
+            if (ipRateLimit.isBlocked()) {
+                rateLimitService.recordAttempt(identifier, ipAddress, false, "Rate limit exceeded (IP)", userAgent, NqtRateLimitService.ACTION_LOGIN);
+                model.addAttribute("nqtError", ipRateLimit.getMessage());
+                model.addAttribute("nqtShow2FA", false);
                 return "admin/login";
             }
 
@@ -132,6 +178,9 @@ public class NqtLoginController {
             }
 
             if (isMatch) {
+                // Password is correct - record successful attempt
+                rateLimitService.recordAttempt(identifier, ipAddress, true, null, userAgent, NqtRateLimitService.ACTION_LOGIN);
+                
                 // Check if 2FA is enabled
                 boolean is2FAEnabled = nqtNguoiDung.getNqt2faEnabled() != null && nqtNguoiDung.getNqt2faEnabled();
                 
@@ -143,6 +192,7 @@ public class NqtLoginController {
                             // 2FA verified, complete login
                             return completeAdminLogin(nqtNguoiDung, session, response);
                         } else {
+                            rateLimitService.recordAttempt(identifier, ipAddress, false, "Invalid 2FA code", userAgent, NqtRateLimitService.ACTION_2FA_VERIFICATION);
                             model.addAttribute("nqtError", "Mã xác thực 2FA không đúng!");
                             model.addAttribute("nqtShow2FA", true);
                             model.addAttribute("nqtTaiKhoan", nqtTaiKhoan);
@@ -160,16 +210,30 @@ public class NqtLoginController {
                     return completeAdminLogin(nqtNguoiDung, session, response);
                 }
             } else {
+                // Password is wrong - record failed attempt
+                rateLimitService.recordAttempt(identifier, ipAddress, false, "Wrong password", userAgent, NqtRateLimitService.ACTION_LOGIN);
                 model.addAttribute("nqtError", "Sai mật khẩu!");
             }
         } else {
+            // User not found - check if this identifier has been locked (for non-existent users, we still track attempts)
+            // But we should check brute force protection to show lock message if applicable
+            NqtRateLimitService.RateLimitResult bruteForceCheck = rateLimitService.checkBruteForceProtection(cleanedUsername);
+            if (bruteForceCheck.isBlocked()) {
+                rateLimitService.recordAttempt(cleanedUsername, ipAddress, false, "Account locked (brute force)", userAgent, NqtRateLimitService.ACTION_LOGIN);
+                model.addAttribute("nqtError", bruteForceCheck.getMessage());
+                model.addAttribute("nqtShow2FA", false);
+                return "admin/login";
+            }
+            
             // Try to find by exact username first for better error message
             Optional<NqtNguoiDung> byUsername = nqtNguoiDungRepository.findByNqtTaiKhoan(cleanedUsername);
             Optional<NqtNguoiDung> byEmail = nqtNguoiDungRepository.findByNqtEmail(cleanedUsername);
             
             if (byUsername.isPresent() || byEmail.isPresent()) {
+                rateLimitService.recordAttempt(cleanedUsername, ipAddress, false, "Wrong password", userAgent, NqtRateLimitService.ACTION_LOGIN);
                 model.addAttribute("nqtError", "Sai mật khẩu!");
             } else {
+                rateLimitService.recordAttempt(cleanedUsername, ipAddress, false, "User not found", userAgent, NqtRateLimitService.ACTION_LOGIN);
                 model.addAttribute("nqtError", "Tài khoản hoặc Email không tồn tại!");
             }
         }
@@ -204,9 +268,25 @@ public class NqtLoginController {
     }
 
     @GetMapping("/admin/logout")
-    public String nqtLogout(HttpSession session, HttpServletResponse response) {
+    public String nqtLogout(HttpServletRequest request, HttpSession session, HttpServletResponse response) {
         // Clear SecurityContext (JWT authentication)
         SecurityContextHolder.clearContext();
+        
+        // Clear all session attributes explicitly
+        if (session != null) {
+            session.removeAttribute("nqtAdminSession");
+            session.removeAttribute("nqtAdminUser");
+            session.removeAttribute("nqtPending2FAUserId");
+            session.removeAttribute("nqtCustomerSession");
+            session.removeAttribute("nqtCustomerUser");
+            
+            // Invalidate session (clears all session attributes)
+            try {
+                session.invalidate();
+            } catch (IllegalStateException e) {
+                // Session already invalidated, ignore
+            }
+        }
         
         // Clear JWT cookie
         Cookie jwtCookie = new Cookie("jwt", null);
@@ -214,9 +294,6 @@ public class NqtLoginController {
         jwtCookie.setPath("/");
         jwtCookie.setMaxAge(0); // Delete cookie
         response.addCookie(jwtCookie);
-        
-        // Invalidate session (clears all session attributes)
-        session.invalidate();
         
         return "redirect:/admin/login";
     }

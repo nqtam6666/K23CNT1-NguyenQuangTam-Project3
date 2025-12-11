@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -100,7 +101,7 @@ public class NqtKhachDatPhongController {
             @RequestParam(value = "nqtGhiChu", required = false) String nqtGhiChu,
             @RequestParam(value = "nqtMaGiamGia", required = false) String nqtMaGiamGia,
             HttpSession session,
-            Model model) {
+            RedirectAttributes redirectAttributes) {
         NqtNguoiDung nqtCustomerUser = (NqtNguoiDung) session.getAttribute("nqtCustomerUser");
 
         if (nqtCustomerUser == null) {
@@ -110,25 +111,41 @@ public class NqtKhachDatPhongController {
         // Validate room
         Optional<NqtPhong> roomOptional = nqtPhongRepository.findById(nqtPhongId);
         if (roomOptional.isEmpty() || !roomOptional.get().getNqtStatus()) {
-            model.addAttribute("nqtError", "Phòng không khả dụng!");
+            redirectAttributes.addFlashAttribute("nqtError", "Phòng không khả dụng!");
             return "redirect:/nqtPhong";
         }
 
         NqtPhong room = roomOptional.get();
 
         // Parse dates
-        LocalDate nqtNgayDen = LocalDate.parse(nqtNgayDenStr);
-        LocalDate nqtNgayDi = LocalDate.parse(nqtNgayDiStr);
+        LocalDate nqtNgayDen;
+        LocalDate nqtNgayDi;
+        try {
+            nqtNgayDen = LocalDate.parse(nqtNgayDenStr);
+            nqtNgayDi = LocalDate.parse(nqtNgayDiStr);
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("nqtError", "Ngày tháng không hợp lệ!");
+            redirectAttributes.addAttribute("phongId", nqtPhongId);
+            redirectAttributes.addAttribute("ngayDen", nqtNgayDenStr);
+            redirectAttributes.addAttribute("ngayDi", nqtNgayDiStr);
+            return "redirect:/nqtDatPhong";
+        }
 
         // Validate dates
         if (nqtNgayDen.isBefore(LocalDate.now())) {
-            model.addAttribute("nqtError", "Ngày đến không hợp lệ!");
-            return "redirect:/nqtDatPhong?phongId=" + nqtPhongId;
+            redirectAttributes.addFlashAttribute("nqtError", "Ngày đến không hợp lệ! Vui lòng chọn ngày từ hôm nay trở đi.");
+            redirectAttributes.addAttribute("phongId", nqtPhongId);
+            redirectAttributes.addAttribute("ngayDen", nqtNgayDenStr);
+            redirectAttributes.addAttribute("ngayDi", nqtNgayDiStr);
+            return "redirect:/nqtDatPhong";
         }
 
         if (nqtNgayDi.isBefore(nqtNgayDen) || nqtNgayDi.isEqual(nqtNgayDen)) {
-            model.addAttribute("nqtError", "Ngày đi phải sau ngày đến!");
-            return "redirect:/nqtDatPhong?phongId=" + nqtPhongId;
+            redirectAttributes.addFlashAttribute("nqtError", "Ngày đi phải sau ngày đến!");
+            redirectAttributes.addAttribute("phongId", nqtPhongId);
+            redirectAttributes.addAttribute("ngayDen", nqtNgayDenStr);
+            redirectAttributes.addAttribute("ngayDi", nqtNgayDiStr);
+            return "redirect:/nqtDatPhong";
         }
 
         // Calculate total price

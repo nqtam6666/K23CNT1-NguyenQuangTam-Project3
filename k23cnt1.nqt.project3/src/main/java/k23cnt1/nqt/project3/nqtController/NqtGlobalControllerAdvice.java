@@ -1,5 +1,6 @@
 package k23cnt1.nqt.project3.nqtController;
 
+import k23cnt1.nqt.project3.nqtService.NqtAdminPathService;
 import k23cnt1.nqt.project3.nqtService.NqtSettingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -13,6 +14,9 @@ public class NqtGlobalControllerAdvice {
 
     @Autowired
     private NqtSettingService nqtSettingService;
+    
+    @Autowired
+    private NqtAdminPathService adminPathService;
 
     @ModelAttribute("nqtWebsiteName")
     public String nqtWebsiteName() {
@@ -129,5 +133,10 @@ public class NqtGlobalControllerAdvice {
             }
         }
         return result;
+    }
+    
+    @ModelAttribute("nqtAdminPath")
+    public String nqtAdminPath() {
+        return adminPathService.getAdminPathWithSlash();
     }
 }

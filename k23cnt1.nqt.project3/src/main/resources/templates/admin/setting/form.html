@@ -26,10 +26,18 @@
                     class="px-4 py-2 rounded-md font-medium transition-all text-white hover:bg-gray-600">
                     LINK HỖ TRỢ
                 </button>
+                <button type="button" onclick="showTab('ratelimit')" id="tab-ratelimit"
+                    class="px-4 py-2 rounded-md font-medium transition-all text-white hover:bg-gray-600">
+                    RATE LIMITING & BRUTE FORCE
+                </button>
+                <button type="button" onclick="showTab('security')" id="tab-security"
+                    class="px-4 py-2 rounded-md font-medium transition-all text-white hover:bg-gray-600">
+                    BẢO MẬT
+                </button>
             </div>
         </div>
 
-        <form th:action="@{/admin/setting}" method="post" enctype="multipart/form-data" autocomplete="off"
+        <form th:action="${nqtAdminPath} + '/setting'" method="post" enctype="multipart/form-data" autocomplete="off"
             class="bg-white shadow-md rounded-lg p-6 max-w-4xl">
             <!-- Hidden fields to prevent browser autocomplete -->
             <input type="text" style="position: absolute; left: -9999px;" tabindex="-1" autocomplete="chrome-off">
@@ -247,6 +255,211 @@
                 </div>
             </div>
 
+            <!-- Tab: RATE LIMITING & BRUTE FORCE -->
+            <div id="content-ratelimit" class="tab-content hidden">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">Cấu hình Rate Limiting & Brute Force Protection</h3>
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                    <p class="text-sm text-yellow-800"><strong>Lưu ý:</strong> Các cài đặt này giúp bảo vệ hệ thống khỏi các cuộc tấn công brute force và rate limiting. Thay đổi các giá trị này có thể ảnh hưởng đến trải nghiệm người dùng.</p>
+                </div>
+
+                <div class="mb-6 border-b pb-4">
+                    <h4 class="text-md font-semibold text-gray-700 mb-3">Brute Force Protection (Bảo vệ chống tấn công brute force)</h4>
+                    
+                    <div class="mb-4">
+                        <label for="rate_limit_max_failed_attempts" class="block text-sm font-medium text-gray-700 mb-1">
+                            Số lần đăng nhập sai tối đa trước khi khóa tài khoản
+                        </label>
+                        <div class="flex items-center space-x-2">
+                            <input type="number" autocomplete="chrome-off"
+                                min="3" 
+                                max="20" 
+                                step="1"
+                                class="w-32 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                                id="rate_limit_max_failed_attempts" 
+                                name="rate_limit_max_failed_attempts" 
+                                th:value="${rate_limit_max_failed_attempts ?: '5'}"
+                                placeholder="5">
+                            <span class="text-sm text-gray-500">lần (3-20)</span>
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">
+                            Sau khi đăng nhập sai số lần này, tài khoản sẽ bị khóa tạm thời.
+                        </p>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="rate_limit_lockout_duration_minutes" class="block text-sm font-medium text-gray-700 mb-1">
+                            Thời gian khóa tài khoản (phút)
+                        </label>
+                        <div class="flex items-center space-x-2">
+                            <input type="number" autocomplete="chrome-off"
+                                min="5" 
+                                max="1440" 
+                                step="1"
+                                class="w-32 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                                id="rate_limit_lockout_duration_minutes" 
+                                name="rate_limit_lockout_duration_minutes" 
+                                th:value="${rate_limit_lockout_duration_minutes ?: '15'}"
+                                placeholder="15">
+                            <span class="text-sm text-gray-500">phút (5-1440)</span>
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">
+                            Thời gian tài khoản bị khóa sau khi vượt quá số lần đăng nhập sai.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="mb-6 border-b pb-4">
+                    <h4 class="text-md font-semibold text-gray-700 mb-3">Rate Limiting theo Tài khoản/Email</h4>
+                    
+                    <div class="mb-4">
+                        <label for="rate_limit_max_attempts" class="block text-sm font-medium text-gray-700 mb-1">
+                            Số lần thử đăng nhập tối đa trong khoảng thời gian
+                        </label>
+                        <div class="flex items-center space-x-2">
+                            <input type="number" autocomplete="chrome-off"
+                                min="5" 
+                                max="50" 
+                                step="1"
+                                class="w-32 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                                id="rate_limit_max_attempts" 
+                                name="rate_limit_max_attempts" 
+                                th:value="${rate_limit_max_attempts ?: '10'}"
+                                placeholder="10">
+                            <span class="text-sm text-gray-500">lần (5-50)</span>
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">
+                            Giới hạn số lần thử đăng nhập cho mỗi tài khoản/email trong khoảng thời gian.
+                        </p>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="rate_limit_window_minutes" class="block text-sm font-medium text-gray-700 mb-1">
+                            Khoảng thời gian (phút)
+                        </label>
+                        <div class="flex items-center space-x-2">
+                            <input type="number" autocomplete="chrome-off"
+                                min="1" 
+                                max="60" 
+                                step="1"
+                                class="w-32 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                                id="rate_limit_window_minutes" 
+                                name="rate_limit_window_minutes" 
+                                th:value="${rate_limit_window_minutes ?: '15'}"
+                                placeholder="15">
+                            <span class="text-sm text-gray-500">phút (1-60)</span>
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">
+                            Khoảng thời gian tính số lần thử đăng nhập.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="mb-6 border-b pb-4">
+                    <h4 class="text-md font-semibold text-gray-700 mb-3">Rate Limiting theo Địa chỉ IP</h4>
+                    
+                    <div class="mb-4">
+                        <label for="rate_limit_ip_max_attempts" class="block text-sm font-medium text-gray-700 mb-1">
+                            Số lần thử đăng nhập tối đa từ một IP
+                        </label>
+                        <div class="flex items-center space-x-2">
+                            <input type="number" autocomplete="chrome-off"
+                                min="10" 
+                                max="100" 
+                                step="1"
+                                class="w-32 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                                id="rate_limit_ip_max_attempts" 
+                                name="rate_limit_ip_max_attempts" 
+                                th:value="${rate_limit_ip_max_attempts ?: '20'}"
+                                placeholder="20">
+                            <span class="text-sm text-gray-500">lần (10-100)</span>
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">
+                            Giới hạn số lần thử đăng nhập từ một địa chỉ IP trong khoảng thời gian.
+                        </p>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="rate_limit_ip_window_minutes" class="block text-sm font-medium text-gray-700 mb-1">
+                            Khoảng thời gian cho IP (phút)
+                        </label>
+                        <div class="flex items-center space-x-2">
+                            <input type="number" autocomplete="chrome-off"
+                                min="1" 
+                                max="60" 
+                                step="1"
+                                class="w-32 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                                id="rate_limit_ip_window_minutes" 
+                                name="rate_limit_ip_window_minutes" 
+                                th:value="${rate_limit_ip_window_minutes ?: '15'}"
+                                placeholder="15">
+                            <span class="text-sm text-gray-500">phút (1-60)</span>
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">
+                            Khoảng thời gian tính số lần thử đăng nhập từ một IP.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <h4 class="text-md font-semibold text-gray-700 mb-3">Dọn dẹp dữ liệu</h4>
+                    
+                    <div class="mb-4">
+                        <label for="rate_limit_cleanup_days" class="block text-sm font-medium text-gray-700 mb-1">
+                            Số ngày giữ lại lịch sử đăng nhập
+                        </label>
+                        <div class="flex items-center space-x-2">
+                            <input type="number" autocomplete="chrome-off"
+                                min="7" 
+                                max="365" 
+                                step="1"
+                                class="w-32 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                                id="rate_limit_cleanup_days" 
+                                name="rate_limit_cleanup_days" 
+                                th:value="${rate_limit_cleanup_days ?: '30'}"
+                                placeholder="30">
+                            <span class="text-sm text-gray-500">ngày (7-365)</span>
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">
+                            Các bản ghi đăng nhập cũ hơn số ngày này sẽ tự động bị xóa (chạy hàng ngày lúc 2h sáng).
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: BẢO MẬT -->
+            <div id="content-security" class="tab-content hidden">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">Cấu hình Bảo mật</h3>
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                    <p class="text-sm text-blue-800"><strong>Lưu ý:</strong> Thay đổi đường dẫn admin giúp ẩn trang quản trị khỏi các cuộc tấn công tự động. Sau khi thay đổi, bạn cần đăng nhập lại bằng đường dẫn mới.</p>
+                </div>
+
+                <div class="mb-6">
+                    <h4 class="text-md font-semibold text-gray-700 mb-3">Đường dẫn Admin</h4>
+                    
+                    <div class="mb-4">
+                        <label for="admin_path" class="block text-sm font-medium text-gray-700 mb-1">
+                            Đường dẫn trang quản trị
+                        </label>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-gray-500">/</span>
+                            <input type="text" autocomplete="chrome-off"
+                                pattern="[a-zA-Z0-9_-]+"
+                                class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                                id="admin_path" 
+                                name="admin_path" 
+                                th:value="${admin_path ?: 'admin'}"
+                                placeholder="admin">
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">
+                            Chỉ cho phép chữ cái, số, dấu gạch dưới (_) và dấu gạch ngang (-). Không được sử dụng các từ khóa: api, oauth2, login, static, uploads, nqt, favicon.ico
+                        </p>
+                        <p class="mt-1 text-xs text-yellow-600">
+                            <strong>Cảnh báo:</strong> Sau khi thay đổi, đường dẫn hiện tại sẽ không còn hoạt động. Hãy ghi nhớ đường dẫn mới!
+                        </p>
+                    </div>
+                </div>
+            </div>
+
             <div class="mt-6 pt-4 border-t">
                 <button type="submit"
                     class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors">
@@ -342,7 +555,8 @@
                 formData.append('nqtSmtpPassword', document.getElementById('nqtSmtpPassword').value || '');
                 formData.append('nqtSmtpFromEmail', document.getElementById('nqtSmtpFromEmail').value);
                 
-                fetch('/admin/setting/test-smtp', {
+                const adminPath = /*[[${nqtAdminPath}]]*/ '/admin';
+                fetch(adminPath + '/setting/test-smtp', {
                     method: 'POST',
                     body: formData
                 })

@@ -4,6 +4,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import k23cnt1.nqt.project3.nqtEntity.NqtNguoiDung;
+import k23cnt1.nqt.project3.nqtService.NqtAdminPathService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -11,6 +13,9 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 @Component
 public class AdminLoginInterceptor implements HandlerInterceptor {
+    
+    @Autowired
+    private NqtAdminPathService adminPathService;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -43,7 +48,8 @@ public class AdminLoginInterceptor implements HandlerInterceptor {
                 } else {
                     // User không có quyền, xóa session và redirect
                     session.invalidate();
-                    response.sendRedirect("/admin/login?error=noPermission");
+                    String adminLoginPath = adminPathService.getAdminLoginPath();
+                    response.sendRedirect(adminLoginPath + "?error=noPermission");
                     return false;
                 }
             }
@@ -60,7 +66,8 @@ public class AdminLoginInterceptor implements HandlerInterceptor {
         }
         
         // Nếu không có session nào hợp lệ, redirect về login
-        response.sendRedirect("/admin/login");
+        String adminLoginPath = adminPathService.getAdminLoginPath();
+        response.sendRedirect(adminLoginPath);
         return false;
     }
 }
