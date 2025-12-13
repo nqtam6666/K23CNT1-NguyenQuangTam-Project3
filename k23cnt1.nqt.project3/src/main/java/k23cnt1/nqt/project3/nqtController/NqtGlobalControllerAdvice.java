@@ -139,4 +139,20 @@ public class NqtGlobalControllerAdvice {
     public String nqtAdminPath() {
         return adminPathService.getAdminPathWithSlash();
     }
+
+    @ModelAttribute("nqtBannerImages")
+    public List<String> nqtBannerImages() {
+        String bannerImagesJson = nqtSettingService.getNqtValue("nqtBannerImages", "[]");
+        List<String> bannerImagesList = new ArrayList<>();
+        if (bannerImagesJson != null && !bannerImagesJson.trim().isEmpty() && !bannerImagesJson.equals("[]")) {
+            try {
+                com.fasterxml.jackson.databind.ObjectMapper objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                bannerImagesList = objectMapper.readValue(bannerImagesJson, 
+                    objectMapper.getTypeFactory().constructCollectionType(List.class, String.class));
+            } catch (Exception e) {
+                // If JSON parsing fails, return empty list
+            }
+        }
+        return bannerImagesList;
+    }
 }

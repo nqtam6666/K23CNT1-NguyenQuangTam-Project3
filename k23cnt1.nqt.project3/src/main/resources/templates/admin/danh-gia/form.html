@@ -6,7 +6,7 @@
         <div class="flex items-center justify-between mb-6">
             <h2 class="text-2xl font-semibold text-gray-800"
                 th:text="${nqtId != null ? 'Cập nhật Đánh giá' : 'Thêm mới Đánh giá'}"></h2>
-            <a th:href="@{/admin/danh-gia}"
+            <a th:href="${nqtAdminPath} + '/danh-gia'"
                 class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white font-medium rounded-lg shadow-sm transition-colors flex items-center">
                 <i class="bi bi-arrow-left mr-2"></i> Quay lại
             </a>
@@ -14,7 +14,7 @@
 
         <div class="bg-white shadow-md rounded-lg overflow-hidden">
             <div class="p-6">
-                <form th:action="${nqtId != null ? '/admin/danh-gia/edit/' + nqtId : '/admin/danh-gia/create'}"
+                <form th:action="${nqtId != null ? nqtAdminPath + '/danh-gia/edit/' + nqtId : nqtAdminPath + '/danh-gia/create'}"
                     th:object="${nqtRequest}" method="post">
 
                     <div class="mb-4">

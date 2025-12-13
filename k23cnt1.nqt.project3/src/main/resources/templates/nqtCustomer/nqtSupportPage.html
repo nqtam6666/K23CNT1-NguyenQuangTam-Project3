@@ -68,10 +68,14 @@
                 </div>
             </div>
 
-            <div class="mt-8 text-center">
-                <a href="/nqtTrangChu" class="inline-block px-6 py-3 rounded-lg font-semibold transition-all hover:shadow-lg text-white"
-                   th:style="'background: linear-gradient(to right, ' + ${nqtWebsiteColor ?: '#d97706'} + ', ' + ${#strings.replace(nqtWebsiteColor ?: '#d97706', '#', '')} + 'cc);'">
-                    ← Về trang chủ
+            <div class="mt-8 flex justify-center gap-4">
+                <a href="/nqtTrangChu" 
+                   class="inline-flex items-center space-x-2 px-6 py-3 rounded-lg font-semibold transition-all hover:shadow-lg text-white hover:scale-105"
+                   th:style="'background: linear-gradient(to right, ' + ${nqtWebsiteColor ?: '#d97706'} + ', #' + ${#strings.replace(nqtWebsiteColor ?: '#d97706', '#', '')} + 'cc);'">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                    <span>Về trang chủ</span>
                 </a>
             </div>
         </div>

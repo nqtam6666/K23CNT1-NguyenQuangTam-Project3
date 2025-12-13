@@ -127,6 +127,7 @@ public class NqtSupportPageController {
         model.addAttribute("pageTitle", pageInfo.get("name"));
         model.addAttribute("pageContent", pageInfo.get("content"));
         model.addAttribute("pageUrl", pageInfo.get("url"));
+        model.addAttribute("isSupportPage", true); // Đánh dấu đang ở trang support
         
         return "nqtCustomer/nqtSupportPage";
     }

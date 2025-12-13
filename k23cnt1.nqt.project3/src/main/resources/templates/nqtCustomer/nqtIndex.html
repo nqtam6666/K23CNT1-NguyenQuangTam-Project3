@@ -411,8 +411,112 @@
         </div>
     </nav>
 
+    <!-- Banner Carousel -->
+    <section th:if="${nqtBannerImages != null and !nqtBannerImages.isEmpty()}" 
+             class="relative w-full h-[500px] md:h-[600px] lg:h-[700px] overflow-hidden bg-gray-900" 
+             style="margin-top: 80px;">
+        <div class="banner-carousel relative w-full h-full">
+            <div class="carousel-container relative w-full h-full">
+                <div class="carousel-slides flex transition-transform duration-700 ease-in-out" 
+                     id="bannerCarousel">
+                    <div th:each="banner, iterStat : ${nqtBannerImages}" 
+                         class="carousel-slide min-w-full h-full relative"
+                         th:classappend="${iterStat.first} ? 'active' : ''">
+                        <img th:src="${banner}" 
+                             alt="Banner" 
+                             class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black/70"></div>
+                    </div>
+                </div>
+                
+                <!-- Navigation Arrows -->
+                <button onclick="changeBannerSlide(-1)" 
+                        class="absolute left-4 top-1/2 -translate-y-1/2 z-30 bg-white/20 hover:bg-white/40 text-white rounded-full p-3 transition-all backdrop-blur-sm shadow-lg">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                </button>
+                <button onclick="changeBannerSlide(1)" 
+                        class="absolute right-4 top-1/2 -translate-y-1/2 z-30 bg-white/20 hover:bg-white/40 text-white rounded-full p-3 transition-all backdrop-blur-sm shadow-lg">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+                
+                <!-- Dots Indicator -->
+                <div class="absolute bottom-20 left-1/2 -translate-x-1/2 z-30 flex gap-2">
+                    <div th:each="banner, iterStat : ${nqtBannerImages}" 
+                         class="banner-dot w-2 h-2 rounded-full bg-white/50 cursor-pointer transition-all"
+                         th:classappend="${iterStat.first} ? 'bg-white w-8' : ''"
+                         th:onclick="'goToBannerSlide(' + ${iterStat.index} + ')'"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Content Overlay -->
+        <div class="absolute inset-0 z-20 flex items-center">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+                <div class="grid lg:grid-cols-3 gap-8 items-center">
+                    <!-- Left: Headline (2 columns on large screens) -->
+                    <div class="lg:col-span-2 text-white">
+                        <h1 class="font-serif text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
+                            Trải nghiệm <span class="gold-accent">sang trọng</span><br>đẳng cấp thế giới
+                        </h1>
+                        <p class="text-lg md:text-xl text-gray-200 mb-6 leading-relaxed">
+                            Nơi hội tụ tinh hoa kiến trúc, nghệ thuật phục vụ và những khoảnh khắc đáng nhớ nhất
+                        </p>
+                        <div class="flex flex-wrap gap-3">
+                            <a href="#rooms" class="bg-gradient-to-r from-amber-600 to-amber-800 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-2xl transition-all hover:scale-105 text-sm md:text-base">
+                                Khám phá phòng
+                            </a>
+                            <a href="#booking" class="glass text-white px-6 py-3 rounded-lg font-semibold hover:bg-white hover:text-gray-900 transition-all border-2 border-white text-sm md:text-base">
+                                Đặt phòng ngay
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Right: Booking Form (1 column on large screens) -->
+                    <div class="lg:col-span-1">
+                        <div class="bg-white/95 backdrop-blur-md rounded-2xl p-6 md:p-8 shadow-2xl border border-white/20">
+                            <h2 class="font-serif text-2xl md:text-3xl text-gray-900 mb-6 text-center">Đặt phòng</h2>
+                            <form th:action="@{/nqtDatPhong}" method="get" class="space-y-4">
+                                <div>
+                                    <label for="checkin-banner" class="block text-gray-700 text-sm font-medium mb-2">Ngày đến</label>
+                                    <input type="date" id="checkin-banner" name="ngayDen" required
+                                        class="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all">
+                                </div>
+                                <div>
+                                    <label for="checkout-banner" class="block text-gray-700 text-sm font-medium mb-2">Ngày đi</label>
+                                    <input type="date" id="checkout-banner" name="ngayDi" required
+                                        class="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all">
+                                </div>
+                                <div>
+                                    <label for="guests-banner" class="block text-gray-700 text-sm font-medium mb-2">Số khách</label>
+                                    <select id="guests-banner" name="soKhach" required
+                                        class="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all">
+                                        <option value="1">1 khách</option>
+                                        <option value="2">2 khách</option>
+                                        <option value="3">3 khách</option>
+                                        <option value="4">4 khách</option>
+                                        <option value="5+">5+ khách</option>
+                                    </select>
+                                </div>
+                                <button type="submit"
+                                    class="w-full bg-gradient-to-r from-amber-600 to-amber-800 text-white py-3 rounded-lg font-semibold hover:shadow-xl transition-all hover:scale-[1.02] mt-2">
+                                    Tìm phòng phù hợp
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Hero Section -->
-    <section class="hero-bg flex items-center justify-center relative" style="padding-top: 80px;">
+    <section class="hero-bg flex items-center justify-center relative" 
+             th:classappend="${nqtBannerImages == null or nqtBannerImages.isEmpty()} ? '' : 'hidden'"
+             style="padding-top: 80px;">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative" style="z-index: 10;">
             <div class="grid lg:grid-cols-2 gap-12 items-center">
                 <!-- Left: Headline -->
@@ -867,6 +971,77 @@
             }
         });
         
+        // Banner Carousel Script
+        let currentBannerSlide = 0;
+        let bannerSlides = [];
+        let bannerAutoSlideInterval = null;
+
+        function initBannerCarousel() {
+            const carousel = document.getElementById('bannerCarousel');
+            if (!carousel) return;
+            
+            bannerSlides = carousel.querySelectorAll('.carousel-slide');
+            if (bannerSlides.length === 0) return;
+            
+            // Auto slide every 5 seconds
+            startBannerAutoSlide();
+        }
+
+        function changeBannerSlide(direction) {
+            if (bannerSlides.length === 0) return;
+            
+            currentBannerSlide += direction;
+            if (currentBannerSlide < 0) {
+                currentBannerSlide = bannerSlides.length - 1;
+            } else if (currentBannerSlide >= bannerSlides.length) {
+                currentBannerSlide = 0;
+            }
+            
+            updateBannerSlide();
+        }
+
+        function goToBannerSlide(index) {
+            if (bannerSlides.length === 0) return;
+            currentBannerSlide = index;
+            updateBannerSlide();
+        }
+
+        function updateBannerSlide() {
+            const carousel = document.getElementById('bannerCarousel');
+            if (!carousel) return;
+            
+            carousel.style.transform = `translateX(-${currentBannerSlide * 100}%)`;
+            
+            // Update dots
+            const dots = document.querySelectorAll('.banner-dot');
+            dots.forEach((dot, index) => {
+                if (index === currentBannerSlide) {
+                    dot.classList.add('bg-white', 'w-8');
+                    dot.classList.remove('bg-white/50');
+                } else {
+                    dot.classList.remove('bg-white', 'w-8');
+                    dot.classList.add('bg-white/50');
+                }
+            });
+            
+            // Restart auto slide
+            startBannerAutoSlide();
+        }
+
+        function startBannerAutoSlide() {
+            if (bannerAutoSlideInterval) {
+                clearInterval(bannerAutoSlideInterval);
+            }
+            bannerAutoSlideInterval = setInterval(() => {
+                changeBannerSlide(1);
+            }, 5000);
+        }
+
+        // Initialize banner carousel on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initBannerCarousel();
+        });
+
         // Apply dynamic color from settings to all gradient elements
         document.addEventListener('DOMContentLoaded', function() {
             const primaryColor = /*[[${nqtWebsiteColor ?: '#d97706'}]]*/ '#d97706';

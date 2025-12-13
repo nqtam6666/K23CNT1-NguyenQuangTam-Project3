@@ -51,6 +51,7 @@ public class NqtGiamGiaService {
         nqtGiamGia.setNqtSoLuongToiDa(nqtRequest.getNqtSoLuongToiDa());
         nqtGiamGia.setNqtStatus(nqtRequest.getNqtStatus() != null ? nqtRequest.getNqtStatus() : true);
         nqtGiamGia.setNqtSoLuongDaDung(0);
+        nqtGiamGia.setNqtChiChoVip(nqtRequest.getNqtChiChoVip() != null ? nqtRequest.getNqtChiChoVip() : false);
 
         // Set người dùng nếu có
         if (nqtRequest.getNqtNguoiDungId() != null) {
@@ -88,6 +89,9 @@ public class NqtGiamGiaService {
         nqtGiamGia.setNqtSoLuongToiDa(nqtRequest.getNqtSoLuongToiDa());
         if (nqtRequest.getNqtStatus() != null) {
             nqtGiamGia.setNqtStatus(nqtRequest.getNqtStatus());
+        }
+        if (nqtRequest.getNqtChiChoVip() != null) {
+            nqtGiamGia.setNqtChiChoVip(nqtRequest.getNqtChiChoVip());
         }
 
         // Set người dùng nếu có
@@ -133,6 +137,7 @@ public class NqtGiamGiaService {
             nqtResponse.setNqtNguoiDungId(null);
             nqtResponse.setNqtNguoiDungTen(null);
         }
+        nqtResponse.setNqtChiChoVip(nqtGiamGia.getNqtChiChoVip() != null ? nqtGiamGia.getNqtChiChoVip() : false);
 
         return nqtResponse;
     }

@@ -10,7 +10,7 @@
                 <i class="bi bi-person-check mr-2" th:if="${nqtId != null}"></i>
                 <span th:text="${nqtId != null ? 'Sửa Người dùng' : 'Thêm Người dùng'}"></span>
             </h2>
-            <a th:href="@{/admin/nguoi-dung}"
+            <a th:href="${nqtAdminPath} + '/nguoi-dung'"
                 class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white font-medium rounded-lg shadow-sm transition-colors flex items-center">
                 <i class="bi bi-arrow-left mr-2"></i> Quay lại
             </a>
@@ -18,7 +18,7 @@
 
         <div class="bg-white shadow-md rounded-lg overflow-hidden">
             <div class="p-6">
-                <form th:action="${nqtId != null ? '/admin/nguoi-dung/edit/' + nqtId : '/admin/nguoi-dung/create'}"
+                <form th:action="${nqtId != null ? nqtAdminPath + '/nguoi-dung/edit/' + nqtId : nqtAdminPath + '/nguoi-dung/create'}"
                     th:object="${nqtRequest}" method="post">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="mb-4">
@@ -93,7 +93,7 @@
                             class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors flex items-center">
                             <i class="bi bi-save mr-2"></i> Lưu
                         </button>
-                        <a th:href="@{/admin/nguoi-dung}"
+                        <a th:href="${nqtAdminPath} + '/nguoi-dung'"
                             class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white font-medium rounded-lg shadow-sm transition-colors">Hủy</a>
                     </div>
                 </form>

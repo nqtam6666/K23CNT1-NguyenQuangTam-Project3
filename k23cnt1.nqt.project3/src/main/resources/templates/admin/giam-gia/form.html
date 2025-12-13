@@ -9,7 +9,7 @@
                 <i class="bi bi-ticket-perforated mr-2"></i>
                 <span th:text="${nqtId != null ? 'Sửa Mã Giảm Giá' : 'Thêm Mã Giảm Giá'}"></span>
             </h2>
-            <a th:href="@{/admin/giam-gia}"
+            <a th:href="${nqtAdminPath} + '/giam-gia'"
                 class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white font-medium rounded-lg shadow-sm transition-colors flex items-center">
                 <i class="bi bi-arrow-left mr-2"></i> Quay lại
             </a>
@@ -17,7 +17,7 @@
 
         <div class="bg-white shadow-md rounded-lg overflow-hidden">
             <div class="p-6">
-                <form th:action="${nqtId != null ? '/admin/giam-gia/edit/' + nqtId : '/admin/giam-gia/create'}"
+                <form th:action="${nqtId != null ? nqtAdminPath + '/giam-gia/edit/' + nqtId : nqtAdminPath + '/giam-gia/create'}"
                     th:object="${nqtRequest}" method="post">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="mb-4">
@@ -92,12 +92,20 @@
                             <select
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                                 th:field="*{nqtNguoiDungId}">
-                                <option value="">-- Chung cho tất cả VIP --</option>
+                                <option value="">-- Chung cho tất cả mọi người --</option>
                                 <option th:each="user : ${nqtNguoiDungList}" th:value="${user.nqtId}"
                                     th:text="${user.nqtHoVaTen} + ' (' + ${user.nqtTaiKhoan} + ')'"></option>
                             </select>
-                            <p class="mt-1 text-xs text-gray-500">Để trống = mã chung cho tất cả khách VIP. Chọn khách
+                            <p class="mt-1 text-xs text-gray-500">Để trống = mã chung cho tất cả mọi người. Chọn khách
                                 hàng = mã riêng cho khách hàng đó</p>
+                        </div>
+                        <div class="mb-4 flex items-center">
+                            <input type="checkbox" 
+                                class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                id="nqtChiChoVip" th:field="*{nqtChiChoVip}">
+                            <label class="ml-2 block text-sm text-gray-700" for="nqtChiChoVip">
+                                Chỉ áp dụng cho khách VIP
+                            </label>
                         </div>
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Trạng thái</label>
@@ -114,7 +122,7 @@
                             class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors flex items-center">
                             <i class="bi bi-save mr-2"></i> Lưu
                         </button>
-                        <a th:href="@{/admin/giam-gia}"
+                        <a th:href="${nqtAdminPath} + '/giam-gia'"
                             class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white font-medium rounded-lg shadow-sm transition-colors">Hủy</a>
                     </div>
                 </form>

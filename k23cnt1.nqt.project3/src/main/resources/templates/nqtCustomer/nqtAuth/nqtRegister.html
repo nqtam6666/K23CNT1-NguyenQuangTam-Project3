@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org"
-    th:replace="~{nqtCustomer/layout :: layout(title='Đăng ký - ' + (nqtWebsiteName ?: 'Hotel NQT'), description='Đăng ký tài khoản mới - ' + (nqtWebsiteName ?: 'Hotel NQT'))}">
+    th:replace="~{nqtCustomer/layout :: layout(title='Đăng ký', description='Đăng ký tài khoản mới')}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -94,17 +94,55 @@
                     </div>
 
                     <div>
-                        <label for="nqtMatKhau" class="block text-sm font-medium text-gray-700 mb-2">Mật khẩu <span class="text-red-500">*</span></label>
+                        <div class="flex items-center justify-between mb-2">
+                            <label for="nqtMatKhau" class="block text-sm font-medium text-gray-700">Mật khẩu <span class="text-red-500">*</span></label>
+                            <button type="button" id="btnGeneratePassword"
+                                class="text-xs px-3 py-1.5 rounded-md font-medium transition-all hover:shadow-md cursor-pointer"
+                                th:style="'background: ' + ${nqtWebsiteColor ?: '#d97706'} + '; color: white;'"
+                                style="background: #d97706; color: white;">
+                                <svg class="w-3 h-3 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                </svg>
+                                Tạo mật khẩu mạnh
+                            </button>
+                        </div>
+                        <div class="relative">
                         <input type="password" id="nqtMatKhau" name="nqtMatKhau" required
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 transition-all input-focus"
+                                class="w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg focus:ring-2 transition-all input-focus"
                             placeholder="Nhập mật khẩu">
+                            <button type="button" id="btnTogglePassword" data-input-id="nqtMatKhau" data-icon-id="togglePasswordIcon"
+                                class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700">
+                                <svg id="togglePasswordIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <div id="passwordStrength" class="mt-2 hidden">
+                            <div class="flex items-center gap-2 mb-1">
+                                <div class="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                    <div id="passwordStrengthBar" class="h-full transition-all duration-300 rounded-full"></div>
+                                </div>
+                                <span id="passwordStrengthText" class="text-xs font-medium"></span>
+                            </div>
+                        </div>
                     </div>
 
                     <div>
                         <label for="nqtMatKhauXacNhan" class="block text-sm font-medium text-gray-700 mb-2">Xác nhận mật khẩu <span class="text-red-500">*</span></label>
+                        <div class="relative">
                         <input type="password" id="nqtMatKhauXacNhan" name="nqtMatKhauXacNhan" required
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 transition-all input-focus"
+                                class="w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg focus:ring-2 transition-all input-focus"
                             placeholder="Nhập lại mật khẩu">
+                            <button type="button" id="btnTogglePasswordConfirm" data-input-id="nqtMatKhauXacNhan" data-icon-id="togglePasswordConfirmIcon"
+                                class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700">
+                                <svg id="togglePasswordConfirmIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <div id="passwordMatch" class="mt-2 text-sm hidden"></div>
                     </div>
 
                     <button type="submit" id="btn-register-submit"
@@ -129,7 +167,11 @@
             </div>
         </div>
     </div>
+    
+    <!-- Scripts for password functionality -->
     <script>
+        console.log('Register page script loading...');
+        // Define all functions immediately in global scope
         // Helper function to convert hex to RGB
         function hexToRgb(hex) {
             // Remove # if present
@@ -160,7 +202,183 @@
             }
         }
         
-        document.addEventListener('DOMContentLoaded', function() {
+        // Generate strong password function - define before DOMContentLoaded
+        function generateStrongPassword(event) {
+            try {
+                const length = 16;
+                const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                const lowercase = 'abcdefghijklmnopqrstuvwxyz';
+                const numbers = '0123456789';
+                const symbols = '!@#$%^&*()_+-=[]{}|;:,.<>?';
+                const allChars = uppercase + lowercase + numbers + symbols;
+                
+                let password = '';
+                // Ensure at least one character from each category
+                password += uppercase[Math.floor(Math.random() * uppercase.length)];
+                password += lowercase[Math.floor(Math.random() * lowercase.length)];
+                password += numbers[Math.floor(Math.random() * numbers.length)];
+                password += symbols[Math.floor(Math.random() * symbols.length)];
+                
+                // Fill the rest randomly
+                for (let i = password.length; i < length; i++) {
+                    password += allChars[Math.floor(Math.random() * allChars.length)];
+                }
+                
+                // Shuffle the password
+                password = password.split('').sort(() => Math.random() - 0.5).join('');
+                
+                // Set password in both fields
+                const passwordInput = document.getElementById('nqtMatKhau');
+                const confirmInput = document.getElementById('nqtMatKhauXacNhan');
+                
+                if (passwordInput && confirmInput) {
+                    passwordInput.value = password;
+                    confirmInput.value = password;
+                    
+                    // Trigger events to update strength and match indicators
+                    passwordInput.dispatchEvent(new Event('input', { bubbles: true }));
+                    confirmInput.dispatchEvent(new Event('input', { bubbles: true }));
+                    
+                    // Show success message
+                    const button = event ? event.target.closest('button') : document.querySelector('button[onclick*="generateStrongPassword"]');
+                    if (button) {
+                        const originalText = button.innerHTML;
+                        const originalStyle = button.style.cssText;
+                        button.innerHTML = '<svg class="w-3 h-3 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Đã tạo!';
+                        button.style.background = '#10b981';
+                        button.style.color = 'white';
+                        setTimeout(() => {
+                            button.innerHTML = originalText;
+                            button.style.cssText = originalStyle;
+                        }, 2000);
+                    }
+                }
+            } catch (error) {
+                console.error('Error generating password:', error);
+                alert('Có lỗi xảy ra khi tạo mật khẩu. Vui lòng thử lại.');
+            }
+        }
+        
+        // Toggle password visibility function
+        function togglePasswordVisibility(inputId, iconId) {
+            try {
+                const input = document.getElementById(inputId);
+                const icon = document.getElementById(iconId);
+                
+                if (!input || !icon) {
+                    console.error('Input or icon not found:', inputId, iconId);
+                    return;
+                }
+                
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>';
+                } else {
+                    input.type = 'password';
+                    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>';
+                }
+            } catch (error) {
+                console.error('Error toggling password visibility:', error);
+            }
+        }
+        
+        // Check password strength
+        function checkPasswordStrength(password) {
+            let strength = 0;
+            let feedback = [];
+            
+            if (password.length >= 8) strength++;
+            else feedback.push('Ít nhất 8 ký tự');
+            
+            if (password.length >= 12) strength++;
+            if (/[a-z]/.test(password)) strength++;
+            else feedback.push('Có chữ thường');
+            
+            if (/[A-Z]/.test(password)) strength++;
+            else feedback.push('Có chữ hoa');
+            
+            if (/[0-9]/.test(password)) strength++;
+            else feedback.push('Có số');
+            
+            if (/[^A-Za-z0-9]/.test(password)) strength++;
+            else feedback.push('Có ký tự đặc biệt');
+            
+            return { strength, feedback };
+        }
+        
+        // Update password strength indicator
+        function updatePasswordStrength() {
+            const password = document.getElementById('nqtMatKhau').value;
+            const strengthDiv = document.getElementById('passwordStrength');
+            const strengthBar = document.getElementById('passwordStrengthBar');
+            const strengthText = document.getElementById('passwordStrengthText');
+            
+            if (password.length === 0) {
+                strengthDiv.classList.add('hidden');
+                return;
+            }
+            
+            strengthDiv.classList.remove('hidden');
+            const { strength, feedback } = checkPasswordStrength(password);
+            
+            let color, text, width;
+            if (strength <= 2) {
+                color = '#ef4444'; // red
+                text = 'Yếu';
+                width = '25%';
+            } else if (strength <= 3) {
+                color = '#f59e0b'; // orange
+                text = 'Trung bình';
+                width = '50%';
+            } else if (strength <= 4) {
+                color = '#3b82f6'; // blue
+                text = 'Khá';
+                width = '75%';
+            } else {
+                color = '#10b981'; // green
+                text = 'Mạnh';
+                width = '100%';
+            }
+            
+            strengthBar.style.width = width;
+            strengthBar.style.backgroundColor = color;
+            strengthText.textContent = text;
+            strengthText.style.color = color;
+        }
+        
+        // Check password match
+        function checkPasswordMatch() {
+            const password = document.getElementById('nqtMatKhau').value;
+            const confirm = document.getElementById('nqtMatKhauXacNhan').value;
+            const matchDiv = document.getElementById('passwordMatch');
+            
+            if (confirm.length === 0) {
+                matchDiv.classList.add('hidden');
+                return;
+            }
+            
+            matchDiv.classList.remove('hidden');
+            if (password === confirm) {
+                matchDiv.textContent = '✓ Mật khẩu khớp';
+                matchDiv.style.color = '#10b981';
+            } else {
+                matchDiv.textContent = '✗ Mật khẩu không khớp';
+                matchDiv.style.color = '#ef4444';
+            }
+        }
+        
+        // Make functions globally available immediately
+        window.generateStrongPassword = generateStrongPassword;
+        window.togglePasswordVisibility = togglePasswordVisibility;
+        
+        // Debug: Log that functions are defined
+        console.log('Password functions defined:', {
+            generateStrongPassword: typeof window.generateStrongPassword,
+            togglePasswordVisibility: typeof window.togglePasswordVisibility
+        });
+        
+        // Initialize when DOM is ready
+        function initPasswordFeatures() {
             const primaryColor = /*[[${nqtWebsiteColor ?: '#d97706'}]]*/ '#d97706';
             
             // Apply button color
@@ -182,7 +400,52 @@
                     this.style.boxShadow = '';
                 });
             });
-        });
+            
+            // Password strength checker
+            const passwordInput = document.getElementById('nqtMatKhau');
+            const confirmInput = document.getElementById('nqtMatKhauXacNhan');
+            
+            if (passwordInput) {
+                passwordInput.addEventListener('input', updatePasswordStrength);
+                passwordInput.addEventListener('input', checkPasswordMatch);
+            }
+            if (confirmInput) {
+                confirmInput.addEventListener('input', checkPasswordMatch);
+            }
+            
+            // Attach event listeners to buttons
+            const btnGeneratePassword = document.getElementById('btnGeneratePassword');
+            if (btnGeneratePassword) {
+                btnGeneratePassword.addEventListener('click', function(event) {
+                    generateStrongPassword(event);
+                });
+            }
+            
+            const btnTogglePassword = document.getElementById('btnTogglePassword');
+            if (btnTogglePassword) {
+                btnTogglePassword.addEventListener('click', function() {
+                    const inputId = btnTogglePassword.getAttribute('data-input-id');
+                    const iconId = btnTogglePassword.getAttribute('data-icon-id');
+                    togglePasswordVisibility(inputId, iconId);
+                });
+            }
+            
+            const btnTogglePasswordConfirm = document.getElementById('btnTogglePasswordConfirm');
+            if (btnTogglePasswordConfirm) {
+                btnTogglePasswordConfirm.addEventListener('click', function() {
+                    const inputId = btnTogglePasswordConfirm.getAttribute('data-input-id');
+                    const iconId = btnTogglePasswordConfirm.getAttribute('data-icon-id');
+                    togglePasswordVisibility(inputId, iconId);
+                });
+            }
+            
+        // Run initialization
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initPasswordFeatures);
+        } else {
+            // DOM already loaded
+            initPasswordFeatures();
+        }
     </script>
 </body>
 </html>

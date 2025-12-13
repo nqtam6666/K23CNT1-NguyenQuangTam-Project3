@@ -202,7 +202,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/nguoi-dung";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/nguoi-dung";
     }
 
     @GetMapping("/admin/nguoi-dung/edit/{nqtId}")
@@ -214,7 +214,7 @@ public class NqtAdminController {
         NqtNguoiDung currentUser = (NqtNguoiDung) session.getAttribute("nqtAdminUser");
         if (currentUser != null && currentUser.getNqtVaiTro() != 99 && nqtResponse.getNqtVaiTro() == 99) {
             redirectAttributes.addFlashAttribute("nqtError", "Bạn không được phép chỉnh sửa tài khoản Admin!");
-            return "redirect:/admin/nguoi-dung";
+            return "redirect:" + adminPathService.getAdminPathWithSlash() + "/nguoi-dung";
         }
         NqtNguoiDungRequest nqtRequest = new NqtNguoiDungRequest();
         nqtRequest.setNqtHoVaTen(nqtResponse.getNqtHoVaTen());
@@ -239,14 +239,14 @@ public class NqtAdminController {
             NqtNguoiDungResponse targetUser = nqtNguoiDungService.nqtGetById(nqtId);
             if (currentUser != null && currentUser.getNqtVaiTro() != 99 && targetUser.getNqtVaiTro() == 99) {
                 redirectAttributes.addFlashAttribute("nqtError", "Bạn không được phép chỉnh sửa tài khoản Admin!");
-                return "redirect:/admin/nguoi-dung";
+                return "redirect:" + adminPathService.getAdminPathWithSlash() + "/nguoi-dung";
             }
             nqtNguoiDungService.nqtUpdate(nqtId, nqtRequest);
             redirectAttributes.addFlashAttribute("nqtSuccess", "Cập nhật thành công!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/nguoi-dung";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/nguoi-dung";
     }
 
     @GetMapping("/admin/nguoi-dung/delete/{nqtId}")
@@ -258,14 +258,14 @@ public class NqtAdminController {
             NqtNguoiDungResponse targetUser = nqtNguoiDungService.nqtGetById(nqtId);
             if (currentUser != null && currentUser.getNqtVaiTro() != 99 && targetUser.getNqtVaiTro() == 99) {
                 redirectAttributes.addFlashAttribute("nqtError", "Bạn không được phép xóa tài khoản Admin!");
-                return "redirect:/admin/nguoi-dung";
+                return "redirect:" + adminPathService.getAdminPathWithSlash() + "/nguoi-dung";
             }
             nqtNguoiDungService.nqtDelete(nqtId);
             redirectAttributes.addFlashAttribute("nqtSuccess", "Xóa thành công!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/nguoi-dung";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/nguoi-dung";
     }
 
     // Bulk Actions for Người dùng
@@ -295,7 +295,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/nguoi-dung";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/nguoi-dung";
     }
 
     @PostMapping("/admin/nguoi-dung/bulk-deactivate")
@@ -324,7 +324,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/nguoi-dung";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/nguoi-dung";
     }
 
     @PostMapping("/admin/nguoi-dung/bulk-delete")
@@ -359,7 +359,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/nguoi-dung";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/nguoi-dung";
     }
 
     // ========== LOẠI PHÒNG ==========
@@ -389,7 +389,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/loai-phong";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/loai-phong";
     }
 
     @GetMapping("/admin/loai-phong/edit/{nqtId}")
@@ -422,7 +422,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/loai-phong";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/loai-phong";
     }
 
     @GetMapping("/admin/loai-phong/delete/{nqtId}")
@@ -433,7 +433,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/loai-phong";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/loai-phong";
     }
 
     // Bulk Actions for Loại phòng
@@ -463,7 +463,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/loai-phong";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/loai-phong";
     }
 
     @PostMapping("/admin/loai-phong/bulk-deactivate")
@@ -492,7 +492,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/loai-phong";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/loai-phong";
     }
 
     @PostMapping("/admin/loai-phong/bulk-delete")
@@ -511,7 +511,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/loai-phong";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/loai-phong";
     }
 
     // ========== PHÒNG ==========
@@ -540,7 +540,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/phong";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/phong";
     }
 
     @GetMapping("/admin/phong/edit/{nqtId}")
@@ -567,7 +567,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/phong";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/phong";
     }
 
     @GetMapping("/admin/phong/delete/{nqtId}")
@@ -578,7 +578,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/phong";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/phong";
     }
 
     // Bulk Actions for Phòng
@@ -604,7 +604,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/phong";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/phong";
     }
 
     @PostMapping("/admin/phong/bulk-deactivate")
@@ -629,7 +629,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/phong";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/phong";
     }
 
     @PostMapping("/admin/phong/bulk-delete")
@@ -648,7 +648,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/phong";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/phong";
     }
 
     // ========== ĐẶT PHÒNG ==========
@@ -680,7 +680,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/dat-phong";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/dat-phong";
     }
 
     @GetMapping("/admin/dat-phong/edit/{nqtId}")
@@ -717,7 +717,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/dat-phong";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/dat-phong";
     }
 
     @GetMapping("/admin/dat-phong/delete/{nqtId}")
@@ -728,7 +728,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/dat-phong";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/dat-phong";
     }
 
     // Bulk Actions for Đặt phòng
@@ -748,7 +748,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/dat-phong";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/dat-phong";
     }
 
     // ========== DỊCH VỤ ==========
@@ -778,7 +778,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/dich-vu";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/dich-vu";
     }
 
     @GetMapping("/admin/dich-vu/edit/{nqtId}")
@@ -810,7 +810,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/dich-vu";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/dich-vu";
     }
 
     @GetMapping("/admin/dich-vu/delete/{nqtId}")
@@ -821,7 +821,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/dich-vu";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/dich-vu";
     }
 
     // Bulk Actions for Dịch vụ
@@ -850,7 +850,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/dich-vu";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/dich-vu";
     }
 
     @PostMapping("/admin/dich-vu/bulk-deactivate")
@@ -878,7 +878,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/dich-vu";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/dich-vu";
     }
 
     @PostMapping("/admin/dich-vu/bulk-delete")
@@ -897,7 +897,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/dich-vu";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/dich-vu";
     }
 
     // ========== ĐƠN GIÁ DỊCH VỤ ==========
@@ -927,7 +927,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/don-gia-dich-vu";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/don-gia-dich-vu";
     }
 
     @GetMapping("/admin/don-gia-dich-vu/edit/{nqtId}")
@@ -956,7 +956,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/don-gia-dich-vu";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/don-gia-dich-vu";
     }
 
     @GetMapping("/admin/don-gia-dich-vu/delete/{nqtId}")
@@ -967,7 +967,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/don-gia-dich-vu";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/don-gia-dich-vu";
     }
 
     // Bulk Actions for Đơn giá dịch vụ
@@ -987,7 +987,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/don-gia-dich-vu";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/don-gia-dich-vu";
     }
 
     // ========== ĐÁNH GIÁ ==========
@@ -1015,7 +1015,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/danh-gia";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/danh-gia";
     }
 
     @GetMapping("/admin/danh-gia/edit/{nqtId}")
@@ -1041,7 +1041,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/danh-gia";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/danh-gia";
     }
 
     @GetMapping("/admin/danh-gia/delete/{nqtId}")
@@ -1052,7 +1052,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/danh-gia";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/danh-gia";
     }
 
     // Bulk Actions for Đánh giá
@@ -1077,7 +1077,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/danh-gia";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/danh-gia";
     }
 
     @PostMapping("/admin/danh-gia/bulk-deactivate")
@@ -1101,7 +1101,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/danh-gia";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/danh-gia";
     }
 
     @PostMapping("/admin/danh-gia/bulk-delete")
@@ -1120,7 +1120,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/danh-gia";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/danh-gia";
     }
 
     // ========== BLOG ==========
@@ -1150,7 +1150,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/blog";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/blog";
     }
 
     @GetMapping("/admin/blog/edit/{nqtId}")
@@ -1182,7 +1182,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/blog";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/blog";
     }
 
     @GetMapping("/admin/blog/delete/{nqtId}")
@@ -1193,7 +1193,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/blog";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/blog";
     }
 
     // Bulk Actions for Blog
@@ -1222,7 +1222,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/blog";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/blog";
     }
 
     @PostMapping("/admin/blog/bulk-deactivate")
@@ -1250,7 +1250,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/blog";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/blog";
     }
 
     @PostMapping("/admin/blog/bulk-delete")
@@ -1269,7 +1269,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/blog";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/blog";
     }
 
     // ========== CẤU HÌNH ==========
@@ -1310,6 +1310,22 @@ public class NqtAdminController {
         // Admin Path Setting - use service to get sanitized path (without leading slash)
         model.addAttribute("admin_path", adminPathService.getAdminPath());
         
+        // Banner Images
+        String bannerImagesJson = nqtSettingService.getNqtValue("nqtBannerImages", "[]");
+        try {
+            java.util.List<String> bannerImagesList = new java.util.ArrayList<>();
+            if (bannerImagesJson != null && !bannerImagesJson.trim().isEmpty() && !bannerImagesJson.equals("[]")) {
+                com.fasterxml.jackson.databind.ObjectMapper objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                bannerImagesList = objectMapper.readValue(bannerImagesJson, 
+                    objectMapper.getTypeFactory().constructCollectionType(java.util.List.class, String.class));
+            }
+            model.addAttribute("bannerImagesList", bannerImagesList);
+            model.addAttribute("bannerImagesJson", bannerImagesJson);
+        } catch (Exception e) {
+            model.addAttribute("bannerImagesList", new java.util.ArrayList<>());
+            model.addAttribute("bannerImagesJson", "[]");
+        }
+        
         return "admin/setting/form";
     }
 
@@ -1345,6 +1361,7 @@ public class NqtAdminController {
             @RequestParam(value = "rate_limit_ip_window_minutes", required = false) String rate_limit_ip_window_minutes,
             @RequestParam(value = "rate_limit_cleanup_days", required = false) String rate_limit_cleanup_days,
             @RequestParam(value = "admin_path", required = false) String admin_path,
+            @RequestParam(value = "bannerImagesJson", required = false) String bannerImagesJson,
             RedirectAttributes redirectAttributes) {
         try {
             if (nqtWebsiteLogoFile != null && !nqtWebsiteLogoFile.isEmpty()) {
@@ -1445,6 +1462,11 @@ public class NqtAdminController {
                 }
             }
             
+            // Save Banner Images
+            if (bannerImagesJson != null && !bannerImagesJson.trim().isEmpty()) {
+                nqtSettingService.saveNqtValue("nqtBannerImages", bannerImagesJson);
+            }
+            
             redirectAttributes.addFlashAttribute("nqtSuccess", "Cập nhật cấu hình thành công!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
@@ -1495,6 +1517,63 @@ public class NqtAdminController {
         return result;
     }
 
+    @PostMapping(value = {
+        "/admin/setting/upload-banner", 
+        "/nqtAdmin/setting/upload-banner"
+    }, produces = "application/json")
+    @ResponseBody
+    public org.springframework.http.ResponseEntity<java.util.Map<String, Object>> uploadBannerImages(
+            jakarta.servlet.http.HttpServletRequest request,
+            @RequestParam("bannerImages") List<MultipartFile> bannerImages) {
+        String requestURI = request.getRequestURI();
+        System.out.println("uploadBannerImages endpoint called, URI: " + requestURI);
+        java.util.Map<String, Object> result = new java.util.HashMap<>();
+        java.util.List<String> uploadedImages = new java.util.ArrayList<>();
+        
+        try {
+            if (bannerImages == null || bannerImages.isEmpty()) {
+                result.put("success", false);
+                result.put("message", "Không có ảnh nào được chọn");
+                return org.springframework.http.ResponseEntity.ok(result);
+            }
+            
+            for (MultipartFile file : bannerImages) {
+                if (file != null && !file.isEmpty()) {
+                    try {
+                        String imagePath = saveFile(file);
+                        if (imagePath != null && !imagePath.isEmpty()) {
+                            uploadedImages.add(imagePath);
+                        }
+                    } catch (Exception e) {
+                        System.err.println("Error saving file: " + e.getMessage());
+                        e.printStackTrace();
+                    }
+                }
+            }
+            
+            if (uploadedImages.isEmpty()) {
+                result.put("success", false);
+                result.put("message", "Không thể upload ảnh. Vui lòng kiểm tra định dạng và kích thước file.");
+            } else {
+                result.put("success", true);
+                result.put("images", uploadedImages);
+                result.put("message", "Đã upload " + uploadedImages.size() + " ảnh thành công!");
+            }
+            
+            return org.springframework.http.ResponseEntity.ok()
+                    .header("Content-Type", "application/json")
+                    .body(result);
+        } catch (Exception e) {
+            System.err.println("Error in uploadBannerImages: " + e.getMessage());
+            e.printStackTrace();
+            result.put("success", false);
+            result.put("message", "Lỗi khi upload ảnh: " + (e.getMessage() != null ? e.getMessage() : "Lỗi không xác định"));
+            return org.springframework.http.ResponseEntity.ok()
+                    .header("Content-Type", "application/json")
+                    .body(result);
+        }
+    }
+
     // ========== MÃ GIẢM GIÁ ==========
     @GetMapping("/admin/giam-gia")
     public String nqtGiamGiaList(Model model) {
@@ -1519,7 +1598,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/giam-gia";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/giam-gia";
     }
 
     @GetMapping("/admin/giam-gia/edit/{nqtId}")
@@ -1537,6 +1616,7 @@ public class NqtAdminController {
         nqtRequest.setNqtSoLuongToiDa(nqtResponse.getNqtSoLuongToiDa());
         nqtRequest.setNqtStatus(nqtResponse.getNqtStatus());
         nqtRequest.setNqtNguoiDungId(nqtResponse.getNqtNguoiDungId());
+        nqtRequest.setNqtChiChoVip(nqtResponse.getNqtChiChoVip());
 
         List<NqtNguoiDungResponse> nqtNguoiDungList = nqtNguoiDungService.nqtGetAll();
         model.addAttribute("nqtRequest", nqtRequest);
@@ -1554,7 +1634,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/giam-gia";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/giam-gia";
     }
 
     @GetMapping("/admin/giam-gia/delete/{nqtId}")
@@ -1565,7 +1645,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/giam-gia";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/giam-gia";
     }
 
     // Bulk Actions for Mã giảm giá
@@ -1588,6 +1668,7 @@ public class NqtAdminController {
                     request.setNqtSoLuongToiDa(giamGia.getNqtSoLuongToiDa());
                     request.setNqtStatus(true);
                     request.setNqtNguoiDungId(giamGia.getNqtNguoiDungId());
+                    request.setNqtChiChoVip(giamGia.getNqtChiChoVip());
                     nqtGiamGiaService.nqtUpdate(id, request);
                     count++;
                 } catch (Exception e) {
@@ -1598,7 +1679,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/giam-gia";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/giam-gia";
     }
 
     @PostMapping("/admin/giam-gia/bulk-deactivate")
@@ -1620,6 +1701,7 @@ public class NqtAdminController {
                     request.setNqtSoLuongToiDa(giamGia.getNqtSoLuongToiDa());
                     request.setNqtStatus(false);
                     request.setNqtNguoiDungId(giamGia.getNqtNguoiDungId());
+                    request.setNqtChiChoVip(giamGia.getNqtChiChoVip());
                     nqtGiamGiaService.nqtUpdate(id, request);
                     count++;
                 } catch (Exception e) {
@@ -1630,7 +1712,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/giam-gia";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/giam-gia";
     }
 
     @PostMapping("/admin/giam-gia/bulk-delete")
@@ -1649,7 +1731,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/giam-gia";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/giam-gia";
     }
 
     // ========== CRON LOG ==========
@@ -1710,7 +1792,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/cron-log";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/cron-log";
     }
 
     @GetMapping("/admin/cron-log/clear-all")
@@ -1721,7 +1803,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/cron-log";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/cron-log";
     }
 
     // ========== NGÂN HÀNG ==========
@@ -1746,7 +1828,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/ngan-hang";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/ngan-hang";
     }
 
     @GetMapping("/admin/ngan-hang/edit/{nqtId}")
@@ -1776,7 +1858,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/ngan-hang";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/ngan-hang";
     }
 
     @GetMapping("/admin/ngan-hang/delete/{nqtId}")
@@ -1787,7 +1869,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/ngan-hang";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/ngan-hang";
     }
 
     // Bulk Actions for Ngân hàng
@@ -1817,7 +1899,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/ngan-hang";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/ngan-hang";
     }
 
     @PostMapping("/admin/ngan-hang/bulk-deactivate")
@@ -1846,7 +1928,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/ngan-hang";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/ngan-hang";
     }
 
     @PostMapping("/admin/ngan-hang/bulk-delete")
@@ -1865,7 +1947,7 @@ public class NqtAdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("nqtError", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/ngan-hang";
+        return "redirect:" + adminPathService.getAdminPathWithSlash() + "/ngan-hang";
     }
 
     // ========== REPORT EXPORT ==========

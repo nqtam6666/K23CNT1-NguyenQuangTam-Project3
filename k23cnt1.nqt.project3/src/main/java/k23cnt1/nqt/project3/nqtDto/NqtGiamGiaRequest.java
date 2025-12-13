@@ -20,6 +20,7 @@ public class NqtGiamGiaRequest {
     private LocalDate nqtNgayKetThuc;
     private Integer nqtSoLuongToiDa;
     private Boolean nqtStatus;
-    private Integer nqtNguoiDungId; // NULL = chung cho tất cả VIP, có giá trị = riêng cho khách hàng
+    private Integer nqtNguoiDungId; // NULL = chung cho tất cả, có giá trị = riêng cho khách hàng
+    private Boolean nqtChiChoVip; // true = chỉ áp dụng cho khách VIP
 }
 

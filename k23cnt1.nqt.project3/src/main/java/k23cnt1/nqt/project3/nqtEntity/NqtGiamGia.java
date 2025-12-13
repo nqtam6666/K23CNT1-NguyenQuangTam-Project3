@@ -56,10 +56,13 @@ public class NqtGiamGia {
     @Column(name = "nqtNgayTao")
     private LocalDateTime nqtNgayTao; // Ngày tạo mã
 
-    // Foreign key: Nếu NULL thì mã chung cho tất cả VIP, nếu có giá trị thì mã riêng cho khách hàng đó
+    // Foreign key: Nếu NULL thì mã chung cho tất cả, nếu có giá trị thì mã riêng cho khách hàng đó
     @ManyToOne
     @JoinColumn(name = "nqtNguoiDungId", referencedColumnName = "nqtId")
     private NqtNguoiDung nqtNguoiDung;
+    
+    @Column(name = "nqtChiChoVip")
+    private Boolean nqtChiChoVip = false; // Nếu true thì chỉ áp dụng cho khách VIP
 
     @PrePersist
     protected void onCreate() {

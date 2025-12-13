@@ -34,6 +34,10 @@
                     class="px-4 py-2 rounded-md font-medium transition-all text-white hover:bg-gray-600">
                     BẢO MẬT
                 </button>
+                <button type="button" onclick="showTab('banner')" id="tab-banner"
+                    class="px-4 py-2 rounded-md font-medium transition-all text-white hover:bg-gray-600">
+                    BANNER
+                </button>
             </div>
         </div>
 
@@ -460,6 +464,51 @@
                 </div>
             </div>
 
+            <!-- Tab: BANNER -->
+            <div id="content-banner" class="tab-content hidden">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">Quản lý Banner Giới thiệu</h3>
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                    <p class="text-sm text-blue-800"><strong>Hướng dẫn:</strong> Upload các ảnh để tạo banner carousel trên trang chủ.</p>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Upload ảnh banner mới</label>
+                    <input type="file" name="bannerImages" accept="image/*" multiple autocomplete="chrome-off"
+                        class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                        id="bannerImagesInput"
+                        onchange="previewBannerImages(this)">
+                    <p class="mt-1 text-xs text-gray-500">Có thể chọn nhiều ảnh cùng lúc (Ctrl+Click hoặc Cmd+Click)</p>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Danh sách ảnh banner hiện tại</label>
+                    <div id="bannerImagesList" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        <!-- Banner images will be displayed here -->
+                        <div th:each="banner, iterStat : ${bannerImagesList}" 
+                             class="relative group border border-gray-300 rounded-lg overflow-hidden bg-gray-50">
+                            <img th:src="${banner}" alt="Banner" 
+                                 class="w-full h-32 object-cover">
+                            <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all flex items-center justify-center">
+                                <button type="button" 
+                                        onclick="removeBannerImage(this, '[[${banner}]]')"
+                                        class="opacity-0 group-hover:opacity-100 bg-red-500 text-white px-3 py-1 rounded text-sm font-medium transition-all">
+                                    Xóa
+                                </button>
+                            </div>
+                            <div class="absolute top-2 left-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
+                                <span th:text="${iterStat.index + 1}">1</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p th:if="${bannerImagesList == null or bannerImagesList.isEmpty()}" 
+                       class="text-sm text-gray-500 mt-2">Chưa có ảnh banner nào. Hãy upload ảnh để bắt đầu.</p>
+                </div>
+
+                <!-- Hidden input to store banner images JSON -->
+                <input type="hidden" name="bannerImagesJson" id="bannerImagesJson" 
+                       th:value="${bannerImagesJson ?: '[]'}">
+            </div>
+
             <div class="mt-6 pt-4 border-t">
                 <button type="submit"
                     class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors">
@@ -571,6 +620,118 @@
                 .catch(error => {
                     resultDiv.innerHTML = '<div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">✗ Lỗi: ' + error.message + '</div>';
                 });
+            }
+
+            // Banner Images Management
+            let bannerImagesArray = [];
+            
+            // Initialize banner images from hidden input
+            document.addEventListener('DOMContentLoaded', function() {
+                const bannerImagesJson = document.getElementById('bannerImagesJson');
+                if (bannerImagesJson && bannerImagesJson.value) {
+                    try {
+                        bannerImagesArray = JSON.parse(bannerImagesJson.value);
+                        updateBannerImagesList();
+                    } catch (e) {
+                        console.error('Error parsing banner images JSON:', e);
+                    }
+                }
+            });
+
+            function previewBannerImages(input) {
+                if (input.files && input.files.length > 0) {
+                    // Upload files first via AJAX
+                    const formData = new FormData();
+                    for (let i = 0; i < input.files.length; i++) {
+                        formData.append('bannerImages', input.files[i]);
+                    }
+                    
+                    // Get admin path from current URL or use model attribute
+                    let adminPath = /*[[${nqtAdminPath}]]*/ '/admin';
+                    // If model attribute is not available, extract from current URL
+                    if (!adminPath || adminPath === '/admin') {
+                        const currentPath = window.location.pathname;
+                        // Extract admin path from current URL (e.g., /admin/setting -> /admin)
+                        const match = currentPath.match(/^\/([^\/]+)/);
+                        if (match) {
+                            adminPath = '/' + match[1];
+                        }
+                    }
+                    console.log('Using admin path:', adminPath);
+                    fetch(adminPath + '/setting/upload-banner', {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json'
+                        },
+                        body: formData
+                    })
+                    .then(response => {
+                        // Check if response is JSON
+                        const contentType = response.headers.get('content-type');
+                        if (!contentType || !contentType.includes('application/json')) {
+                            return response.text().then(text => {
+                                console.error('Non-JSON response:', text);
+                                throw new Error('Server trả về dữ liệu không hợp lệ. Vui lòng thử lại.');
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success && data.images) {
+                            // Add new images to array
+                            data.images.forEach(img => {
+                                if (!bannerImagesArray.includes(img)) {
+                                    bannerImagesArray.push(img);
+                                }
+                            });
+                            updateBannerImagesList();
+                            // Clear input
+                            input.value = '';
+                        } else {
+                            alert('Lỗi khi upload ảnh: ' + (data.message || 'Không thể upload'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Lỗi khi upload ảnh: ' + (error.message || 'Không thể kết nối đến server'));
+                    });
+                }
+            }
+
+            function removeBannerImage(button, imagePath) {
+                if (confirm('Bạn có chắc muốn xóa ảnh này khỏi banner?')) {
+                    bannerImagesArray = bannerImagesArray.filter(img => img !== imagePath);
+                    updateBannerImagesList();
+                }
+            }
+
+            function updateBannerImagesList() {
+                const listDiv = document.getElementById('bannerImagesList');
+                const hiddenInput = document.getElementById('bannerImagesJson');
+                
+                // Update hidden input
+                hiddenInput.value = JSON.stringify(bannerImagesArray);
+                
+                // Update display
+                if (bannerImagesArray.length === 0) {
+                    listDiv.innerHTML = '<p class="text-sm text-gray-500 col-span-full">Chưa có ảnh banner nào. Hãy upload ảnh để bắt đầu.</p>';
+                } else {
+                    listDiv.innerHTML = bannerImagesArray.map((img, index) => `
+                        <div class="relative group border border-gray-300 rounded-lg overflow-hidden bg-gray-50">
+                            <img src="${img}" alt="Banner ${index + 1}" class="w-full h-32 object-cover">
+                            <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all flex items-center justify-center">
+                                <button type="button" 
+                                        onclick="removeBannerImage(this, '${img}')"
+                                        class="opacity-0 group-hover:opacity-100 bg-red-500 text-white px-3 py-1 rounded text-sm font-medium transition-all">
+                                    Xóa
+                                </button>
+                            </div>
+                            <div class="absolute top-2 left-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
+                                ${index + 1}
+                            </div>
+                        </div>
+                    `).join('');
+                }
             }
         </script>
     </div>

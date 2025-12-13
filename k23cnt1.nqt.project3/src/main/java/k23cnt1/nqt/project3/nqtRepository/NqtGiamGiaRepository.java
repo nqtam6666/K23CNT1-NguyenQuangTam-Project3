@@ -43,11 +43,14 @@ public interface NqtGiamGiaRepository extends JpaRepository<NqtGiamGia, Integer>
            "g.nqtMaGiamGia = :maGiamGia AND " +
            "g.nqtStatus = true AND " +
            "(g.nqtNguoiDung IS NULL OR g.nqtNguoiDung = :nguoiDung) AND " +
+           "(g.nqtChiChoVip IS NULL OR g.nqtChiChoVip = false OR " +
+           " (g.nqtChiChoVip = true AND :nguoiDungCapBac = 'KhachVip')) AND " +
            "(g.nqtNgayBatDau IS NULL OR g.nqtNgayBatDau <= :ngayHienTai) AND " +
            "(g.nqtNgayKetThuc IS NULL OR g.nqtNgayKetThuc >= :ngayHienTai) AND " +
            "(g.nqtSoLuongToiDa IS NULL OR g.nqtSoLuongDaDung < g.nqtSoLuongToiDa)")
     Optional<NqtGiamGia> findValidCodeForUser(@Param("maGiamGia") String maGiamGia,
                                                @Param("nguoiDung") NqtNguoiDung nguoiDung,
+                                               @Param("nguoiDungCapBac") String nguoiDungCapBac,
                                                @Param("ngayHienTai") LocalDate ngayHienTai);
 
     // Tìm tất cả mã giảm giá đang hoạt động

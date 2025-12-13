@@ -9,7 +9,7 @@
                 <i class="bi bi-newspaper mr-2"></i>
                 <span th:text="${nqtId != null ? 'Sửa Blog' : 'Thêm Blog'}"></span>
             </h2>
-            <a th:href="@{/admin/blog}"
+            <a th:href="${nqtAdminPath} + '/blog'"
                 class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white font-medium rounded-lg shadow-sm transition-colors flex items-center">
                 <i class="bi bi-arrow-left mr-2"></i> Quay lại
             </a>
@@ -17,7 +17,7 @@
 
         <div class="bg-white shadow-md rounded-lg overflow-hidden">
             <div class="p-6">
-                <form th:action="${nqtId != null ? '/admin/blog/edit/' + nqtId : '/admin/blog/create'}"
+                <form th:action="${nqtId != null ? nqtAdminPath + '/blog/edit/' + nqtId : nqtAdminPath + '/blog/create'}"
                     th:object="${nqtRequest}" method="post" enctype="multipart/form-data">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="col-span-1 md:col-span-2 mb-4">
@@ -77,7 +77,7 @@
                             class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors flex items-center">
                             <i class="bi bi-save mr-2"></i> Lưu
                         </button>
-                        <a th:href="@{/admin/blog}"
+                        <a th:href="${nqtAdminPath} + '/blog'"
                             class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white font-medium rounded-lg shadow-sm transition-colors">Hủy</a>
                     </div>
                 </form>

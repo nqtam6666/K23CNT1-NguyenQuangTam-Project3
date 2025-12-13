@@ -8,7 +8,7 @@
                 <i class="bi bi-tag mr-2"></i>
                 <span th:text="${nqtId != null ? 'Cập nhật Đơn giá Dịch vụ' : 'Thêm mới Đơn giá Dịch vụ'}"></span>
             </h2>
-            <a th:href="@{/admin/don-gia-dich-vu}"
+            <a th:href="${nqtAdminPath} + '/don-gia-dich-vu'"
                 class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white font-medium rounded-lg shadow-sm transition-colors flex items-center">
                 <i class="bi bi-arrow-left mr-2"></i> Quay lại
             </a>
@@ -17,7 +17,7 @@
         <div class="bg-white shadow-md rounded-lg overflow-hidden">
             <div class="p-6">
                 <form
-                    th:action="${nqtId != null ? '/admin/don-gia-dich-vu/edit/' + nqtId : '/admin/don-gia-dich-vu/create'}"
+                    th:action="${nqtId != null ? nqtAdminPath + '/don-gia-dich-vu/edit/' + nqtId : nqtAdminPath + '/don-gia-dich-vu/create'}"
                     th:object="${nqtRequest}" method="post">
 
                     <div class="grid grid-cols-1 gap-6">

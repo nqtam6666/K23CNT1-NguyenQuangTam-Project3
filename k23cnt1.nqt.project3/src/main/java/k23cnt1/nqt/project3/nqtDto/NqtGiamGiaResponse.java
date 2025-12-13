@@ -26,5 +26,6 @@ public class NqtGiamGiaResponse {
     private LocalDateTime nqtNgayTao;
     private Integer nqtNguoiDungId;
     private String nqtNguoiDungTen; // Tên người dùng nếu có
+    private Boolean nqtChiChoVip; // true = chỉ áp dụng cho khách VIP
 }
 

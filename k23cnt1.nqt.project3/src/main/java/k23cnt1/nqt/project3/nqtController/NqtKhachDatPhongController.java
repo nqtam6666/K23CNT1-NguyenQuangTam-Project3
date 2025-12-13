@@ -196,8 +196,9 @@ public class NqtKhachDatPhongController {
 
         // 1. Kiểm tra mã giảm giá nếu có
         if (nqtMaGiamGia != null && !nqtMaGiamGia.trim().isEmpty()) {
+            String customerCapBac = nqtCustomerUser.getNqtCapBac() != null ? nqtCustomerUser.getNqtCapBac() : "";
             Optional<NqtGiamGia> discountOptional = nqtGiamGiaRepository.findValidCodeForUser(
-                    nqtMaGiamGia.trim(), nqtCustomerUser, LocalDate.now());
+                    nqtMaGiamGia.trim(), nqtCustomerUser, customerCapBac, LocalDate.now());
             
             if (discountOptional.isPresent()) {
                 NqtGiamGia discount = discountOptional.get();
@@ -489,8 +490,9 @@ public class NqtKhachDatPhongController {
             return ResponseEntity.ok().body("{\"valid\": false, \"message\": \"Vui lòng nhập mã giảm giá\"}");
         }
 
+        String customerCapBac = nqtCustomerUser.getNqtCapBac() != null ? nqtCustomerUser.getNqtCapBac() : "";
         Optional<NqtGiamGia> discountOptional = nqtGiamGiaRepository.findValidCodeForUser(
-                code.trim(), nqtCustomerUser, LocalDate.now());
+                code.trim(), nqtCustomerUser, customerCapBac, LocalDate.now());
 
         if (discountOptional.isEmpty()) {
             return ResponseEntity.ok().body("{\"valid\": false, \"message\": \"Mã giảm giá không hợp lệ hoặc đã hết hạn\"}");
