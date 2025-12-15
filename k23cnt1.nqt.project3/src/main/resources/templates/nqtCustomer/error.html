@@ -7,13 +7,21 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link th:with="fontName=${#strings.replace(nqtWebsiteFont ?: 'Inter', ' ', '+')}" 
-          th:href="@{'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=' + ${fontName} + ':wght@300;400;500;600;700&display=swap'}" 
+    <link th:with="bodyFont=${#strings.replace(nqtCustomerFontBody ?: (nqtWebsiteFont ?: 'Inter'), ' ', '+')},
+                   headingFont=${#strings.replace(nqtCustomerFontHeading ?: 'Playfair Display', ' ', '+')},
+                   serifFont=${#strings.replace(nqtCustomerFontSerif ?: 'Playfair Display', ' ', '+')}" 
+          th:href="@{'https://fonts.googleapis.com/css2?family=' + ${headingFont} + ':wght@400;500;600;700&family=' + ${serifFont} + ':wght@400;500;600;700&family=' + ${bodyFont} + ':wght@300;400;500;600;700&display=swap'}" 
           rel="stylesheet">
     <style th:inline="css">
-        .font-serif { font-family: 'Playfair Display', serif; }
         * {
-            font-family: /*[[${nqtWebsiteFont ?: 'Inter'}]]*/ 'Inter', sans-serif;
+            font-family: /*[[${nqtCustomerFontBody ?: (nqtWebsiteFont ?: 'Inter')}]]*/ 'Inter', sans-serif;
+        }
+        h1, h2, h3, h4, h5, h6,
+        .text-heading, .font-heading {
+            font-family: /*[[${nqtCustomerFontHeading ?: 'Playfair Display'}]]*/ 'Playfair Display', serif !important;
+        }
+        .font-serif { 
+            font-family: /*[[${nqtCustomerFontSerif ?: 'Playfair Display'}]]*/ 'Playfair Display', serif !important; 
         }
         :root {
             --color-primary: /*[[${nqtWebsiteColor ?: '#d97706'}]]*/ #d97706;

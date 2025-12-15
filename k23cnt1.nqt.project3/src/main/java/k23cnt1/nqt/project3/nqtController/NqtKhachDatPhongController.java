@@ -67,10 +67,17 @@ public class NqtKhachDatPhongController {
             String redirectUrl = "/nqtDatPhong";
             if (phongId != null || ngayDen != null || ngayDi != null || soKhach != null) {
                 redirectUrl += "?";
-                if (phongId != null) redirectUrl += "phongId=" + phongId;
-                if (ngayDen != null) redirectUrl += (redirectUrl.contains("?") && !redirectUrl.endsWith("?") ? "&" : "") + "ngayDen=" + ngayDen;
-                if (ngayDi != null) redirectUrl += (redirectUrl.contains("?") && !redirectUrl.endsWith("?") ? "&" : "") + "ngayDi=" + ngayDi;
-                if (soKhach != null) redirectUrl += (redirectUrl.contains("?") && !redirectUrl.endsWith("?") ? "&" : "") + "soKhach=" + soKhach;
+                if (phongId != null)
+                    redirectUrl += "phongId=" + phongId;
+                if (ngayDen != null)
+                    redirectUrl += (redirectUrl.contains("?") && !redirectUrl.endsWith("?") ? "&" : "") + "ngayDen="
+                            + ngayDen;
+                if (ngayDi != null)
+                    redirectUrl += (redirectUrl.contains("?") && !redirectUrl.endsWith("?") ? "&" : "") + "ngayDi="
+                            + ngayDi;
+                if (soKhach != null)
+                    redirectUrl += (redirectUrl.contains("?") && !redirectUrl.endsWith("?") ? "&" : "") + "soKhach="
+                            + soKhach;
             }
             session.setAttribute("nqtRedirectAfterLogin", redirectUrl);
             return "redirect:/nqtDangNhap";
@@ -133,7 +140,8 @@ public class NqtKhachDatPhongController {
 
         // Validate dates
         if (nqtNgayDen.isBefore(LocalDate.now())) {
-            redirectAttributes.addFlashAttribute("nqtError", "Ngày đến không hợp lệ! Vui lòng chọn ngày từ hôm nay trở đi.");
+            redirectAttributes.addFlashAttribute("nqtError",
+                    "Ngày đến không hợp lệ! Vui lòng chọn ngày từ hôm nay trở đi.");
             redirectAttributes.addAttribute("phongId", nqtPhongId);
             redirectAttributes.addAttribute("ngayDen", nqtNgayDenStr);
             redirectAttributes.addAttribute("ngayDi", nqtNgayDiStr);
@@ -199,28 +207,29 @@ public class NqtKhachDatPhongController {
             String customerCapBac = nqtCustomerUser.getNqtCapBac() != null ? nqtCustomerUser.getNqtCapBac() : "";
             Optional<NqtGiamGia> discountOptional = nqtGiamGiaRepository.findValidCodeForUser(
                     nqtMaGiamGia.trim(), nqtCustomerUser, customerCapBac, LocalDate.now());
-            
+
             if (discountOptional.isPresent()) {
                 NqtGiamGia discount = discountOptional.get();
-                
+
                 // Kiểm tra giá trị tối thiểu
                 if (discount.getNqtGiaTriToiThieu() == null || totalPrice >= discount.getNqtGiaTriToiThieu()) {
                     // Tính giảm giá
                     if (discount.getNqtLoaiGiam() == 0) { // Phần trăm
                         discountAmount = totalPrice * discount.getNqtGiaTriGiam() / 100;
                         // Áp dụng giới hạn tối đa nếu có
-                        if (discount.getNqtGiaTriGiamToiDa() != null && discountAmount > discount.getNqtGiaTriGiamToiDa()) {
+                        if (discount.getNqtGiaTriGiamToiDa() != null
+                                && discountAmount > discount.getNqtGiaTriGiamToiDa()) {
                             discountAmount = discount.getNqtGiaTriGiamToiDa();
                         }
                     } else { // Số tiền cố định
                         discountAmount = discount.getNqtGiaTriGiam();
                     }
-                    
+
                     appliedDiscount = discount;
                 }
             }
         }
-        
+
         // 2. Nếu không có mã giảm giá, áp dụng chiết khấu VIP tự động
         if (appliedDiscount == null && "KhachVip".equals(nqtCustomerUser.getNqtCapBac())) {
             String vipDiscountPercentStr = nqtSettingService.getNqtValue("nqtVipDiscountPercent", "10");
@@ -247,7 +256,7 @@ public class NqtKhachDatPhongController {
             appliedDiscount.setNqtSoLuongDaDung(appliedDiscount.getNqtSoLuongDaDung() + 1);
             nqtGiamGiaRepository.save(appliedDiscount);
         }
-        
+
         nqtDatPhongRepository.save(savedBooking);
 
         // Update room status to booked
@@ -276,13 +285,13 @@ public class NqtKhachDatPhongController {
         }
 
         NqtDatPhong booking = bookingOptional.get();
-        
+
         // Lấy danh sách ngân hàng đang hoạt động
         List<k23cnt1.nqt.project3.nqtDto.NqtNganHangResponse> nganHangList = nqtNganHangService.nqtGetActive();
-        
+
         // Tạo Map chứa QR URL cho mỗi ngân hàng
         java.util.Map<Integer, String> qrUrlMap = new java.util.HashMap<>();
-        
+
         // Lấy mã nội dung chuyển khoản từ booking đã lưu trong database
         String noiDung = booking.getNqtNoiDungChuyenKhoan();
         if (noiDung == null || noiDung.isEmpty()) {
@@ -291,14 +300,13 @@ public class NqtKhachDatPhongController {
             booking.setNqtNoiDungChuyenKhoan(noiDung);
             nqtDatPhongRepository.save(booking);
         }
-        
+
         for (k23cnt1.nqt.project3.nqtDto.NqtNganHangResponse nganHang : nganHangList) {
             String qrUrl = nqtNganHangService.generateVietQrUrl(
-                nganHang.getNqtMaNganHang(),
-                nganHang.getNqtSoTaiKhoan(),
-                booking.getNqtTongTien() != null ? booking.getNqtTongTien() : 0f,
-                noiDung
-            );
+                    nganHang.getNqtMaNganHang(),
+                    nganHang.getNqtSoTaiKhoan(),
+                    booking.getNqtTongTien() != null ? booking.getNqtTongTien() : 0f,
+                    noiDung);
             qrUrlMap.put(nganHang.getNqtId(), qrUrl);
         }
 
@@ -317,10 +325,10 @@ public class NqtKhachDatPhongController {
     @ResponseBody
     public ResponseEntity<Map<String, Object>> checkPaymentStatus(@PathVariable("id") Integer id, HttpSession session) {
         Map<String, Object> response = new HashMap<>();
-        
+
         try {
             NqtNguoiDung nqtCustomerUser = (NqtNguoiDung) session.getAttribute("nqtCustomerUser");
-            
+
             if (nqtCustomerUser == null) {
                 response.put("success", false);
                 response.put("message", "Chưa đăng nhập");
@@ -328,9 +336,9 @@ public class NqtKhachDatPhongController {
             }
 
             Optional<NqtDatPhong> bookingOptional = nqtDatPhongRepository.findById(id);
-            
-            if (bookingOptional.isEmpty() || 
-                !bookingOptional.get().getNqtNguoiDung().getNqtId().equals(nqtCustomerUser.getNqtId())) {
+
+            if (bookingOptional.isEmpty() ||
+                    !bookingOptional.get().getNqtNguoiDung().getNqtId().equals(nqtCustomerUser.getNqtId())) {
                 response.put("success", false);
                 response.put("message", "Không tìm thấy đơn đặt phòng");
                 return ResponseEntity.ok(response);
@@ -338,16 +346,16 @@ public class NqtKhachDatPhongController {
 
             // Kiểm tra thanh toán
             boolean isPaid = nqtPaymentCheckService.checkPaymentStatus(id);
-            
+
             response.put("success", true);
             response.put("isPaid", isPaid);
             response.put("message", isPaid ? "Đã thanh toán thành công" : "Chưa thanh toán");
-            
+
         } catch (Exception e) {
             response.put("success", false);
             response.put("message", "Lỗi: " + e.getMessage());
         }
-        
+
         return ResponseEntity.ok(response);
     }
 
@@ -385,17 +393,17 @@ public class NqtKhachDatPhongController {
         }
 
         NqtDatPhong booking = bookingOptional.get();
-        
+
         // Check if review exists
         List<NqtDanhGia> existingReviews = nqtDanhGiaRepository.findByNqtDatPhong(booking);
         boolean hasReview = !existingReviews.isEmpty();
-        
+
         // Lấy thông tin ngân hàng và QR code nếu chưa thanh toán
         boolean isPaid = booking.getNqtStatus() != null && booking.getNqtStatus() == 1;
         if (!isPaid) {
             List<k23cnt1.nqt.project3.nqtDto.NqtNganHangResponse> nganHangList = nqtNganHangService.nqtGetActive();
             java.util.Map<Integer, String> qrUrlMap = new java.util.HashMap<>();
-            
+
             // Lấy mã nội dung chuyển khoản
             String noiDung = booking.getNqtNoiDungChuyenKhoan();
             if (noiDung == null || noiDung.isEmpty()) {
@@ -403,30 +411,29 @@ public class NqtKhachDatPhongController {
                 booking.setNqtNoiDungChuyenKhoan(noiDung);
                 nqtDatPhongRepository.save(booking);
             }
-            
+
             // Tạo QR URL cho mỗi ngân hàng
             for (k23cnt1.nqt.project3.nqtDto.NqtNganHangResponse nganHang : nganHangList) {
                 String qrUrl = nqtNganHangService.generateVietQrUrl(
-                    nganHang.getNqtMaNganHang(),
-                    nganHang.getNqtSoTaiKhoan(),
-                    booking.getNqtTongTien() != null ? booking.getNqtTongTien() : 0f,
-                    noiDung
-                );
+                        nganHang.getNqtMaNganHang(),
+                        nganHang.getNqtSoTaiKhoan(),
+                        booking.getNqtTongTien() != null ? booking.getNqtTongTien() : 0f,
+                        noiDung);
                 qrUrlMap.put(nganHang.getNqtId(), qrUrl);
             }
-            
+
             model.addAttribute("nganHangList", nganHangList);
             model.addAttribute("qrUrlMap", qrUrlMap);
             model.addAttribute("noiDung", noiDung);
         }
-        
+
         // Kiểm tra xem có thể hủy đặt phòng không
         // Chỉ cho phép hủy nếu: chưa thanh toán (status = 0) và ngày đến chưa đến
         boolean canCancel = false;
         if (booking.getNqtStatus() != null && booking.getNqtStatus() == 0) {
             canCancel = booking.getNqtNgayDen().isAfter(LocalDate.now());
         }
-        
+
         model.addAttribute("booking", booking);
         model.addAttribute("hasReview", hasReview);
         model.addAttribute("isPaid", isPaid);
@@ -473,6 +480,43 @@ public class NqtKhachDatPhongController {
         return "redirect:/nqtDatPhongCuaToi";
     }
 
+    // API: Get room price
+    @GetMapping("/api/get-room-price")
+    @ResponseBody
+    public ResponseEntity<?> getRoomPrice(@RequestParam("roomId") Integer roomId) {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            Optional<NqtPhong> roomOptional = nqtPhongRepository.findById(roomId);
+
+            if (roomOptional.isEmpty()) {
+                response.put("success", false);
+                response.put("message", "Phòng không tồn tại");
+                return ResponseEntity.ok(response);
+            }
+
+            NqtPhong room = roomOptional.get();
+
+            if (!room.getNqtStatus()) {
+                response.put("success", false);
+                response.put("message", "Phòng không khả dụng");
+                return ResponseEntity.ok(response);
+            }
+
+            response.put("success", true);
+            response.put("pricePerNight", room.getNqtLoaiPhong().getNqtGia());
+            response.put("roomTypeName", room.getNqtLoaiPhong().getNqtTenLoaiPhong());
+            response.put("maxGuests", room.getNqtLoaiPhong().getNqtSoNguoi());
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Lỗi: " + e.getMessage());
+            return ResponseEntity.ok(response);
+        }
+    }
+
     // API: Check discount code
     @GetMapping("/api/check-discount-code")
     @ResponseBody
@@ -481,7 +525,7 @@ public class NqtKhachDatPhongController {
             @RequestParam(value = "totalPrice", required = false) Float totalPrice,
             HttpSession session) {
         NqtNguoiDung nqtCustomerUser = (NqtNguoiDung) session.getAttribute("nqtCustomerUser");
-        
+
         if (nqtCustomerUser == null) {
             return ResponseEntity.ok().body("{\"valid\": false, \"message\": \"Vui lòng đăng nhập\"}");
         }
@@ -495,15 +539,16 @@ public class NqtKhachDatPhongController {
                 code.trim(), nqtCustomerUser, customerCapBac, LocalDate.now());
 
         if (discountOptional.isEmpty()) {
-            return ResponseEntity.ok().body("{\"valid\": false, \"message\": \"Mã giảm giá không hợp lệ hoặc đã hết hạn\"}");
+            return ResponseEntity.ok()
+                    .body("{\"valid\": false, \"message\": \"Mã giảm giá không hợp lệ hoặc đã hết hạn\"}");
         }
 
         NqtGiamGia discount = discountOptional.get();
-        
+
         // Kiểm tra giá trị tối thiểu nếu có
-        if (totalPrice != null && discount.getNqtGiaTriToiThieu() != null 
+        if (totalPrice != null && discount.getNqtGiaTriToiThieu() != null
                 && totalPrice < discount.getNqtGiaTriToiThieu()) {
-            return ResponseEntity.ok().body("{\"valid\": false, \"message\": \"Đơn hàng phải đạt tối thiểu " 
+            return ResponseEntity.ok().body("{\"valid\": false, \"message\": \"Đơn hàng phải đạt tối thiểu "
                     + String.format("%.0f", discount.getNqtGiaTriToiThieu()) + " VNĐ\"}");
         }
 
@@ -520,6 +565,7 @@ public class NqtKhachDatPhongController {
             }
         }
 
+        // Xây dựng thông báo giảm giá
         String discountText = "";
         if (discount.getNqtLoaiGiam() == 0) {
             discountText = "Giảm " + String.format("%.0f", discount.getNqtGiaTriGiam()) + "%";
@@ -530,15 +576,23 @@ public class NqtKhachDatPhongController {
             discountText = "Giảm " + String.format("%.0f", discount.getNqtGiaTriGiam()) + " VNĐ";
         }
 
+        // Thêm thông tin giá trị tối thiểu nếu có
+        if (discount.getNqtGiaTriToiThieu() != null) {
+            discountText += " - Áp dụng cho đơn từ " + String.format("%.0f", discount.getNqtGiaTriToiThieu()) + " VNĐ";
+        }
+
+        // Thêm thông tin tiết kiệm nếu có totalPrice
         if (totalPrice != null) {
             discountText += " - Tiết kiệm: " + String.format("%.0f", discountAmount) + " VNĐ";
         }
 
-        return ResponseEntity.ok().body("{\"valid\": true, \"message\": \"" + discountText + "\", \"discountAmount\": " + discountAmount + "}");
+        return ResponseEntity.ok().body(
+                "{\"valid\": true, \"message\": \"" + discountText + "\", \"discountAmount\": " + discountAmount + "}");
     }
 
     /**
      * Tạo mã ngẫu nhiên gồm chữ in hoa và số
+     * 
      * @param length Độ dài mã cần tạo
      * @return Chuỗi ngẫu nhiên
      */
@@ -546,12 +600,12 @@ public class NqtKhachDatPhongController {
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         Random random = new Random();
         StringBuilder code = new StringBuilder();
-        
+
         for (int i = 0; i < length; i++) {
             int index = random.nextInt(chars.length());
             code.append(chars.charAt(index));
         }
-        
+
         return code.toString();
     }
 }

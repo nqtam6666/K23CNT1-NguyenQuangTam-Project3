@@ -5,6 +5,7 @@ import k23cnt1.nqt.project3.nqtRepository.NqtNguoiDungRepository;
 import k23cnt1.nqt.project3.nqtService.NqtJwtService;
 import k23cnt1.nqt.project3.nqtService.Nqt2FAService;
 import k23cnt1.nqt.project3.nqtService.NqtRateLimitService;
+import k23cnt1.nqt.project3.nqtService.NqtAdminPathService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -17,6 +18,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.Optional;
 
@@ -38,8 +40,23 @@ public class NqtLoginController {
     @Autowired
     private NqtRateLimitService rateLimitService;
 
-    @GetMapping("/admin/login")
-    public String nqtLogin(@RequestParam(value = "error", required = false) String error, Model model) {
+    @Autowired
+    private NqtAdminPathService adminPathService;
+
+    @GetMapping({"/admin/login", "/{path}/login"})
+    public String nqtLogin(@PathVariable(required = false) String path,
+                          @RequestParam(value = "error", required = false) String error, 
+                          Model model) {
+        // Validate that the path matches the current admin path (if path variable is used)
+        if (path != null) {
+            String currentAdminPath = adminPathService.getAdminPath();
+            if (!path.equals(currentAdminPath) && !path.equals("admin")) {
+                // Path doesn't match admin path, redirect to correct login
+                String adminLoginPath = adminPathService.getAdminLoginPath();
+                return "redirect:" + adminLoginPath;
+            }
+        }
+        
         if ("noPermission".equals(error)) {
             model.addAttribute("nqtError", "Bạn không có quyền truy cập Admin! Chỉ nhân viên và admin mới được phép.");
         }
@@ -48,14 +65,25 @@ public class NqtLoginController {
         return "admin/login";
     }
 
-    @PostMapping("/admin/login")
-    public String nqtLoginSubmit(@RequestParam(value = "nqtTaiKhoan", required = false) String nqtTaiKhoan,
+    @PostMapping({"/admin/login", "/{path}/login"})
+    public String nqtLoginSubmit(@PathVariable(required = false) String path,
+            @RequestParam(value = "nqtTaiKhoan", required = false) String nqtTaiKhoan,
             @RequestParam(value = "nqtMatKhau", required = false) String nqtMatKhau,
             @RequestParam(value = "nqt2faCode", required = false) String nqt2faCode,
             HttpServletRequest request,
             HttpSession session,
             HttpServletResponse response,
             Model model) {
+        
+        // Validate that the path matches the current admin path (if path variable is used)
+        if (path != null) {
+            String currentAdminPath = adminPathService.getAdminPath();
+            if (!path.equals(currentAdminPath) && !path.equals("admin")) {
+                // Path doesn't match admin path, redirect to correct login
+                String adminLoginPath = adminPathService.getAdminLoginPath();
+                return "redirect:" + adminLoginPath;
+            }
+        }
         
         String ipAddress = rateLimitService.getClientIpAddress(request);
         String userAgent = rateLimitService.getUserAgent(request);
@@ -264,11 +292,26 @@ public class NqtLoginController {
         // Set session for backward compatibility
         session.setAttribute("nqtAdminSession", nqtNguoiDung.getNqtTaiKhoan());
         session.setAttribute("nqtAdminUser", nqtNguoiDung);
-        return "redirect:/admin";
+        // Use dynamic admin path for redirect
+        String adminPath = adminPathService.getAdminPathWithSlash();
+        return "redirect:" + adminPath;
     }
 
-    @GetMapping("/admin/logout")
-    public String nqtLogout(HttpServletRequest request, HttpSession session, HttpServletResponse response) {
+    @GetMapping({"/admin/logout", "/{path}/logout"})
+    public String nqtLogout(@PathVariable(required = false) String path, 
+                           HttpServletRequest request, 
+                           HttpSession session, 
+                           HttpServletResponse response) {
+        // Validate that the path matches the current admin path (if path variable is used)
+        if (path != null) {
+            String currentAdminPath = adminPathService.getAdminPath();
+            if (!path.equals(currentAdminPath) && !path.equals("admin")) {
+                // Path doesn't match admin path, redirect to correct login
+                String adminLoginPath = adminPathService.getAdminLoginPath();
+                return "redirect:" + adminLoginPath;
+            }
+        }
+        
         // Clear SecurityContext (JWT authentication)
         SecurityContextHolder.clearContext();
         
@@ -295,6 +338,8 @@ public class NqtLoginController {
         jwtCookie.setMaxAge(0); // Delete cookie
         response.addCookie(jwtCookie);
         
-        return "redirect:/admin/login";
+        // Use dynamic admin path for redirect
+        String adminLoginPath = adminPathService.getAdminLoginPath();
+        return "redirect:" + adminLoginPath;
     }
 }

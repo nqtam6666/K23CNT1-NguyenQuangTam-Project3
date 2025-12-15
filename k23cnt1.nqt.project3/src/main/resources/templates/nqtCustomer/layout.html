@@ -14,8 +14,10 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link th:with="fontName=${#strings.replace(nqtWebsiteFont ?: 'Inter', ' ', '+')}" 
-          th:href="@{'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=' + ${fontName} + ':wght@300;400;500;600;700&display=swap'}" 
+    <link th:with="bodyFont=${#strings.replace(nqtCustomerFontBody ?: (nqtWebsiteFont ?: 'Inter'), ' ', '+')},
+                   headingFont=${#strings.replace(nqtCustomerFontHeading ?: 'Playfair Display', ' ', '+')},
+                   serifFont=${#strings.replace(nqtCustomerFontSerif ?: 'Playfair Display', ' ', '+')}" 
+          th:href="@{'https://fonts.googleapis.com/css2?family=' + ${headingFont} + ':wght@400;500;600;700&family=' + ${serifFont} + ':wght@400;500;600;700&family=' + ${bodyFont} + ':wght@300;400;500;600;700&display=swap'}" 
           rel="stylesheet">
 
     <style th:inline="css">
@@ -29,21 +31,28 @@
         }
 
         * {
-            font-family: /*[[${nqtWebsiteFont ?: 'Inter'}]]*/ 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+            font-family: /*[[${nqtCustomerFontBody ?: (nqtWebsiteFont ?: 'Inter')}]]*/ 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
             text-rendering: optimizeLegibility !important;
             -webkit-font-smoothing: antialiased !important;
             -moz-osx-font-smoothing: grayscale !important;
         }
 
         body {
-            font-family: /*[[${nqtWebsiteFont ?: 'Inter'}]]*/ 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+            font-family: /*[[${nqtCustomerFontBody ?: (nqtWebsiteFont ?: 'Inter')}]]*/ 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
             text-rendering: optimizeLegibility !important;
             -webkit-font-smoothing: antialiased !important;
             -moz-osx-font-smoothing: grayscale !important;
         }
 
+        /* Heading Font */
+        h1, h2, h3, h4, h5, h6,
+        .text-heading, .font-heading {
+            font-family: /*[[${nqtCustomerFontHeading ?: 'Playfair Display'}]]*/ 'Playfair Display', Georgia, 'Times New Roman', serif !important;
+        }
+
+        /* Serif Font */
         .font-serif {
-            font-family: 'Playfair Display', Georgia, 'Times New Roman', serif !important;
+            font-family: /*[[${nqtCustomerFontSerif ?: 'Playfair Display'}]]*/ 'Playfair Display', Georgia, 'Times New Roman', serif !important;
         }
 
         /* Glassmorphism Effect */
@@ -342,6 +351,50 @@
                         <a href="/nqtLoaiPhong" class="text-gray-700 hover:text-amber-700 font-medium transition-colors">Loại phòng</a>
                         <a href="/nqtDichVu" class="text-gray-700 hover:text-amber-700 font-medium transition-colors">Dịch vụ</a>
                         <a href="/nqtTinTuc" class="text-gray-700 hover:text-amber-700 font-medium transition-colors">Tin tức</a>
+                        <!-- Voucher Dropdown -->
+                        <div class="relative group" th:if="${nqtActiveVouchers != null and !nqtActiveVouchers.isEmpty()}">
+                            <button class="text-gray-700 hover:text-amber-700 font-medium transition-colors flex items-center space-x-1" type="button">
+                                <span>Voucher</span>
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </button>
+                            <div class="absolute top-full left-0 mt-2 w-80 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 border border-gray-100 z-50 max-h-96 overflow-y-auto">
+                                <div class="p-2">
+                                    <div class="px-3 py-2 text-xs font-semibold text-gray-500 uppercase border-b">Mã giảm giá đang áp dụng</div>
+                                    <div th:each="voucher : ${nqtActiveVouchers}" class="p-3 hover:bg-amber-50 rounded-lg transition-colors border-b border-gray-100 last:border-b-0 cursor-pointer"
+                                         onclick="copyVoucherCode(this)" 
+                                         th:data-code="${voucher.nqtMaGiamGia}"
+                                         title="Click để copy mã">
+                                        <div class="flex items-start justify-between">
+                                            <div class="flex-1">
+                                                <div class="flex items-center space-x-2 mb-1">
+                                                    <span class="font-semibold text-amber-700" th:text="${voucher.nqtMaGiamGia}">VOUCHER</span>
+                                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                                    </svg>
+                                                </div>
+                                                <div class="text-sm text-gray-600 mb-2" th:text="${voucher.nqtMoTa ?: 'Không có mô tả'}">Mô tả</div>
+                                                <div class="flex items-center space-x-2 text-xs flex-wrap gap-1">
+                                                    <span class="px-2 py-1 bg-amber-100 text-amber-700 rounded font-medium"
+                                                          th:text="${voucher.nqtLoaiGiam == 0 ? voucher.nqtGiaTriGiam + '%' : voucher.nqtGiaTriGiam + ' VNĐ'}">10%</span>
+                                                    <span th:if="${voucher.nqtGiaTriToiThieu != null}" 
+                                                          class="text-gray-500">Tối thiểu: <span th:text="${#numbers.formatDecimal(voucher.nqtGiaTriToiThieu, 0, 0)}"></span> VNĐ</span>
+                                                    <span th:if="${voucher.nqtChiChoVip != null and voucher.nqtChiChoVip}" 
+                                                          class="px-2 py-1 bg-purple-100 text-purple-700 rounded text-xs">VIP Only</span>
+                                                </div>
+                                                <div class="text-xs text-gray-400 mt-1" th:if="${voucher.nqtNgayKetThuc != null}">
+                                                    HSD: <span th:text="${#temporals.format(voucher.nqtNgayKetThuc, 'dd/MM/yyyy')}"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="px-3 py-2 text-xs text-gray-400 text-center border-t">
+                                        Click vào voucher để copy mã
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <a href="/nqtLienHe" class="text-gray-700 hover:text-amber-700 font-medium transition-colors">Liên hệ</a>
                     </th:block>
                 </div>
@@ -701,6 +754,51 @@
             generateStrongPassword: typeof window.generateStrongPassword,
             togglePasswordVisibility: typeof window.togglePasswordVisibility
         });
+        
+        // Copy voucher code function
+        window.copyVoucherCode = function(element) {
+            const code = element.getAttribute('data-code');
+            if (code) {
+                // Copy to clipboard
+                navigator.clipboard.writeText(code).then(function() {
+                    // Show feedback
+                    const originalBg = element.style.backgroundColor;
+                    element.style.backgroundColor = '#d4af37';
+                    element.style.transition = 'background-color 0.3s';
+                    
+                    // Create temporary notification
+                    const notification = document.createElement('div');
+                    notification.textContent = 'Đã copy mã: ' + code;
+                    notification.className = 'fixed top-20 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+                    notification.style.transition = 'opacity 0.3s';
+                    document.body.appendChild(notification);
+                    
+                    setTimeout(function() {
+                        element.style.backgroundColor = originalBg;
+                        notification.style.opacity = '0';
+                        setTimeout(function() {
+                            document.body.removeChild(notification);
+                        }, 300);
+                    }, 2000);
+                }).catch(function(err) {
+                    console.error('Failed to copy:', err);
+                    // Fallback for older browsers
+                    const textArea = document.createElement('textarea');
+                    textArea.value = code;
+                    textArea.style.position = 'fixed';
+                    textArea.style.opacity = '0';
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    try {
+                        document.execCommand('copy');
+                        alert('Đã copy mã: ' + code);
+                    } catch (err) {
+                        alert('Không thể copy mã. Vui lòng copy thủ công: ' + code);
+                    }
+                    document.body.removeChild(textArea);
+                });
+            }
+        };
     </script>
 </body>
 </html>

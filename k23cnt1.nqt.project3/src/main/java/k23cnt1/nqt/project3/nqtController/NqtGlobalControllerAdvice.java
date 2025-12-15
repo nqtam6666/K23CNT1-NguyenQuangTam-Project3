@@ -2,6 +2,8 @@ package k23cnt1.nqt.project3.nqtController;
 
 import k23cnt1.nqt.project3.nqtService.NqtAdminPathService;
 import k23cnt1.nqt.project3.nqtService.NqtSettingService;
+import k23cnt1.nqt.project3.nqtService.NqtGiamGiaService;
+import k23cnt1.nqt.project3.nqtDto.NqtGiamGiaResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -17,6 +19,9 @@ public class NqtGlobalControllerAdvice {
     
     @Autowired
     private NqtAdminPathService adminPathService;
+    
+    @Autowired
+    private NqtGiamGiaService nqtGiamGiaService;
 
     @ModelAttribute("nqtWebsiteName")
     public String nqtWebsiteName() {
@@ -55,6 +60,28 @@ public class NqtGlobalControllerAdvice {
     @ModelAttribute("nqtWebsiteFont")
     public String nqtWebsiteFont() {
         return nqtSettingService.getNqtValue("nqtWebsiteFont", "Inter");
+    }
+
+    @ModelAttribute("nqtCustomerFontBody")
+    public String nqtCustomerFontBody() {
+        // Nếu chưa có setting riêng, dùng nqtWebsiteFont làm mặc định
+        String customFont = nqtSettingService.getNqtValue("nqtCustomerFontBody", null);
+        if (customFont == null || customFont.isEmpty()) {
+            return nqtSettingService.getNqtValue("nqtWebsiteFont", "Inter");
+        }
+        return customFont;
+    }
+
+    @ModelAttribute("nqtCustomerFontHeading")
+    public String nqtCustomerFontHeading() {
+        // Mặc định dùng Playfair Display cho heading
+        return nqtSettingService.getNqtValue("nqtCustomerFontHeading", "Playfair Display");
+    }
+
+    @ModelAttribute("nqtCustomerFontSerif")
+    public String nqtCustomerFontSerif() {
+        // Mặc định dùng Playfair Display cho serif
+        return nqtSettingService.getNqtValue("nqtCustomerFontSerif", "Playfair Display");
     }
 
     @ModelAttribute("nqtWebsiteAddress")
@@ -154,5 +181,15 @@ public class NqtGlobalControllerAdvice {
             }
         }
         return bannerImagesList;
+    }
+
+    @ModelAttribute("nqtActiveVouchers")
+    public List<NqtGiamGiaResponse> nqtActiveVouchers() {
+        try {
+            return nqtGiamGiaService.nqtGetActiveVouchers();
+        } catch (Exception e) {
+            // Return empty list if error
+            return new ArrayList<>();
+        }
     }
 }

@@ -9,6 +9,7 @@ import k23cnt1.nqt.project3.nqtRepository.NqtNguoiDungRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -112,6 +113,38 @@ public class NqtGiamGiaService {
             throw new RuntimeException("Không tìm thấy mã giảm giá với ID: " + nqtId);
         }
         nqtGiamGiaRepository.deleteById(nqtId);
+    }
+
+    /**
+     * Lấy danh sách voucher đang active và hợp lệ (trong thời gian áp dụng, chưa hết số lượng)
+     * Chỉ lấy voucher chung (không gắn với người dùng cụ thể)
+     */
+    public List<NqtGiamGiaResponse> nqtGetActiveVouchers() {
+        LocalDate today = LocalDate.now();
+        return nqtGiamGiaRepository.findByNqtStatusTrue().stream()
+                .filter(voucher -> {
+                    // Chỉ lấy voucher chung (không gắn với người dùng cụ thể)
+                    if (voucher.getNqtNguoiDung() != null) {
+                        return false;
+                    }
+                    // Kiểm tra thời gian áp dụng
+                    if (voucher.getNqtNgayBatDau() != null && voucher.getNqtNgayBatDau().isAfter(today)) {
+                        return false;
+                    }
+                    if (voucher.getNqtNgayKetThuc() != null && voucher.getNqtNgayKetThuc().isBefore(today)) {
+                        return false;
+                    }
+                    // Kiểm tra số lượng còn lại
+                    if (voucher.getNqtSoLuongToiDa() != null) {
+                        if (voucher.getNqtSoLuongDaDung() == null || 
+                            voucher.getNqtSoLuongDaDung() >= voucher.getNqtSoLuongToiDa()) {
+                            return false;
+                        }
+                    }
+                    return true;
+                })
+                .map(this::nqtConvertToResponse)
+                .collect(Collectors.toList());
     }
 
     private NqtGiamGiaResponse nqtConvertToResponse(NqtGiamGia nqtGiamGia) {

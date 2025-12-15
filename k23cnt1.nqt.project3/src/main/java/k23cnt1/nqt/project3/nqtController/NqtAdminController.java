@@ -1280,6 +1280,10 @@ public class NqtAdminController {
         model.addAttribute("nqtTieuDe", nqtSettingService.getNqtValue("TieuDe", "Tiêu đề mặc định"));
         model.addAttribute("nqtWebsiteLogo", nqtSettingService.getNqtValue("nqtWebsiteLogo", ""));
         model.addAttribute("nqtWebsiteFont", nqtSettingService.getNqtValue("nqtWebsiteFont", "Nunito"));
+        // Customer Font Settings
+        model.addAttribute("nqtCustomerFontBody", nqtSettingService.getNqtValue("nqtCustomerFontBody", ""));
+        model.addAttribute("nqtCustomerFontHeading", nqtSettingService.getNqtValue("nqtCustomerFontHeading", "Playfair Display"));
+        model.addAttribute("nqtCustomerFontSerif", nqtSettingService.getNqtValue("nqtCustomerFontSerif", "Playfair Display"));
         model.addAttribute("nqtWebsiteAddress", nqtSettingService.getNqtValue("nqtWebsiteAddress", "123 Đường ABC, Quận XYZ, Hà Nội, Việt Nam"));
         model.addAttribute("nqtWebsitePhone", nqtSettingService.getNqtValue("nqtWebsitePhone", "0123456789"));
         model.addAttribute("nqtWebsiteEmail", nqtSettingService.getNqtValue("nqtWebsiteEmail", "contact@example.com"));
@@ -1336,6 +1340,9 @@ public class NqtAdminController {
     public String nqtSettingUpdate(@RequestParam("nqtWebsiteName") String nqtWebsiteName,
             @RequestParam("nqtWebsiteColor") String nqtWebsiteColor,
             @RequestParam("nqtWebsiteFont") String nqtWebsiteFont,
+            @RequestParam(value = "nqtCustomerFontBody", required = false) String nqtCustomerFontBody,
+            @RequestParam(value = "nqtCustomerFontHeading", required = false) String nqtCustomerFontHeading,
+            @RequestParam(value = "nqtCustomerFontSerif", required = false) String nqtCustomerFontSerif,
             @RequestParam("nqtTieuDe") String nqtTieuDe,
             @RequestParam(value = "nqtWebsiteLogoFile", required = false) MultipartFile nqtWebsiteLogoFile,
             @RequestParam(value = "nqtWebsiteAddress", required = false) String nqtWebsiteAddress,
@@ -1373,6 +1380,16 @@ public class NqtAdminController {
             nqtSettingService.saveNqtValue("nqtWebsiteName", nqtWebsiteName);
             nqtSettingService.saveNqtValue("nqtWebsiteColor", nqtWebsiteColor);
             nqtSettingService.saveNqtValue("nqtWebsiteFont", nqtWebsiteFont);
+            // Save customer font settings
+            if (nqtCustomerFontBody != null && !nqtCustomerFontBody.trim().isEmpty()) {
+                nqtSettingService.saveNqtValue("nqtCustomerFontBody", nqtCustomerFontBody.trim());
+            }
+            if (nqtCustomerFontHeading != null && !nqtCustomerFontHeading.trim().isEmpty()) {
+                nqtSettingService.saveNqtValue("nqtCustomerFontHeading", nqtCustomerFontHeading.trim());
+            }
+            if (nqtCustomerFontSerif != null && !nqtCustomerFontSerif.trim().isEmpty()) {
+                nqtSettingService.saveNqtValue("nqtCustomerFontSerif", nqtCustomerFontSerif.trim());
+            }
             nqtSettingService.saveNqtValue("TieuDe", nqtTieuDe);
             if (nqtWebsiteAddress != null) {
                 nqtSettingService.saveNqtValue("nqtWebsiteAddress", nqtWebsiteAddress);
