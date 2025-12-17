@@ -47,6 +47,7 @@ public class NqtNguoiDungService {
         nqtNguoiDung.setNqtStatus(nqtRequest.getNqtStatus() != null ? nqtRequest.getNqtStatus() : true);
         nqtNguoiDung.setNqtCapBac(nqtRequest.getNqtCapBac() != null && !nqtRequest.getNqtCapBac().isEmpty() 
                 ? nqtRequest.getNqtCapBac() : "KhachThuong");
+        nqtNguoiDung.setNqtAvatar(nqtRequest.getNqtAvatar());
 
         NqtNguoiDung nqtSaved = nqtNguoiDungRepository.save(nqtNguoiDung);
         return nqtConvertToResponse(nqtSaved);
@@ -79,6 +80,9 @@ public class NqtNguoiDungService {
         if (nqtRequest.getNqtCapBac() != null && !nqtRequest.getNqtCapBac().isEmpty()) {
             nqtNguoiDung.setNqtCapBac(nqtRequest.getNqtCapBac());
         }
+        if (nqtRequest.getNqtAvatar() != null) {
+            nqtNguoiDung.setNqtAvatar(nqtRequest.getNqtAvatar());
+        }
 
         NqtNguoiDung nqtUpdated = nqtNguoiDungRepository.save(nqtNguoiDung);
         return nqtConvertToResponse(nqtUpdated);
@@ -102,6 +106,7 @@ public class NqtNguoiDungService {
         nqtResponse.setNqtVaiTro(nqtNguoiDung.getNqtVaiTro());
         nqtResponse.setNqtStatus(nqtNguoiDung.getNqtStatus());
         nqtResponse.setNqtCapBac(nqtNguoiDung.getNqtCapBac() != null ? nqtNguoiDung.getNqtCapBac() : "KhachThuong");
+        nqtResponse.setNqtAvatar(nqtNguoiDung.getNqtAvatar());
         return nqtResponse;
     }
 }

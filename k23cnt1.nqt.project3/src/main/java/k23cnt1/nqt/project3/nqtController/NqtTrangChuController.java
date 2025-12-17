@@ -63,8 +63,8 @@ public class NqtTrangChuController {
                 .limit(3)
                 .toList();
 
-        // Lấy đánh giá đã duyệt cho testimonials
-        List<NqtDanhGia> testimonials = nqtDanhGiaRepository.findByNqtStatusOrderByNqtNgayDanhGiaDesc(true)
+        // Lấy đánh giá đã duyệt cho testimonials (với fetch join để tránh lazy loading)
+        List<NqtDanhGia> testimonials = nqtDanhGiaRepository.findByNqtStatusOrderByNqtNgayDanhGiaDescWithFetch(true)
                 .stream()
                 .limit(6)
                 .toList();

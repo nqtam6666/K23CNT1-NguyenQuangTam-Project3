@@ -17,5 +17,6 @@ public class NqtNguoiDungRequest {
     private Byte nqtVaiTro;
     private Boolean nqtStatus;
     private String nqtCapBac;
+    private String nqtAvatar;
 }
 

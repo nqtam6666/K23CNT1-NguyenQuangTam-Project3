@@ -195,8 +195,16 @@ public class NqtAdminController {
 
     @PostMapping("/admin/nguoi-dung/create")
     public String nqtNguoiDungCreate(@ModelAttribute NqtNguoiDungRequest nqtRequest,
+            @RequestParam(value = "nqtAvatarFile", required = false) MultipartFile nqtAvatarFile,
             RedirectAttributes redirectAttributes) {
         try {
+            // Handle avatar upload
+            if (nqtAvatarFile != null && !nqtAvatarFile.isEmpty()) {
+                String avatarPath = saveFile(nqtAvatarFile);
+                if (avatarPath != null && !avatarPath.isEmpty()) {
+                    nqtRequest.setNqtAvatar(avatarPath);
+                }
+            }
             nqtNguoiDungService.nqtCreate(nqtRequest);
             redirectAttributes.addFlashAttribute("nqtSuccess", "Tạo người dùng thành công!");
         } catch (Exception e) {
@@ -225,6 +233,7 @@ public class NqtAdminController {
         nqtRequest.setNqtVaiTro(nqtResponse.getNqtVaiTro());
         nqtRequest.setNqtStatus(nqtResponse.getNqtStatus());
         nqtRequest.setNqtCapBac(nqtResponse.getNqtCapBac());
+        nqtRequest.setNqtAvatar(nqtResponse.getNqtAvatar());
         model.addAttribute("nqtRequest", nqtRequest);
         model.addAttribute("nqtId", nqtId);
         return "admin/nguoi-dung/form";
@@ -232,6 +241,7 @@ public class NqtAdminController {
 
     @PostMapping("/admin/nguoi-dung/edit/{nqtId}")
     public String nqtNguoiDungUpdate(@PathVariable Integer nqtId, @ModelAttribute NqtNguoiDungRequest nqtRequest,
+            @RequestParam(value = "nqtAvatarFile", required = false) MultipartFile nqtAvatarFile,
             RedirectAttributes redirectAttributes, HttpSession session) {
         try {
             // Check permission
@@ -240,6 +250,13 @@ public class NqtAdminController {
             if (currentUser != null && currentUser.getNqtVaiTro() != 99 && targetUser.getNqtVaiTro() == 99) {
                 redirectAttributes.addFlashAttribute("nqtError", "Bạn không được phép chỉnh sửa tài khoản Admin!");
                 return "redirect:" + adminPathService.getAdminPathWithSlash() + "/nguoi-dung";
+            }
+            // Handle avatar upload
+            if (nqtAvatarFile != null && !nqtAvatarFile.isEmpty()) {
+                String avatarPath = saveFile(nqtAvatarFile);
+                if (avatarPath != null && !avatarPath.isEmpty()) {
+                    nqtRequest.setNqtAvatar(avatarPath);
+                }
             }
             nqtNguoiDungService.nqtUpdate(nqtId, nqtRequest);
             redirectAttributes.addFlashAttribute("nqtSuccess", "Cập nhật thành công!");

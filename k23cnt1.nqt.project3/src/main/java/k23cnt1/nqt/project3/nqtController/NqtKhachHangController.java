@@ -18,8 +18,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.UUID;
 
 @Controller
 public class NqtKhachHangController {
@@ -481,6 +487,7 @@ public class NqtKhachHangController {
             @RequestParam(value = "nqtMatKhauCu", required = false) String nqtMatKhauCu,
             @RequestParam(value = "nqtMatKhauMoi", required = false) String nqtMatKhauMoi,
             @RequestParam(value = "nqtMatKhauMoiXacNhan", required = false) String nqtMatKhauMoiXacNhan,
+            @RequestParam(value = "nqtAvatar", required = false) MultipartFile nqtAvatarFile,
             HttpSession session,
             Model model) {
         NqtNguoiDung nqtCustomerUser = (NqtNguoiDung) session.getAttribute("nqtCustomerUser");
@@ -595,6 +602,41 @@ public class NqtKhachHangController {
                     }
                     // Reload entity to get fresh password
                     nqtNguoiDung = verifyPassword.get();
+                }
+            }
+
+            // Handle avatar upload
+            if (nqtAvatarFile != null && !nqtAvatarFile.isEmpty()) {
+                try {
+                    // Validate file type
+                    String contentType = nqtAvatarFile.getContentType();
+                    if (contentType != null && (contentType.startsWith("image/jpeg") || 
+                        contentType.startsWith("image/jpg") || 
+                        contentType.startsWith("image/png") || 
+                        contentType.startsWith("image/gif"))) {
+                        
+                        // Validate file size (max 5MB)
+                        if (nqtAvatarFile.getSize() > 5 * 1024 * 1024) {
+                            model.addAttribute("nqtError", "Kích thước ảnh không được vượt quá 5MB!");
+                            model.addAttribute("nqtCustomerUser", nqtNguoiDung);
+                            return "nqtCustomer/nqtTaiKhoan/nqtDashboard";
+                        }
+                        
+                        String avatarPath = saveFile(nqtAvatarFile);
+                        if (avatarPath != null && !avatarPath.isEmpty()) {
+                            nqtNguoiDung.setNqtAvatar(avatarPath);
+                        }
+                    } else {
+                        model.addAttribute("nqtError", "Chỉ chấp nhận file ảnh (JPG, PNG, GIF)!");
+                        model.addAttribute("nqtCustomerUser", nqtNguoiDung);
+                        return "nqtCustomer/nqtTaiKhoan/nqtDashboard";
+                    }
+                } catch (Exception e) {
+                    System.err.println("Error uploading avatar: " + e.getMessage());
+                    e.printStackTrace();
+                    model.addAttribute("nqtError", "Lỗi khi upload ảnh đại diện: " + e.getMessage());
+                    model.addAttribute("nqtCustomerUser", nqtNguoiDung);
+                    return "nqtCustomer/nqtTaiKhoan/nqtDashboard";
                 }
             }
 
@@ -783,5 +825,24 @@ public class NqtKhachHangController {
         }
 
         return "nqtCustomer/nqtTaiKhoan/nqtDashboard";
+    }
+
+    // Helper method to save file
+    private String saveFile(MultipartFile file) {
+        if (file != null && !file.isEmpty()) {
+            try {
+                String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+                Path path = Paths.get("src/main/resources/static/uploads");
+                if (!Files.exists(path)) {
+                    Files.createDirectories(path);
+                }
+                Files.copy(file.getInputStream(), path.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
+                return "/uploads/" + fileName;
+            } catch (Exception e) {
+                System.err.println("Error saving file: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+        return null;
     }
 }

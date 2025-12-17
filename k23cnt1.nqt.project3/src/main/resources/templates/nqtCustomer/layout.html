@@ -172,21 +172,31 @@
             margin-top: 0 !important;
         }
 
-        /* User Avatar - Ensure it's always visible */
-        .user-avatar-bg,
-        button .w-9.h-9.rounded-full {
+        /* User Avatar - Ensure it's always visible and properly aligned */
+        .user-avatar-bg {
             display: flex !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-            width: 36px !important;
-            height: 36px !important;
-            min-width: 36px !important;
-            min-height: 36px !important;
-            max-width: 36px !important;
-            max-height: 36px !important;
-            position: relative !important;
-            z-index: 50 !important;
+            align-items: center !important;
+            justify-content: center !important;
             flex-shrink: 0 !important;
+            overflow: hidden !important;
+        }
+        
+        /* Ensure avatar image fills container without gaps */
+        .user-avatar-bg img {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            display: block !important;
+            border-radius: 50% !important;
+        }
+        
+        /* Ensure avatar text is centered */
+        .user-avatar-bg span {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 100% !important;
+            height: 100% !important;
         }
 
         /* Custom Scrollbar */
@@ -420,15 +430,22 @@
                         </a>
                         <!-- User Menu -->
                         <div class="relative group">
-                            <button class="flex items-center space-x-2 text-gray-700 hover:text-amber-700 transition-colors" type="button">
-                                <div class="rounded-full flex items-center justify-center flex-shrink-0 shadow-md overflow-hidden"
-                                    style="width: 36px !important; height: 36px !important; min-width: 36px !important; min-height: 36px !important; max-width: 36px !important; max-height: 36px !important; display: flex !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 50 !important; background: linear-gradient(135deg, #d97706, rgba(217, 119, 6, 0.8)) !important;"
-                                    th:style="'width: 36px !important; height: 36px !important; min-width: 36px !important; min-height: 36px !important; max-width: 36px !important; max-height: 36px !important; display: flex !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 50 !important; background: linear-gradient(135deg, ' + ${nqtWebsiteColor ?: '#d97706'} + ', rgba(217, 119, 6, 0.8)) !important;'">
-                                    <span class="text-white font-semibold text-sm leading-none" 
-                                        style="color: white !important; font-size: 14px !important; line-height: 1 !important; display: block !important;"
-                                        th:text="${session.nqtCustomerUser != null and session.nqtCustomerUser.nqtHoVaTen != null ? #strings.substring(session.nqtCustomerUser.nqtHoVaTen, 0, 1) : 'U'}">U</span>
+                            <button class="flex items-center space-x-2 text-gray-700 hover:text-amber-700 transition-colors">
+                                <div class="rounded-full flex items-center justify-center user-avatar-bg overflow-hidden flex-shrink-0"
+                                    style="width: 36px; height: 36px; min-width: 36px; min-height: 36px; max-width: 36px; max-height: 36px; padding: 0; margin: 0;"
+                                    th:style="${session.nqtCustomerUser.nqtAvatar != null and session.nqtCustomerUser.nqtAvatar != ''} ? 
+                                        'width: 36px; height: 36px; min-width: 36px; min-height: 36px; max-width: 36px; max-height: 36px; padding: 0; margin: 0;' : 
+                                        ('width: 36px; height: 36px; min-width: 36px; min-height: 36px; max-width: 36px; max-height: 36px; padding: 0; margin: 0; background: linear-gradient(to right bottom, ' + ${nqtWebsiteColor ?: '#d97706'} + ', ' + ${#strings.replace(nqtWebsiteColor ?: '#d97706', '#', '')} + 'cc);')">
+                                    <img th:if="${session.nqtCustomerUser.nqtAvatar != null and session.nqtCustomerUser.nqtAvatar != ''}"
+                                         th:src="${session.nqtCustomerUser.nqtAvatar}"
+                                         alt="Avatar"
+                                         style="width: 100%; height: 100%; object-fit: cover; display: block; margin: 0; padding: 0; border-radius: 50%;">
+                                    <span th:unless="${session.nqtCustomerUser.nqtAvatar != null and session.nqtCustomerUser.nqtAvatar != ''}"
+                                          class="text-white font-semibold text-sm leading-none"
+                                          style="margin: 0; padding: 0; line-height: 1;"
+                                          th:text="${#strings.substring(session.nqtCustomerUser.nqtHoVaTen, 0, 1)}">U</span>
                                 </div>
-                                <span class="font-medium hidden md:block" th:text="${session.nqtCustomerUser.nqtHoVaTen}">User</span>
+                                <span class="font-medium hidden md:block leading-none" th:text="${session.nqtCustomerUser.nqtHoVaTen}">User</span>
                             </button>
                             <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 border border-gray-100">
                                 <a href="/nqtTaiKhoan" class="block px-4 py-2.5 text-gray-700 hover:bg-amber-50 rounded-t-lg transition-colors">Tài khoản</a>

@@ -59,6 +59,9 @@ public class NqtNguoiDung {
     @Column(name = "nqtPasswordResetTokenExpiresAt")
     private java.time.LocalDateTime nqtPasswordResetTokenExpiresAt; // Token expiration time
 
+    @Column(name = "nqtAvatar", columnDefinition = "VARCHAR(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci")
+    private String nqtAvatar; // Đường dẫn đến file avatar của người dùng
+
     @OneToMany(mappedBy = "nqtNguoiDung", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private java.util.List<NqtDatPhong> nqtDatPhongList;
 
