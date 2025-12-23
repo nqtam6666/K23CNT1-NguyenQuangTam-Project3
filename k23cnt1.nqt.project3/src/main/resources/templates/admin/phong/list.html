@@ -210,21 +210,24 @@
                         return;
                     }
                     
+                    // Get admin path from Thymeleaf
+                    const adminPath = /*[[${nqtAdminPath}]]*/ '/admin';
+                    
                     let confirmMessage = '';
                     let actionUrl = '';
                     
                     switch(action) {
                         case 'activate':
                             confirmMessage = 'Bạn có chắc chắn muốn đặt trống ' + selected.length + ' phòng đã chọn?';
-                            actionUrl = '/admin/' + entity + '/bulk-activate';
+                            actionUrl = adminPath + '/' + entity + '/bulk-activate';
                             break;
                         case 'deactivate':
                             confirmMessage = 'Bạn có chắc chắn muốn đặt đã đặt ' + selected.length + ' phòng đã chọn?';
-                            actionUrl = '/admin/' + entity + '/bulk-deactivate';
+                            actionUrl = adminPath + '/' + entity + '/bulk-deactivate';
                             break;
                         case 'delete':
                             confirmMessage = 'Bạn có chắc chắn muốn xóa ' + selected.length + ' phòng đã chọn? Hành động này không thể hoàn tác!';
-                            actionUrl = '/admin/' + entity + '/bulk-delete';
+                            actionUrl = adminPath + '/' + entity + '/bulk-delete';
                             break;
                         default:
                             alert('Hành động không hợp lệ!');

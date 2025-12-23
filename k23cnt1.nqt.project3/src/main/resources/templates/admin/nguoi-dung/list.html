@@ -239,21 +239,24 @@
                         return;
                     }
                     
+                    // Get admin path from Thymeleaf
+                    const adminPath = /*[[${nqtAdminPath}]]*/ '/admin';
+                    
                     let confirmMessage = '';
                     let actionUrl = '';
                     
                     switch(action) {
                         case 'activate':
                             confirmMessage = 'Bạn có chắc chắn muốn kích hoạt ' + selected.length + ' mục đã chọn?';
-                            actionUrl = '/admin/nguoi-dung/bulk-activate';
+                            actionUrl = adminPath + '/nguoi-dung/bulk-activate';
                             break;
                         case 'deactivate':
                             confirmMessage = 'Bạn có chắc chắn muốn vô hiệu hóa ' + selected.length + ' mục đã chọn?';
-                            actionUrl = '/admin/nguoi-dung/bulk-deactivate';
+                            actionUrl = adminPath + '/nguoi-dung/bulk-deactivate';
                             break;
                         case 'delete':
                             confirmMessage = 'Bạn có chắc chắn muốn xóa ' + selected.length + ' mục đã chọn? Hành động này không thể hoàn tác!';
-                            actionUrl = '/admin/nguoi-dung/bulk-delete';
+                            actionUrl = adminPath + '/nguoi-dung/bulk-delete';
                             break;
                         default:
                             alert('Hành động không hợp lệ!');

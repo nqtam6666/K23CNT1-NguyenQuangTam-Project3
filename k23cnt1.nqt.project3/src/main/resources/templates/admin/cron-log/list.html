@@ -24,9 +24,13 @@
 
         <!-- Filters -->
         <div class="mb-4 flex space-x-4">
+            <script th:inline="javascript">
+                const adminPath = /*[[${nqtAdminPath}]]*/ '/admin';
+            </script>
             <select
                 class="px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-700"
-                onchange="window.location.href = '/admin/cron-log?status=' + this.value">
+                th:attr="data-admin-path=${nqtAdminPath}"
+                onchange="window.location.href = this.getAttribute('data-admin-path') + '/cron-log?status=' + this.value;">
                 <option value="">-- Tất cả Trạng thái --</option>
                 <option value="SUCCESS" th:selected="${selectedStatus == 'SUCCESS'}">SUCCESS</option>
                 <option value="ERROR" th:selected="${selectedStatus == 'ERROR'}">ERROR</option>
@@ -36,8 +40,10 @@
                 placeholder="Tìm theo tên task..."
                 class="px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-700"
                 th:value="${selectedTaskName}"
-                onkeypress="if(event.key === 'Enter') { window.location.href = '/admin/cron-log?taskName=' + this.value; }">
-            <button onclick="window.location.href = '/admin/cron-log?taskName=' + document.querySelector('input[placeholder=\"Tìm theo tên task...\"]').value"
+                th:attr="data-admin-path=${nqtAdminPath}"
+                onkeypress="if(event.key === 'Enter') { window.location.href = this.getAttribute('data-admin-path') + '/cron-log?taskName=' + this.value; }">
+            <button th:attr="data-admin-path=${nqtAdminPath}"
+                onclick="window.location.href = this.getAttribute('data-admin-path') + '/cron-log?taskName=' + document.querySelector('input[placeholder=&quot;Tìm theo tên task...&quot;]').value"
                 class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -126,7 +132,8 @@
                                 th:text="${#temporals.format(item.nqtCreatedAt, 'dd/MM/yyyy HH:mm:ss')}"></td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <button th:if="${item.nqtErrorDetails != null}"
-                                    onclick="showErrorDetails([[${item.nqtErrorDetails}]])"
+                                    th:attr="data-error-details=${item.nqtErrorDetails}"
+                                    onclick="showErrorDetails(this.getAttribute('data-error-details'))"
                                     class="text-red-600 hover:text-red-900 mr-3" title="Xem chi tiết lỗi">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>

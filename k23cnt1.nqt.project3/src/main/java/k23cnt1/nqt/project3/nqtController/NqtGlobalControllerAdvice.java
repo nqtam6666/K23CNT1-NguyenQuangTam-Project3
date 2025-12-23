@@ -192,4 +192,45 @@ public class NqtGlobalControllerAdvice {
             return new ArrayList<>();
         }
     }
+
+    // Popup Settings
+    @ModelAttribute("nqtPopupEnabled")
+    public String nqtPopupEnabled() {
+        return nqtSettingService.getNqtValue("nqtPopupEnabled", "true");
+    }
+
+    @ModelAttribute("nqtPopupTitle")
+    public String nqtPopupTitle() {
+        String popupTitle = nqtSettingService.getNqtValue("nqtPopupTitle", "");
+        if (popupTitle == null || popupTitle.trim().isEmpty()) {
+            String websiteName = nqtSettingService.getNqtValue("nqtWebsiteName", "Hotel NQT");
+            return "🎉 Chào mừng đến với " + websiteName + "!";
+        }
+        return popupTitle;
+    }
+
+    @ModelAttribute("nqtPopupContent")
+    public String nqtPopupContent() {
+        return nqtSettingService.getNqtValue("nqtPopupContent", "Chúng tôi rất vui được chào đón bạn đến với khách sạn của chúng tôi. Hãy tận hưởng những ưu đãi độc quyền ngay hôm nay!");
+    }
+
+    @ModelAttribute("nqtPopupOfferText")
+    public String nqtPopupOfferText() {
+        return nqtSettingService.getNqtValue("nqtPopupOfferText", "Giảm 20%");
+    }
+
+    @ModelAttribute("nqtPopupOfferDesc")
+    public String nqtPopupOfferDesc() {
+        return nqtSettingService.getNqtValue("nqtPopupOfferDesc", "Cho đơn đặt phòng đầu tiên");
+    }
+
+    @ModelAttribute("nqtPopupButtonText")
+    public String nqtPopupButtonText() {
+        return nqtSettingService.getNqtValue("nqtPopupButtonText", "Đặt phòng ngay");
+    }
+
+    @ModelAttribute("nqtPopupButtonLink")
+    public String nqtPopupButtonLink() {
+        return nqtSettingService.getNqtValue("nqtPopupButtonLink", "#booking");
+    }
 }

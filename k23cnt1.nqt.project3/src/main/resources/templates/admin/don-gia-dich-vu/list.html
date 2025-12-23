@@ -188,12 +188,15 @@
                         return;
                     }
                     
+                    // Get admin path from Thymeleaf
+                    const adminPath = /*[[${nqtAdminPath}]]*/ '/admin';
+                    
                     let confirmMessage = '';
                     let actionUrl = '';
                     
                     if (action === 'delete') {
                         confirmMessage = 'Bạn có chắc chắn muốn xóa ' + selected.length + ' mục đã chọn? Hành động này không thể hoàn tác!';
-                        actionUrl = '/admin/' + entity + '/bulk-delete';
+                        actionUrl = adminPath + '/' + entity + '/bulk-delete';
                     } else {
                         alert('Hành động không hợp lệ!');
                         return;

@@ -184,6 +184,9 @@
                     if (window.updateBulkActions) window.updateBulkActions();
                 };
 
+                // Get admin path from Thymeleaf
+                const adminPath = /*[[${nqtAdminPath}]]*/ '/admin';
+                
                 window.executeBulkAction = function(entity) {
                     const selected = Array.from(getRowCheckboxes()).filter(cb => cb.checked).map(cb => cb.value);
                     const actionSelect = document.getElementById('bulkActionSelect');
@@ -205,15 +208,15 @@
                     switch(action) {
                         case 'activate':
                             confirmMessage = 'Bạn có chắc chắn muốn kích hoạt ' + selected.length + ' mục đã chọn?';
-                            actionUrl = '/admin/' + entity + '/bulk-activate';
+                            actionUrl = adminPath + '/' + entity + '/bulk-activate';
                             break;
                         case 'deactivate':
                             confirmMessage = 'Bạn có chắc chắn muốn vô hiệu hóa ' + selected.length + ' mục đã chọn?';
-                            actionUrl = '/admin/' + entity + '/bulk-deactivate';
+                            actionUrl = adminPath + '/' + entity + '/bulk-deactivate';
                             break;
                         case 'delete':
                             confirmMessage = 'Bạn có chắc chắn muốn xóa ' + selected.length + ' mục đã chọn? Hành động này không thể hoàn tác!';
-                            actionUrl = '/admin/' + entity + '/bulk-delete';
+                            actionUrl = adminPath + '/' + entity + '/bulk-delete';
                             break;
                         default:
                             alert('Hành động không hợp lệ!');

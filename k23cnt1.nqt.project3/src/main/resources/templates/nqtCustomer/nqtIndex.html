@@ -52,6 +52,17 @@
         .font-serif {
             font-family: /*[[${nqtCustomerFontSerif ?: 'Playfair Display'}]]*/ 'Playfair Display', Georgia, 'Times New Roman', serif !important;
         }
+        
+        /* Ensure all children of font-serif elements inherit the serif font */
+        .font-serif *,
+        h1.font-serif *,
+        h2.font-serif *,
+        h3.font-serif *,
+        h4.font-serif *,
+        h5.font-serif *,
+        h6.font-serif * {
+            font-family: inherit !important;
+        }
 
         /* Glassmorphism Effect */
         .glass {
@@ -137,6 +148,38 @@
         /* Gold Accent - Use setting color */
         .gold-accent {
             color: var(--color-primary) !important;
+            font-family: inherit !important;
+        }
+        
+        /* Special styling for gold-accent on dark backgrounds (hero section) - Bright orange-gold color with strong glow */
+        .hero-bg .gold-accent,
+        section[class*="hero"] .gold-accent,
+        section[class*="banner"] .gold-accent,
+        section[class*="Banner"] .gold-accent,
+        .banner-carousel .gold-accent,
+        .carousel-container .gold-accent,
+        section:has(.banner-carousel) .gold-accent,
+        section .banner-carousel ~ * .gold-accent,
+        section .banner-carousel .gold-accent,
+        /* Target gold-accent in banner carousel overlay */
+        section:has(.banner-carousel) .gold-accent,
+        section .absolute.inset-0 .gold-accent {
+            color: #FF9933 !important;
+            font-family: inherit !important;
+            background: none !important;
+            background-image: none !important;
+            -webkit-background-clip: unset !important;
+            background-clip: unset !important;
+            -webkit-text-fill-color: #FF9933 !important;
+            text-shadow: 
+                0 0 3px rgba(255, 153, 51, 0.4),
+                0 0 6px rgba(255, 153, 51, 0.3),
+                0 0 9px rgba(255, 153, 51, 0.25),
+                0 0 12px rgba(255, 153, 51, 0.2),
+                0 0 15px rgba(255, 153, 51, 0.15),
+                0 2px 4px rgba(0, 0, 0, 0.2);
+            filter: brightness(1.05) drop-shadow(0 0 4px rgba(255, 153, 51, 0.4)) drop-shadow(0 0 8px rgba(255, 153, 51, 0.3));
+            font-weight: 700;
         }
 
         .gold-border {
@@ -375,6 +418,198 @@
                 font-size: 12px;
             }
         }
+
+        /* Welcome Popup Styles */
+        .welcome-popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .welcome-popup-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .welcome-popup {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+            transform: scale(0.9) translateY(20px);
+            transition: transform 0.3s ease;
+            overflow: hidden;
+        }
+
+        .welcome-popup-overlay.show .welcome-popup {
+            transform: scale(1) translateY(0);
+        }
+
+        .welcome-popup-header {
+            background: linear-gradient(135deg, var(--color-primary) 0%, rgba(217, 119, 6, 0.8) 100%);
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .welcome-popup-header h2 {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            margin: 0;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .welcome-popup-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-size: 20px;
+            line-height: 1;
+        }
+
+        .welcome-popup-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        .welcome-popup-body {
+            padding: 30px;
+            text-align: center;
+        }
+
+        .welcome-popup-body h3 {
+            color: #1a1a1a;
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .welcome-popup-body p {
+            color: #666;
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .welcome-popup-offer {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffe69c 100%);
+            border: 2px solid var(--color-primary);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .welcome-popup-offer .offer-text {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--color-primary);
+            margin-bottom: 10px;
+        }
+
+        .welcome-popup-offer .offer-desc {
+            font-size: 14px;
+            color: #856404;
+        }
+
+        .welcome-popup-button {
+            background: linear-gradient(to right, var(--color-primary), rgba(217, 119, 6, 0.8));
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .welcome-popup-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(217, 119, 6, 0.3);
+        }
+
+        /* Action Buttons */
+        .welcome-popup-action-btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid;
+            flex: 1;
+            max-width: 150px;
+        }
+
+        .welcome-popup-close-btn {
+            background: white;
+            color: #666;
+            border-color: #ddd;
+        }
+
+        .welcome-popup-close-btn:hover {
+            background: #f5f5f5;
+            border-color: #999;
+            transform: translateY(-1px);
+        }
+
+        .welcome-popup-hide-btn {
+            background: var(--color-primary);
+            color: white;
+            border-color: var(--color-primary);
+        }
+
+        .welcome-popup-hide-btn:hover {
+            background: rgba(217, 119, 6, 0.9);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .welcome-popup {
+                max-width: 90%;
+                margin: 20px;
+            }
+
+            .welcome-popup-header h2 {
+                font-size: 24px;
+            }
+
+            .welcome-popup-body h3 {
+                font-size: 20px;
+            }
+
+            .welcome-popup-offer .offer-text {
+                font-size: 28px;
+            }
+        }
     </style>
 </head>
 
@@ -482,10 +717,12 @@
                                          th:src="${session.nqtCustomerUser.nqtAvatar}"
                                          alt="Avatar"
                                          style="width: 100%; height: 100%; object-fit: cover; display: block; margin: 0; padding: 0; border-radius: 50%;">
-                                    <span th:unless="${session.nqtCustomerUser.nqtAvatar != null and session.nqtCustomerUser.nqtAvatar != ''}"
-                                          class="text-white font-semibold text-sm leading-none"
-                                          style="margin: 0; padding: 0; line-height: 1;"
-                                          th:text="${#strings.substring(session.nqtCustomerUser.nqtHoVaTen, 0, 1)}">U</span>
+                                    <!-- Default avatar icon when user has no avatar -->
+                                    <svg th:unless="${session.nqtCustomerUser.nqtAvatar != null and session.nqtCustomerUser.nqtAvatar != ''}"
+                                         class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
+                                         style="margin: 0; padding: 0;">
+                                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                    </svg>
                                 </div>
                                 <span class="font-medium hidden md:block leading-none" th:text="${session.nqtCustomerUser.nqtHoVaTen}">User</span>
                             </button>
@@ -549,8 +786,8 @@
                 <div class="grid lg:grid-cols-3 gap-8 items-center">
                     <!-- Left: Headline (2 columns on large screens) -->
                     <div class="lg:col-span-2 text-white">
-                        <h1 class="font-serif text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
-                            Trải nghiệm <span class="gold-accent">sang trọng</span><br>đẳng cấp thế giới
+                        <h1 class="font-serif text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-relaxed">
+                            <span style="display: block; margin-bottom: 15px;">Trải nghiệm <span class="gold-accent">sang trọng</span></span>đẳng cấp thế giới
                         </h1>
                         <p class="text-lg md:text-xl text-gray-200 mb-6 leading-relaxed">
                             Nơi hội tụ tinh hoa kiến trúc, nghệ thuật phục vụ và những khoảnh khắc đáng nhớ nhất
@@ -615,8 +852,8 @@
             <div class="grid lg:grid-cols-2 gap-12 items-center">
                 <!-- Left: Headline -->
                 <div class="text-white fade-in-up">
-                    <h1 class="font-serif text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-                        Trải nghiệm <span class="gold-accent">sang trọng</span><br>đẳng cấp thế giới
+                    <h1 class="font-serif text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-relaxed">
+                        <span style="display: block; margin-bottom: 15px;">Trải nghiệm <span class="gold-accent">sang trọng</span></span>đẳng cấp thế giới
                     </h1>
                     <p class="text-xl md:text-2xl text-gray-200 mb-8 leading-relaxed">
                         Nơi hội tụ tinh hoa kiến trúc, nghệ thuật phục vụ và những khoảnh khắc đáng nhớ nhất
@@ -981,22 +1218,22 @@
                     <p class="text-gray-300 text-sm leading-relaxed mb-6 max-w-xs">Khách sạn cao cấp với dịch vụ tinh tế và trải nghiệm độc quyền.</p>
                     <div class="flex items-center space-x-3">
                         <a th:href="${nqtWebsiteFacebook ?: '#'}" target="_blank" 
-                            class="w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-300 group bg-white hover:bg-blue-600 hover:scale-110 hover:shadow-xl overflow-hidden"
+                            class="w-11 h-11 rounded-xl flex items-center justify-center bg-white overflow-hidden"
                             th:if="${nqtWebsiteFacebook != null and nqtWebsiteFacebook != '' and nqtWebsiteFacebook != '#'}"
                             title="Facebook">
-                            <img src="/img/facebook.png" alt="Facebook" class="w-6 h-6 object-contain group-hover:brightness-0 group-hover:invert transition-all">
+                            <img src="/img/facebook.png" alt="Facebook" class="w-6 h-6 object-contain">
                         </a>
                         <a th:href="${nqtWebsiteZalo ?: '#'}" target="_blank" 
-                            class="w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-300 group bg-white hover:bg-blue-500 hover:scale-110 hover:shadow-xl overflow-hidden"
+                            class="w-11 h-11 rounded-xl flex items-center justify-center bg-white overflow-hidden"
                             th:if="${nqtWebsiteZalo != null and nqtWebsiteZalo != '' and nqtWebsiteZalo != '#'}"
                             title="Zalo">
-                            <img src="/img/Logo-Zalo-App-Rec.webp" alt="Zalo" class="w-6 h-6 object-contain group-hover:brightness-0 group-hover:invert transition-all">
+                            <img src="/img/Logo-Zalo-App-Rec.webp" alt="Zalo" class="w-6 h-6 object-contain">
                         </a>
                         <a th:href="${nqtWebsiteLink ?: '#'}" target="_blank" 
-                            class="w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-300 group bg-white hover:bg-indigo-600 hover:scale-110 hover:shadow-xl overflow-hidden"
+                            class="w-11 h-11 rounded-xl flex items-center justify-center bg-white overflow-hidden"
                             th:if="${nqtWebsiteLink != null and nqtWebsiteLink != '' and nqtWebsiteLink != '#'}"
                             title="Website">
-                            <img src="/img/world-wide-web.png" alt="Website" class="w-6 h-6 object-contain group-hover:brightness-0 group-hover:invert transition-all">
+                            <img src="/img/world-wide-web.png" alt="Website" class="w-6 h-6 object-contain">
                         </a>
                     </div>
                 </div>
@@ -1178,24 +1415,29 @@
             
             // Apply gradient to all elements with style containing linear-gradient
             // Thymeleaf renders th:style as style, so we check all elements with style attribute
-            // BUT skip navigation links and dropdown items to avoid conflicts
+            // BUT skip navigation text links (not buttons) and dropdown items to avoid conflicts
             const allElementsWithStyle = document.querySelectorAll('*');
             allElementsWithStyle.forEach(function(el) {
-                // Skip navigation links and dropdown items
+                // Skip navigation text links (not buttons) and dropdown items
                 const tagName = el.tagName.toLowerCase();
                 const classes = el.className || '';
-                const isNavLink = tagName === 'a' && (
-                    el.closest('nav') !== null || 
-                    el.closest('.group') !== null ||
-                    classes.includes('hover:text-amber-') ||
-                    classes.includes('hover:bg-amber-')
+                const href = el.getAttribute('href') || '';
+                const styleAttr = el.getAttribute('style') || '';
+                
+                // Check if it's a navigation text link (not a button with gradient)
+                const isNavTextLink = tagName === 'a' && (
+                    (el.closest('nav') !== null && !styleAttr.includes('linear-gradient') && !classes.includes('px-')) || 
+                    (el.closest('.group') !== null && !styleAttr.includes('linear-gradient')) ||
+                    (classes.includes('hover:text-amber-') && !styleAttr.includes('linear-gradient'))
                 );
                 
-                if (isNavLink) {
+                // Don't skip register button or any button with gradient
+                const isRegisterButton = href === '/nqtDangKy' || (styleAttr.includes('linear-gradient') && classes.includes('px-'));
+                
+                if (isNavTextLink && !isRegisterButton) {
                     return; // Skip this element
                 }
                 
-                const styleAttr = el.getAttribute('style') || '';
                 // Check if element has a style with linear-gradient
                 if (styleAttr.includes('linear-gradient')) {
                     // Determine gradient direction and apply dynamic colors
@@ -1240,11 +1482,50 @@
                 }
             });
             
+            // Helper function to lighten color (makes it brighter)
+            function lightenColor(hex, percent) {
+                const num = parseInt(hex.replace('#', ''), 16);
+                const r = Math.min(255, Math.floor((num >> 16) + (255 - (num >> 16)) * percent));
+                const g = Math.min(255, Math.floor(((num >> 8) & 0x00FF) + (255 - ((num >> 8) & 0x00FF)) * percent));
+                const b = Math.min(255, Math.floor((num & 0x0000FF) + (255 - (num & 0x0000FF)) * percent));
+                return '#' + ((r << 16) | (g << 8) | b).toString(16).padStart(6, '0');
+            }
+            
             // Apply to gold-accent class immediately
             const goldAccents = document.querySelectorAll('.gold-accent');
             goldAccents.forEach(function(el) {
-                el.style.color = primaryColor;
-                el.style.setProperty('color', primaryColor, 'important');
+                // Check if element is in hero section or banner
+                const isInHero = el.closest('.hero-bg') || 
+                                 el.closest('section[class*="hero"]') || 
+                                 el.closest('[class*="banner"]') || 
+                                 el.closest('[id*="banner"]') ||
+                                 el.closest('.banner-carousel') ||
+                                 el.closest('.carousel-container') ||
+                                 el.closest('section:has(.banner-carousel)');
+                
+                if (isInHero) {
+                    // Use orange color (#FF9933) - no gradient, solid color with subtle orange glow
+                    const orangeColor = '#FF9933';
+                    el.style.color = orangeColor;
+                    el.style.setProperty('color', orangeColor, 'important');
+                    // Remove any gradient effects
+                    el.style.background = 'none';
+                    el.style.backgroundImage = 'none';
+                    el.style.setProperty('-webkit-background-clip', 'unset', 'important');
+                    el.style.setProperty('background-clip', 'unset', 'important');
+                    el.style.setProperty('-webkit-text-fill-color', orangeColor, 'important');
+                    // Add subtle orange glow effect around text
+                    el.style.textShadow = '0 0 3px rgba(255, 153, 51, 0.4), 0 0 6px rgba(255, 153, 51, 0.3), 0 0 9px rgba(255, 153, 51, 0.25), 0 0 12px rgba(255, 153, 51, 0.2), 0 0 15px rgba(255, 153, 51, 0.15), 0 2px 4px rgba(0, 0, 0, 0.2)';
+                    el.style.filter = 'brightness(1.05) drop-shadow(0 0 4px rgba(255, 153, 51, 0.4)) drop-shadow(0 0 8px rgba(255, 153, 51, 0.3))';
+                    el.style.fontWeight = '700';
+                } else {
+                    // Normal color for other sections
+                    el.style.color = primaryColor;
+                    el.style.setProperty('color', primaryColor, 'important');
+                    // Remove any gradient effects
+                    el.style.background = 'none';
+                    el.style.backgroundImage = 'none';
+                }
             });
             
             // Also update CSS variable for gold-accent
@@ -1300,6 +1581,19 @@
                 btn.style.setProperty('color', 'white', 'important');
                 btn.style.setProperty('border', 'none', 'important');
             });
+            
+            // Apply dynamic color to register button (Đăng ký) in navigation - Force apply
+            const registerButton = document.querySelector('a[href="/nqtDangKy"]');
+            if (registerButton) {
+                // Create darker version for gradient end
+                const registerButtonDark = primaryColor + 'dd';
+                // Force apply gradient with !important to override any other styles
+                registerButton.style.setProperty('background', 'linear-gradient(to right, ' + primaryColor + ', ' + registerButtonDark + ')', 'important');
+                registerButton.style.setProperty('background-image', 'linear-gradient(to right, ' + primaryColor + ', ' + registerButtonDark + ')', 'important');
+                registerButton.style.setProperty('background-color', 'transparent', 'important');
+                registerButton.style.setProperty('color', 'white', 'important');
+                registerButton.style.setProperty('border', 'none', 'important');
+            }
         });
 
         // Copy voucher code function
@@ -1405,6 +1699,150 @@
         </svg>
         <span>Hotline: <span th:text="${nqtWebsitePhone ?: '0961138440'}">0961138440</span></span>
     </a>
+
+    <!-- Welcome Popup -->
+    <div id="welcomePopup" class="welcome-popup-overlay" th:if="${nqtPopupEnabled == 'true'}">
+        <div class="welcome-popup">
+            <div class="welcome-popup-header">
+                <h2 th:text="${nqtPopupTitle != null and nqtPopupTitle != '' ? nqtPopupTitle : ('🎉 Chào mừng đến với ' + (nqtWebsiteName ?: 'Hotel NQT') + '!')}">🎉 Chào mừng đến với Hotel NQT!</h2>
+                <button class="welcome-popup-close" onclick="closeWelcomePopup()" aria-label="Đóng">×</button>
+            </div>
+            <div class="welcome-popup-body">
+                <h3 th:if="${nqtPopupContent != null and nqtPopupContent != '' and !nqtPopupContent.isEmpty()}">Ưu đãi đặc biệt dành cho bạn!</h3>
+                <p th:if="${nqtPopupContent != null and nqtPopupContent != '' and !nqtPopupContent.isEmpty()}" 
+                   th:text="${nqtPopupContent}">Chúng tôi rất vui được chào đón bạn đến với khách sạn của chúng tôi. Hãy tận hưởng những ưu đãi độc quyền ngay hôm nay!</p>
+                <p th:unless="${nqtPopupContent != null and nqtPopupContent != '' and !nqtPopupContent.isEmpty()}" 
+                   class="text-gray-600">Chúng tôi rất vui được chào đón bạn đến với khách sạn của chúng tôi. Hãy tận hưởng những ưu đãi độc quyền ngay hôm nay!</p>
+                <div class="welcome-popup-offer" th:if="${nqtPopupOfferText != null and nqtPopupOfferText != '' and !nqtPopupOfferText.isEmpty()}">
+                    <div class="offer-text" th:text="${nqtPopupOfferText}">Giảm 20%</div>
+                    <div class="offer-desc" th:if="${nqtPopupOfferDesc != null and nqtPopupOfferDesc != '' and !nqtPopupOfferDesc.isEmpty()}" 
+                         th:text="${nqtPopupOfferDesc}">Cho đơn đặt phòng đầu tiên</div>
+                </div>
+                <!-- <a th:href="${nqtPopupButtonLink != null and nqtPopupButtonLink != '' ? nqtPopupButtonLink : '#booking'}" 
+                   class="welcome-popup-button" 
+                   onclick="closeWelcomePopup(); return true;"
+                   th:text="${nqtPopupButtonText != null and nqtPopupButtonText != '' ? nqtPopupButtonText : 'Đặt phòng ngay'}">Đặt phòng ngay</a>
+                 -->
+                <!-- Action Buttons -->
+                <div class="flex gap-3 mt-4 justify-center">
+                    <button type="button" 
+                            onclick="closeWelcomePopup()" 
+                            class="welcome-popup-action-btn welcome-popup-close-btn">
+                        Đóng
+                    </button>
+                    <button type="button" 
+                            onclick="closeWelcomePopupFor2Hours()" 
+                            class="welcome-popup-action-btn welcome-popup-hide-btn">
+                        Ẩn 2 tiếng
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Welcome Popup Logic
+        function showWelcomePopup() {
+            const popup = document.getElementById('welcomePopup');
+            if (popup) {
+                popup.classList.add('show');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeWelcomePopup() {
+            const popup = document.getElementById('welcomePopup');
+            if (popup) {
+                popup.classList.remove('show');
+                document.body.style.overflow = '';
+                // KHÔNG lưu vào localStorage - popup sẽ hiện lại lần sau
+            }
+        }
+
+        function closeWelcomePopupFor2Hours() {
+            const popup = document.getElementById('welcomePopup');
+            if (popup) {
+                popup.classList.remove('show');
+                document.body.style.overflow = '';
+                
+                // Lưu thời gian đóng vào localStorage (2 tiếng = 7200000 milliseconds)
+                const closeTime = new Date().getTime();
+                localStorage.setItem('welcomePopupClosed', closeTime.toString());
+            }
+        }
+
+        function shouldShowPopup() {
+            const closedTime = localStorage.getItem('welcomePopupClosed');
+            
+            // Nếu chưa từng đóng, hiển thị popup
+            if (!closedTime) {
+                return true;
+            }
+            
+            // Kiểm tra xem đã qua 2 tiếng chưa (2 tiếng = 7200000 milliseconds)
+            const now = new Date().getTime();
+            const timeDiff = now - parseInt(closedTime);
+            const twoHours = 2 * 60 * 60 * 1000; // 2 tiếng tính bằng milliseconds
+            
+            // Nếu đã qua 2 tiếng, hiển thị lại popup
+            return timeDiff >= twoHours;
+        }
+
+        // Kiểm tra và hiển thị popup khi trang được tải
+        document.addEventListener('DOMContentLoaded', function() {
+            // Kiểm tra xem popup có được bật không
+            const popupEnabled = /*[[${nqtPopupEnabled == 'true'}]]*/ true;
+            if (!popupEnabled) {
+                return; // Không hiển thị popup nếu bị tắt
+            }
+            
+            // Áp dụng màu động cho popup
+            const primaryColor = /*[[${nqtWebsiteColor ?: '#d97706'}]]*/ '#d97706';
+            
+            // Áp dụng màu cho header và button
+            const popupHeader = document.querySelector('.welcome-popup-header');
+            const popupButton = document.querySelector('.welcome-popup-button');
+            const offerText = document.querySelector('.welcome-popup-offer .offer-text');
+            
+            if (popupHeader) {
+                popupHeader.style.background = `linear-gradient(135deg, ${primaryColor} 0%, ${primaryColor}dd 100%)`;
+            }
+            
+            if (popupButton) {
+                popupButton.style.background = `linear-gradient(to right, ${primaryColor}, ${primaryColor}dd)`;
+            }
+            
+            if (offerText) {
+                offerText.style.color = primaryColor;
+            }
+            
+            // Áp dụng màu cho nút "Ẩn 2 tiếng"
+            const hideButton = document.querySelector('.welcome-popup-hide-btn');
+            if (hideButton) {
+                hideButton.style.background = primaryColor;
+                hideButton.style.borderColor = primaryColor;
+            }
+            
+            // Đợi một chút để trang load hoàn toàn
+            setTimeout(function() {
+                if (shouldShowPopup()) {
+                    showWelcomePopup();
+                }
+            }, 500);
+        });
+
+        // Đóng popup khi click vào overlay (ngoài popup)
+        document.addEventListener('DOMContentLoaded', function() {
+            const popup = document.getElementById('welcomePopup');
+            if (popup) {
+                popup.addEventListener('click', function(e) {
+                    if (e.target === popup) {
+                        closeWelcomePopup();
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 
 </html>

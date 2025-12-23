@@ -33,31 +33,59 @@
             </div>
 
             <div class="glass-card rounded-2xl p-6 mb-8">
-                <form th:action="@{/nqtPhong}" method="get" class="flex flex-col md:flex-row gap-4">
-                    <div class="flex-1">
-                        <input type="text" name="search" th:value="${searchQuery}" 
-                            placeholder="Tìm kiếm theo tên phòng hoặc số phòng..."
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 input-focus">
+                <div class="flex flex-col gap-4">
+                    <div class="flex flex-col md:flex-row gap-4">
+                        <div class="flex-1">
+                            <input type="text" id="searchInput" 
+                                th:value="${searchQuery}" 
+                                placeholder="Tìm kiếm theo tên phòng hoặc số phòng..."
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 input-focus">
+                        </div>
+                        <div class="md:w-64">
+                            <select id="loaiPhongSelect" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+                                <option value="">Tất cả loại phòng</option>
+                                <option th:each="type : ${roomTypes}" th:value="${type.nqtId}" 
+                                    th:text="${type.nqtTenLoaiPhong}"
+                                    th:selected="${selectedLoaiPhong != null and selectedLoaiPhong == type.nqtId}">
+                                </option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="md:w-64">
-                        <select name="loaiPhong" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
-                            <option value="">Tất cả loại phòng</option>
-                            <option th:each="type : ${roomTypes}" th:value="${type.nqtId}" 
-                                th:text="${type.nqtTenLoaiPhong}"
-                                th:selected="${selectedLoaiPhong != null and selectedLoaiPhong == type.nqtId}">
-                            </option>
-                        </select>
+                    <div class="flex flex-col md:flex-row gap-4">
+                        <div class="md:w-48">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Giá từ (VNĐ)</label>
+                            <input type="number" id="priceMin" placeholder="Tối thiểu" min="0" step="10000"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 input-focus">
+                        </div>
+                        <div class="md:w-48">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Giá đến (VNĐ)</label>
+                            <input type="number" id="priceMax" placeholder="Tối đa" min="0" step="10000"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 input-focus">
+                        </div>
+                        <div class="md:w-48">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Sức chứa (người)</label>
+                            <select id="capacitySelect" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+                                <option value="">Tất cả</option>
+                                <option value="1">1 người</option>
+                                <option value="2">2 người</option>
+                                <option value="3">3 người</option>
+                                <option value="4">4 người</option>
+                                <option value="5">5+ người</option>
+                            </select>
+                        </div>
                     </div>
-                    <button type="submit" class="text-white px-8 py-3 rounded-lg font-semibold hover:shadow-lg transition-all btn-primary"
-                        th:style="'background: linear-gradient(to right, ' + ${nqtWebsiteColor ?: '#d97706'} + ', rgba(217, 119, 6, 0.8)) !important; color: white !important;'"
-                        style="background: linear-gradient(to right, #d97706, rgba(217, 119, 6, 0.8)) !important; color: white !important;">
-                        Tìm kiếm
-                    </button>
-                </form>
+                </div>
             </div>
 
-            <div th:if="${rooms != null and !rooms.isEmpty()}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div th:each="room : ${rooms}" class="glass-card rounded-2xl overflow-hidden group cursor-pointer">
+            <div id="roomsContainer" th:if="${rooms != null and !rooms.isEmpty()}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div th:each="room : ${rooms}" class="room-card glass-card rounded-2xl overflow-hidden group cursor-pointer"
+                    th:data-room-id="${room.nqtId}"
+                    th:data-room-name="${room.nqtTenPhong != null ? room.nqtTenPhong : ''}"
+                    th:data-room-number="${room.nqtSoPhong != null ? room.nqtSoPhong : ''}"
+                    th:data-loai-phong-id="${room.nqtLoaiPhong != null ? room.nqtLoaiPhong.nqtId : ''}"
+                    th:data-loai-phong-name="${room.nqtLoaiPhong != null ? room.nqtLoaiPhong.nqtTenLoaiPhong : ''}"
+                    th:data-price="${room.nqtLoaiPhong != null and room.nqtLoaiPhong.nqtGia != null ? room.nqtLoaiPhong.nqtGia : 0}"
+                    th:data-capacity="${room.nqtLoaiPhong != null and room.nqtLoaiPhong.nqtSoNguoi != null ? room.nqtLoaiPhong.nqtSoNguoi : 0}">
                     <div class="h-64 flex items-center justify-center relative overflow-hidden room-card-bg"
                         th:style="'background: linear-gradient(135deg, ' + ${nqtWebsiteColor ?: '#d97706'} + ' 0%, ' + ${#strings.replace(nqtWebsiteColor ?: '#d97706', '#', '')} + 'dd 50%, ' + ${nqtWebsiteColor ?: '#d97706'} + ' 100%);'"
                         style="background: linear-gradient(135deg, #d97706 0%, #d97706dd 50%, #d97706 100%);">
@@ -107,46 +135,239 @@
                 </div>
             </div>
 
-            <div th:if="${rooms == null or rooms.isEmpty()}" class="text-center py-16">
+            <div id="noResultsMessage" class="text-center py-16" style="display: none;">
                 <svg class="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
                 </svg>
                 <h3 class="text-xl font-semibold text-gray-900 mb-2">Không tìm thấy phòng</h3>
-                <p class="text-gray-600 mb-6">Vui lòng thử lại với từ khóa khác</p>
-                <a href="/nqtPhong" class="inline-block text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-all btn-primary"
+                <p class="text-gray-600 mb-6">Vui lòng thử lại với bộ lọc khác</p>
+                <button onclick="resetFilters()" class="inline-block text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-all btn-primary"
                     th:style="'background: linear-gradient(to right, ' + ${nqtWebsiteColor ?: '#d97706'} + ', rgba(217, 119, 6, 0.8)) !important; color: white !important;'"
                     style="background: linear-gradient(to right, #d97706, rgba(217, 119, 6, 0.8)) !important; color: white !important;">
-                    Xem tất cả phòng
-                </a>
+                    Xóa bộ lọc
+                </button>
             </div>
         </div>
+        
+        <script>
+            (function() {
+                'use strict';
+                console.log('=== nqtPhong filter script START ===');
+            
+            function initFilters() {
+                try {
+                    console.log('Initializing filters...');
+                    const primaryColor = /*[[${nqtWebsiteColor ?: '#d97706'}]]*/ '#d97706';
+                    const primaryColorDark = primaryColor + 'cc';
+                    
+                    // Apply color to buttons
+                    const buttons = document.querySelectorAll('.btn-primary');
+                    buttons.forEach(function(btn) {
+                        btn.style.setProperty('background', 'linear-gradient(to right, ' + primaryColor + ', rgba(217, 119, 6, 0.8))', 'important');
+                        btn.style.setProperty('color', 'white', 'important');
+                    });
+                    
+                    // Apply focus color to inputs
+                    const inputs = document.querySelectorAll('.input-focus');
+                    inputs.forEach(function(input) {
+                        input.addEventListener('focus', function() {
+                            this.style.borderColor = primaryColor;
+                            this.style.boxShadow = '0 0 0 2px ' + primaryColor + '40';
+                        });
+                        input.addEventListener('blur', function() {
+                            this.style.borderColor = '';
+                            this.style.boxShadow = '';
+                        });
+                    });
+
+                    // Real-time filtering
+                    console.log('Initializing filter system for rooms...');
+                    const searchInput = document.getElementById('searchInput');
+                    const loaiPhongSelect = document.getElementById('loaiPhongSelect');
+                    const priceMin = document.getElementById('priceMin');
+                    const priceMax = document.getElementById('priceMax');
+                    const capacitySelect = document.getElementById('capacitySelect');
+                    const roomsContainer = document.getElementById('roomsContainer');
+                    const noResultsMessage = document.getElementById('noResultsMessage');
+
+                    console.log('Filter elements:', {
+                        searchInput: !!searchInput,
+                        loaiPhongSelect: !!loaiPhongSelect,
+                        priceMin: !!priceMin,
+                        priceMax: !!priceMax,
+                        capacitySelect: !!capacitySelect,
+                        roomsContainer: !!roomsContainer,
+                        noResultsMessage: !!noResultsMessage
+                    });
+
+            function filterRooms() {
+                console.log('filterRooms called');
+                if (!searchInput || !loaiPhongSelect || !priceMin || !priceMax || !capacitySelect) {
+                    console.error('Filter elements not found', {
+                        searchInput: !!searchInput,
+                        loaiPhongSelect: !!loaiPhongSelect,
+                        priceMin: !!priceMin,
+                        priceMax: !!priceMax,
+                        capacitySelect: !!capacitySelect
+                    });
+                    return;
+                }
+
+                const searchTerm = (searchInput.value || '').toLowerCase().trim();
+                const selectedLoaiPhong = loaiPhongSelect.value || '';
+                const minPrice = priceMin.value ? parseFloat(priceMin.value) : 0;
+                const maxPrice = priceMax.value ? parseFloat(priceMax.value) : Infinity;
+                const selectedCapacity = capacitySelect.value || '';
+
+                const roomCards = document.querySelectorAll('.room-card');
+                console.log('Found room cards:', roomCards.length);
+                if (roomCards.length === 0) {
+                    console.warn('No room cards found');
+                    return;
+                }
+
+                let visibleCount = 0;
+
+                roomCards.forEach(function(card) {
+                    const roomName = (card.getAttribute('data-room-name') || '').toLowerCase();
+                    const roomNumber = (card.getAttribute('data-room-number') || '').toLowerCase();
+                    const loaiPhongId = String(card.getAttribute('data-loai-phong-id') || '');
+                    const price = parseFloat(card.getAttribute('data-price')) || 0;
+                    const capacity = parseInt(card.getAttribute('data-capacity')) || 0;
+
+                    // Search filter
+                    const matchesSearch = !searchTerm || 
+                        roomName.includes(searchTerm) || 
+                        roomNumber.includes(searchTerm);
+
+                    // Loai phong filter
+                    const matchesLoaiPhong = !selectedLoaiPhong || loaiPhongId === selectedLoaiPhong;
+
+                    // Price filter
+                    const matchesPrice = price >= minPrice && price <= maxPrice;
+
+                    // Capacity filter
+                    let matchesCapacity = true;
+                    if (selectedCapacity) {
+                        const capacityValue = parseInt(selectedCapacity);
+                        if (capacityValue === 5) {
+                            matchesCapacity = capacity >= 5;
+                        } else {
+                            matchesCapacity = capacity === capacityValue;
+                        }
+                    }
+
+                    if (matchesSearch && matchesLoaiPhong && matchesPrice && matchesCapacity) {
+                        card.style.display = 'block';
+                        visibleCount++;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+
+                // Show/hide no results message
+                if (visibleCount === 0) {
+                    if (roomsContainer) roomsContainer.style.display = 'none';
+                    if (noResultsMessage) noResultsMessage.style.display = 'block';
+                } else {
+                    if (roomsContainer) roomsContainer.style.display = 'grid';
+                    if (noResultsMessage) noResultsMessage.style.display = 'none';
+                }
+                console.log('Filter complete. Visible cards:', visibleCount);
+            }
+
+            // Add event listeners for real-time filtering
+            if (searchInput) {
+                console.log('Attaching event listeners to searchInput');
+                searchInput.addEventListener('input', function() {
+                    console.log('searchInput input event triggered');
+                    filterRooms();
+                });
+                searchInput.addEventListener('keyup', function() {
+                    console.log('searchInput keyup event triggered');
+                    filterRooms();
+                });
+            } else {
+                console.error('searchInput element not found, cannot attach listeners');
+            }
+            if (loaiPhongSelect) {
+                console.log('Attaching event listeners to loaiPhongSelect');
+                loaiPhongSelect.addEventListener('change', function() {
+                    console.log('loaiPhongSelect change event triggered');
+                    filterRooms();
+                });
+            } else {
+                console.error('loaiPhongSelect element not found, cannot attach listeners');
+            }
+            if (priceMin) {
+                console.log('Attaching event listeners to priceMin');
+                priceMin.addEventListener('input', function() {
+                    console.log('priceMin input event triggered');
+                    filterRooms();
+                });
+                priceMin.addEventListener('change', function() {
+                    console.log('priceMin change event triggered');
+                    filterRooms();
+                });
+            } else {
+                console.error('priceMin element not found, cannot attach listeners');
+            }
+            if (priceMax) {
+                console.log('Attaching event listeners to priceMax');
+                priceMax.addEventListener('input', function() {
+                    console.log('priceMax input event triggered');
+                    filterRooms();
+                });
+                priceMax.addEventListener('change', function() {
+                    console.log('priceMax change event triggered');
+                    filterRooms();
+                });
+            } else {
+                console.error('priceMax element not found, cannot attach listeners');
+            }
+            if (capacitySelect) {
+                console.log('Attaching event listeners to capacitySelect');
+                capacitySelect.addEventListener('change', function() {
+                    console.log('capacitySelect change event triggered');
+                    filterRooms();
+                });
+            } else {
+                console.error('capacitySelect element not found, cannot attach listeners');
+            }
+
+                    // Initial filter on page load (in case there are URL parameters)
+                    console.log('Setting up initial filter...');
+                    setTimeout(function() {
+                        console.log('Running initial filter...');
+                        filterRooms();
+                    }, 500);
+
+                    // Reset filters function
+                    window.resetFilters = function() {
+                        if (searchInput) searchInput.value = '';
+                        if (loaiPhongSelect) loaiPhongSelect.value = '';
+                        if (priceMin) priceMin.value = '';
+                        if (priceMax) priceMax.value = '';
+                        if (capacitySelect) capacitySelect.value = '';
+                        filterRooms();
+                    };
+                    
+                    console.log('Filter system initialized successfully');
+                } catch (error) {
+                    console.error('Error initializing filters:', error);
+                }
+            }
+            
+            // Try to initialize immediately if DOM is ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initFilters);
+            } else {
+                // DOM is already ready
+                initFilters();
+                }
+            })();
+        </script>
     </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const primaryColor = /*[[${nqtWebsiteColor ?: '#d97706'}]]*/ '#d97706';
-            const primaryColorDark = primaryColor + 'cc';
-            
-            // Apply color to buttons
-            const buttons = document.querySelectorAll('.btn-primary');
-            buttons.forEach(function(btn) {
-                btn.style.setProperty('background', 'linear-gradient(to right, ' + primaryColor + ', rgba(217, 119, 6, 0.8))', 'important');
-                btn.style.setProperty('color', 'white', 'important');
-            });
-            
-            // Apply focus color to inputs
-            const inputs = document.querySelectorAll('.input-focus');
-            inputs.forEach(function(input) {
-                input.addEventListener('focus', function() {
-                    this.style.borderColor = primaryColor;
-                    this.style.boxShadow = '0 0 0 2px ' + primaryColor + '40';
-                });
-                input.addEventListener('blur', function() {
-                    this.style.borderColor = '';
-                    this.style.boxShadow = '';
-                });
-            });
-        });
-    </script>
 </body>
 </html>
 

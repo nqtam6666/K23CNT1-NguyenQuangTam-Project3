@@ -59,10 +59,21 @@
                                 th:field="*{nqtTaiKhoan}" required>
                         </div>
                         <div class="mb-4" th:if="${nqtId == null}">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Mật khẩu</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Mật khẩu <span class="text-red-500">*</span></label>
                             <input type="password"
+                                th:field="*{nqtMatKhau}"
+                                autocomplete="new-password"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                                th:field="*{nqtMatKhau}" required>
+                                required>
+                        </div>
+                        <div class="mb-4" th:if="${nqtId != null}">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Mật khẩu mới</label>
+                            <input type="password"
+                                th:field="*{nqtMatKhau}"
+                                autocomplete="new-password"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="Để trống nếu không muốn đổi mật khẩu">
+                            <p class="mt-1 text-xs text-gray-500">Chỉ nhập nếu muốn đổi mật khẩu. Để trống nếu giữ nguyên mật khẩu hiện tại.</p>
                         </div>
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Số điện thoại</label>
@@ -73,8 +84,9 @@
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
                             <input type="email"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                                th:field="*{nqtEmail}">
+                                th:field="*{nqtEmail}"
+                                autocomplete="off"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                         </div>
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Địa chỉ</label>

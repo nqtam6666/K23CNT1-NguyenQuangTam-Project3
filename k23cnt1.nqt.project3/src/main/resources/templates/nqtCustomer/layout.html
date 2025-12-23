@@ -190,8 +190,9 @@
             border-radius: 50% !important;
         }
         
-        /* Ensure avatar text is centered */
-        .user-avatar-bg span {
+        /* Ensure avatar text/icon is centered */
+        .user-avatar-bg span,
+        .user-avatar-bg svg {
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
@@ -340,18 +341,18 @@
     <!-- Navigation -->
     <nav class="nav-glass fixed top-0 left-0 right-0 z-50 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-20 gap-2 sm:gap-4">
+            <div class="flex justify-between items-center h-20">
                 <!-- Logo -->
-                <a href="/nqtTrangChu" class="flex items-center space-x-2 sm:space-x-3 group flex-shrink-0 min-w-0">
-                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all overflow-hidden flex-shrink-0"
+                <a href="/nqtTrangChu" class="flex items-center space-x-3 group">
+                    <div class="w-12 h-12 rounded-lg flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all overflow-hidden"
                         th:style="'background: linear-gradient(to bottom right, ' + ${nqtWebsiteColor ?: '#d97706'} + ', ' + ${#strings.replace(nqtWebsiteColor ?: '#d97706', '#', '')} + 'cc);'">
                         <img th:src="${nqtWebsiteLogo}" alt="Logo" class="w-full h-full object-cover"
                             th:if="${nqtWebsiteLogo != null and nqtWebsiteLogo != ''}">
-                        <span class="text-white font-serif font-bold text-lg sm:text-xl" 
+                        <span class="text-white font-serif font-bold text-xl" 
                             th:unless="${nqtWebsiteLogo != null and nqtWebsiteLogo != ''}"
                             th:text="${#strings.substring(nqtWebsiteName ?: 'Hotel NQT', 0, 1)}">H</span>
                     </div>
-                    <span class="text-lg sm:text-xl md:text-2xl font-serif font-bold text-gray-900 truncate" th:text="${nqtWebsiteName ?: 'Hotel NQT'}">Hotel NQT</span>
+                    <span class="text-2xl font-serif font-bold text-gray-900" th:text="${nqtWebsiteName ?: 'Hotel NQT'}">Hotel NQT</span>
                 </a>
 
                 <!-- Desktop Menu -->
@@ -410,10 +411,12 @@
                 </div>
 
                 <!-- User Actions -->
-                <div class="flex items-center space-x-2 sm:space-x-4 flex-shrink-0" style="margin-right: 50px;">
+                <div class="flex items-center space-x-4">
                     <th:block th:if="${session.nqtCustomerUser == null}">
-                        <a href="/nqtDangNhap" class="text-gray-700 hover:text-amber-700 font-medium transition-colors text-sm sm:text-base">Đăng nhập</a>
-                        <a href="/nqtDangKy" class="bg-gradient-to-r from-amber-600 to-amber-800 text-white px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg font-medium hover:shadow-lg transition-all hover:scale-105 text-sm sm:text-base">
+                        <a href="/nqtDangNhap" class="text-gray-700 hover:text-amber-700 font-medium transition-colors">Đăng nhập</a>
+                        <a href="/nqtDangKy" 
+                           class="text-white px-6 py-2.5 rounded-lg font-medium hover:shadow-lg transition-all hover:scale-105"
+                           th:style="'background: linear-gradient(to right, ' + ${nqtWebsiteColor ?: '#d97706'} + ', ' + ${#strings.replace(nqtWebsiteColor ?: '#d97706', '#', '')} + 'dd);'">
                             Đăng ký
                         </a>
                     </th:block>
@@ -421,12 +424,12 @@
                         <!-- Admin Button -->
                         <a th:if="${session.nqtCustomerUser != null and session.nqtCustomerUser.nqtVaiTro != null and session.nqtCustomerUser.nqtVaiTro == 99}" 
                            th:href="${nqtAdminPath}" 
-                           class="flex items-center space-x-1 sm:space-x-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg font-medium transition-all hover:shadow-md text-gray-700 bg-gray-100 hover:bg-gray-200 border border-gray-300 text-xs sm:text-sm">
-                            <svg class="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                           class="flex items-center space-x-2 px-4 py-2.5 rounded-lg font-medium transition-all hover:shadow-md text-gray-700 bg-gray-100 hover:bg-gray-200 border border-gray-300">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                             </svg>
-                            <span class="hidden sm:block" >Admin</span>
+                            <span class="hidden md:block text-sm">Admin</span>
                         </a>
                         <!-- User Menu -->
                         <div class="relative group">
@@ -440,10 +443,12 @@
                                          th:src="${session.nqtCustomerUser.nqtAvatar}"
                                          alt="Avatar"
                                          style="width: 100%; height: 100%; object-fit: cover; display: block; margin: 0; padding: 0; border-radius: 50%;">
-                                    <span th:unless="${session.nqtCustomerUser.nqtAvatar != null and session.nqtCustomerUser.nqtAvatar != ''}"
-                                          class="text-white font-semibold text-sm leading-none"
-                                          style="margin: 0; padding: 0; line-height: 1;"
-                                          th:text="${#strings.substring(session.nqtCustomerUser.nqtHoVaTen, 0, 1)}">U</span>
+                                    <!-- Default avatar icon when user has no avatar -->
+                                    <svg th:unless="${session.nqtCustomerUser.nqtAvatar != null and session.nqtCustomerUser.nqtAvatar != ''}"
+                                         class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
+                                         style="margin: 0; padding: 0;">
+                                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                    </svg>
                                 </div>
                                 <span class="font-medium hidden md:block leading-none" th:text="${session.nqtCustomerUser.nqtHoVaTen}">User</span>
                             </button>
@@ -566,6 +571,20 @@
         };
     </script>
     <script src="https://cdn.gtranslate.net/widgets/latest/float.js" defer></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Apply dynamic color to user avatar
+            const primaryColor = /*[[${nqtWebsiteColor ?: '#d97706'}]]*/ '#d97706';
+            const userAvatar = document.querySelector('.user-avatar-bg');
+            const avatarColorDark = primaryColor + 'cc';
+            
+            if (userAvatar && !userAvatar.querySelector('img')) {
+                // Only apply background if there's no avatar image
+                userAvatar.style.background = 'linear-gradient(to right bottom, ' + primaryColor + ', ' + avatarColorDark + ')';
+            }
+        });
+    </script>
 
     <!-- Zalo Chat Button -->
     <a th:with="phone=${#strings.replace(#strings.replace(nqtWebsitePhone ?: '0961138440', ' ', ''), '-', '')}"

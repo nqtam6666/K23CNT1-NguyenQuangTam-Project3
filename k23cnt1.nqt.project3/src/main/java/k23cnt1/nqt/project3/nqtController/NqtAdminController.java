@@ -1311,6 +1311,15 @@ public class NqtAdminController {
         model.addAttribute("nqtWebsiteSupportLinks", nqtSettingService.getNqtValue("nqtWebsiteSupportLinks", ""));
         model.addAttribute("nqtVipDiscountPercent", nqtSettingService.getNqtValue("nqtVipDiscountPercent", "10"));
         
+        // Popup Settings
+        model.addAttribute("nqtPopupEnabled", nqtSettingService.getNqtValue("nqtPopupEnabled", "true"));
+        model.addAttribute("nqtPopupTitle", nqtSettingService.getNqtValue("nqtPopupTitle", ""));
+        model.addAttribute("nqtPopupContent", nqtSettingService.getNqtValue("nqtPopupContent", ""));
+        model.addAttribute("nqtPopupOfferText", nqtSettingService.getNqtValue("nqtPopupOfferText", "Giảm 20%"));
+        model.addAttribute("nqtPopupOfferDesc", nqtSettingService.getNqtValue("nqtPopupOfferDesc", "Cho đơn đặt phòng đầu tiên"));
+        model.addAttribute("nqtPopupButtonText", nqtSettingService.getNqtValue("nqtPopupButtonText", "Đặt phòng ngay"));
+        model.addAttribute("nqtPopupButtonLink", nqtSettingService.getNqtValue("nqtPopupButtonLink", "#booking"));
+        
         // SMTP Settings
         model.addAttribute("nqtSmtpHost", nqtSettingService.getNqtValue("nqtSmtpHost", "smtp.gmail.com"));
         model.addAttribute("nqtSmtpPort", nqtSettingService.getNqtValue("nqtSmtpPort", "587"));
@@ -1386,6 +1395,13 @@ public class NqtAdminController {
             @RequestParam(value = "rate_limit_cleanup_days", required = false) String rate_limit_cleanup_days,
             @RequestParam(value = "admin_path", required = false) String admin_path,
             @RequestParam(value = "bannerImagesJson", required = false) String bannerImagesJson,
+            @RequestParam(value = "nqtPopupEnabled", required = false) String nqtPopupEnabled,
+            @RequestParam(value = "nqtPopupTitle", required = false) String nqtPopupTitle,
+            @RequestParam(value = "nqtPopupContent", required = false) String nqtPopupContent,
+            @RequestParam(value = "nqtPopupOfferText", required = false) String nqtPopupOfferText,
+            @RequestParam(value = "nqtPopupOfferDesc", required = false) String nqtPopupOfferDesc,
+            @RequestParam(value = "nqtPopupButtonText", required = false) String nqtPopupButtonText,
+            @RequestParam(value = "nqtPopupButtonLink", required = false) String nqtPopupButtonLink,
             RedirectAttributes redirectAttributes) {
         try {
             if (nqtWebsiteLogoFile != null && !nqtWebsiteLogoFile.isEmpty()) {
@@ -1499,6 +1515,31 @@ public class NqtAdminController {
             // Save Banner Images
             if (bannerImagesJson != null && !bannerImagesJson.trim().isEmpty()) {
                 nqtSettingService.saveNqtValue("nqtBannerImages", bannerImagesJson);
+            }
+            
+            // Save Popup Settings
+            if (nqtPopupEnabled != null) {
+                nqtSettingService.saveNqtValue("nqtPopupEnabled", "true");
+            } else {
+                nqtSettingService.saveNqtValue("nqtPopupEnabled", "false");
+            }
+            if (nqtPopupTitle != null) {
+                nqtSettingService.saveNqtValue("nqtPopupTitle", nqtPopupTitle);
+            }
+            if (nqtPopupContent != null) {
+                nqtSettingService.saveNqtValue("nqtPopupContent", nqtPopupContent);
+            }
+            if (nqtPopupOfferText != null) {
+                nqtSettingService.saveNqtValue("nqtPopupOfferText", nqtPopupOfferText);
+            }
+            if (nqtPopupOfferDesc != null) {
+                nqtSettingService.saveNqtValue("nqtPopupOfferDesc", nqtPopupOfferDesc);
+            }
+            if (nqtPopupButtonText != null) {
+                nqtSettingService.saveNqtValue("nqtPopupButtonText", nqtPopupButtonText);
+            }
+            if (nqtPopupButtonLink != null) {
+                nqtSettingService.saveNqtValue("nqtPopupButtonLink", nqtPopupButtonLink);
             }
             
             redirectAttributes.addFlashAttribute("nqtSuccess", "Cập nhật cấu hình thành công!");
@@ -1777,36 +1818,42 @@ public class NqtAdminController {
             @RequestParam(value = "status", required = false) String status,
             Model model) {
         
-        org.springframework.data.domain.Page<k23cnt1.nqt.project3.nqtEntity.NqtCronLog> logPage;
-        
         long totalSuccess = 0;
         long totalError = 0;
         long totalWarning = 0;
         
-        if (taskName != null && !taskName.isEmpty()) {
-            List<k23cnt1.nqt.project3.nqtEntity.NqtCronLog> logs = nqtCronLogService.getLogsByTaskName(taskName);
-            model.addAttribute("nqtList", logs);
-            model.addAttribute("totalLogs", logs.size());
-            totalSuccess = logs.stream().filter(l -> "SUCCESS".equals(l.getNqtStatus())).count();
-            totalError = logs.stream().filter(l -> "ERROR".equals(l.getNqtStatus())).count();
-            totalWarning = logs.stream().filter(l -> "WARNING".equals(l.getNqtStatus())).count();
-        } else if (status != null && !status.isEmpty()) {
-            List<k23cnt1.nqt.project3.nqtEntity.NqtCronLog> logs = nqtCronLogService.getLogsByStatus(status);
-            model.addAttribute("nqtList", logs);
-            model.addAttribute("totalLogs", logs.size());
-            totalSuccess = logs.stream().filter(l -> "SUCCESS".equals(l.getNqtStatus())).count();
-            totalError = logs.stream().filter(l -> "ERROR".equals(l.getNqtStatus())).count();
-            totalWarning = logs.stream().filter(l -> "WARNING".equals(l.getNqtStatus())).count();
-        } else {
-            logPage = nqtCronLogService.getAllLogs(page, size);
-            List<k23cnt1.nqt.project3.nqtEntity.NqtCronLog> allLogs = nqtCronLogService.getLatestLogs(1000);
-            model.addAttribute("nqtList", logPage.getContent());
-            model.addAttribute("totalPages", logPage.getTotalPages());
-            model.addAttribute("currentPage", page);
-            model.addAttribute("totalLogs", logPage.getTotalElements());
-            totalSuccess = allLogs.stream().filter(l -> "SUCCESS".equals(l.getNqtStatus())).count();
-            totalError = allLogs.stream().filter(l -> "ERROR".equals(l.getNqtStatus())).count();
-            totalWarning = allLogs.stream().filter(l -> "WARNING".equals(l.getNqtStatus())).count();
+        try {
+            if (taskName != null && !taskName.isEmpty()) {
+                List<k23cnt1.nqt.project3.nqtEntity.NqtCronLog> logs = nqtCronLogService.getLogsByTaskName(taskName);
+                model.addAttribute("nqtList", logs);
+                model.addAttribute("totalLogs", logs.size());
+                totalSuccess = logs.stream().filter(l -> "SUCCESS".equals(l.getNqtStatus())).count();
+                totalError = logs.stream().filter(l -> "ERROR".equals(l.getNqtStatus())).count();
+                totalWarning = logs.stream().filter(l -> "WARNING".equals(l.getNqtStatus())).count();
+            } else if (status != null && !status.isEmpty()) {
+                List<k23cnt1.nqt.project3.nqtEntity.NqtCronLog> logs = nqtCronLogService.getLogsByStatus(status);
+                model.addAttribute("nqtList", logs);
+                model.addAttribute("totalLogs", logs.size());
+                totalSuccess = logs.stream().filter(l -> "SUCCESS".equals(l.getNqtStatus())).count();
+                totalError = logs.stream().filter(l -> "ERROR".equals(l.getNqtStatus())).count();
+                totalWarning = logs.stream().filter(l -> "WARNING".equals(l.getNqtStatus())).count();
+            } else {
+                org.springframework.data.domain.Page<k23cnt1.nqt.project3.nqtEntity.NqtCronLog> logPage = nqtCronLogService.getAllLogs(page, size);
+                List<k23cnt1.nqt.project3.nqtEntity.NqtCronLog> allLogs = nqtCronLogService.getLatestLogs(1000);
+                model.addAttribute("nqtList", logPage.getContent());
+                model.addAttribute("totalPages", logPage.getTotalPages());
+                model.addAttribute("currentPage", page);
+                model.addAttribute("totalLogs", logPage.getTotalElements());
+                totalSuccess = allLogs.stream().filter(l -> "SUCCESS".equals(l.getNqtStatus())).count();
+                totalError = allLogs.stream().filter(l -> "ERROR".equals(l.getNqtStatus())).count();
+                totalWarning = allLogs.stream().filter(l -> "WARNING".equals(l.getNqtStatus())).count();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            model.addAttribute("nqtList", new java.util.ArrayList<>());
+            model.addAttribute("totalLogs", 0);
+            model.addAttribute("totalPages", 0);
+            model.addAttribute("currentPage", 0);
         }
         
         model.addAttribute("totalSuccess", totalSuccess);

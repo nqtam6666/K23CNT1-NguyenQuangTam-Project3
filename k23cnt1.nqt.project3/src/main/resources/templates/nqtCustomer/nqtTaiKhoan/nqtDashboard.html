@@ -73,9 +73,13 @@
                                          th:src="${nqtCustomerUser.nqtAvatar}"
                                          alt="Avatar"
                                          class="w-full h-full object-cover">
-                                    <span th:unless="${nqtCustomerUser.nqtAvatar != null and nqtCustomerUser.nqtAvatar != ''}"
-                                          class="text-white font-semibold text-6xl"
-                                          th:text="${#strings.substring(nqtCustomerUser.nqtHoVaTen, 0, 1)}">U</span>
+                                    <!-- Default avatar when user has no avatar -->
+                                    <div th:unless="${nqtCustomerUser.nqtAvatar != null and nqtCustomerUser.nqtAvatar != ''}"
+                                         class="flex items-center justify-center w-full h-full">
+                                        <svg class="w-24 h-24 text-white" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                        </svg>
+                                    </div>
                                     <!-- Overlay on hover -->
                                     <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all flex items-center justify-center">
                                         <svg class="w-12 h-12 text-white opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
