@@ -122,12 +122,15 @@
                                     th:text="${#numbers.formatDecimal(item.nqtGiaTriGiam, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                <span th:if="${item.nqtNguoiDungTen == null}"
-                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Chung
-                                    cho VIP</span>
                                 <span th:if="${item.nqtNguoiDungTen != null}"
                                     th:text="'Riêng: ' + ${item.nqtNguoiDungTen}"
                                     class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800"></span>
+                                <span th:if="${item.nqtNguoiDungTen == null && item.nqtChiChoVip == true}"
+                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Chung
+                                    cho VIP</span>
+                                <span th:if="${item.nqtNguoiDungTen == null && (item.nqtChiChoVip == false || item.nqtChiChoVip == null)}"
+                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Chung
+                                    cho tất cả</span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span th:if="${item.nqtStatus}"
